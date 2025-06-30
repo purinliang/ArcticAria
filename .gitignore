@@ -1,0 +1,11 @@
+# .gitignore
+# common
+.DS_Store
+*.log
+
+# client
+/client/node_modules/
+/client/dist/
+/client/.env
+/client/.vite/
+/client/.cache/
