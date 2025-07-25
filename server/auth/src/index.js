@@ -1,27 +1,54 @@
 import { hash, compare } from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 
+const corsHeaders = {
+	'Access-Control-Allow-Origin': 'https://arcticaria.pages.dev',
+	'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+	'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
 export default {
 	async fetch(request, env, ctx) {
 		const url = new URL(request.url);
 		const path = url.pathname;
 		const method = request.method;
 
+		if (method === 'OPTIONS') {
+			return new Response(null, {
+				status: 204,
+				headers: corsHeaders,
+			});
+		}
+
 		if (path === '/register' && method === 'POST') {
-			return await register(request, env);
+			const res = await register(request, env);
+			return withCORS(res);
 		}
 
 		if (path === '/login' && method === 'POST') {
-			return await login(request, env);
+			const res = await login(request, env);
+			return withCORS(res);
 		}
 
 		if (path === '/verify' && method === 'GET') {
-			return await verifyToken(request, env);
+			const res = await verifyToken(request, env);
+			return withCORS(res);
 		}
 
-		return new Response('Not Found', { status: 404 });
+		return new Response('Not Found', { status: 404, headers: corsHeaders });
 	},
 };
+
+function withCORS(res) {
+	const newHeaders = new Headers(res.headers);
+	for (const [key, value] of Object.entries(corsHeaders)) {
+		newHeaders.set(key, value);
+	}
+	return new Response(res.body, {
+		status: res.status,
+		headers: newHeaders,
+	});
+}
 
 async function register(request, env) {
 	const { email, password } = await request.json();
