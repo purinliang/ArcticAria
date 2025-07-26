@@ -29,11 +29,11 @@ export default {
 		const reqLogger = logger.child({ requestId });
 
 		try {
-			// reqLogger.info({
-			// 	method: request.method,
-			// 	url: request.url,
-			// 	msg: 'Request received'
-			// });
+			reqLogger.info({
+				method: request.method,
+				url: request.url,
+				msg: 'Request received'
+			});
 
 			const url = new URL(request.url);
 			const path = url.pathname;
