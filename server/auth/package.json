@@ -15,6 +15,8 @@
 	},
 	"dependencies": {
 		"bcryptjs": "^3.0.2",
-		"jose": "^6.0.12"
+		"crypto": "^1.0.1",
+		"jose": "^6.0.12",
+		"pino": "^9.7.0"
 	}
 }
