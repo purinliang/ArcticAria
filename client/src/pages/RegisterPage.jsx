@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { TextField, Button, Box, Typography, Container } from '@mui/material';
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_AUTH_API_BASE;
 
 export default function RegisterPage() {
     const [form, setForm] = useState({ email: '', password: '', confirm: '' });
@@ -12,11 +12,12 @@ export default function RegisterPage() {
     };
 
     const handleRegister = async () => {
-        if (form.password !== form.confirm) {
-            alert('Passwords do not match');
-            return;
-        }
+        // if (form.password !== form.confirm) {
+        //     alert('Passwords do not match');
+        //     return;
+        // }
         try {
+            console.log(`POST ${API_BASE}/register`);
             await axios.post(`${API_BASE}/register`, {
                 email: form.email,
                 password: form.password,
@@ -48,7 +49,7 @@ export default function RegisterPage() {
                     value={form.password}
                     onChange={handleChange}
                 />
-                <TextField
+                {/* <TextField
                     fullWidth
                     margin="normal"
                     label="Confirm Password"
@@ -56,7 +57,7 @@ export default function RegisterPage() {
                     name="confirm"
                     value={form.confirm}
                     onChange={handleChange}
-                />
+                /> */}
                 <Button
                     variant="contained"
                     color="primary"
