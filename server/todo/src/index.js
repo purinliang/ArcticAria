@@ -14,7 +14,7 @@ const logger = pino({
 
 const corsHeaders = {
 	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+	'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 	'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
@@ -33,12 +33,22 @@ export default {
 				return new Response(null, { status: 204, headers: corsHeaders });
 			}
 
+			if (path === '/todo' && method === 'GET') {
+				return withCORS(await getTodos(request, env, reqLogger));
+			}
+
 			if (path === '/todo' && method === 'POST') {
 				return withCORS(await createTodo(request, env, reqLogger));
 			}
 
-			if (path === '/todo' && method === 'GET') {
-				return withCORS(await getTodos(request, env, reqLogger));
+			if (path.startsWith('/todo/') && method === 'PUT') {
+				const id = path.split('/')[2];
+				return withCORS(await updateTodo(request, env, reqLogger, id));
+			}
+
+			if (path.startsWith('/todo/') && method === 'DELETE') {
+				const id = path.split('/')[2];
+				return withCORS(await deleteTodo(request, env, reqLogger, id));
 			}
 
 			reqLogger.warn({ path }, 'Route not found');
@@ -78,32 +88,47 @@ async function createTodo(request, env, logger) {
 	}
 
 	try {
-		const { title, content } = await request.json();
-		if (!title) {
-			logger.warn('Missing title field in todo creation request');
-			return new Response('Missing title', { status: 400 });
+		const { title, content, next_due_date, recurrence_rule, reminder_days_before } = await request.json();
+
+		if (!title || !next_due_date) {
+			logger.warn('Missing title or next_due_date');
+			return new Response('Missing required fields', { status: 400 });
 		}
 
 		const todoId = crypto.randomUUID();
 
 		await env.DB.prepare(`
-			INSERT INTO todos (id, user_id, title, content)
-			VALUES (?, ?, ?, ?)
-		`).bind(todoId, user.userId, title, content || null).run();
+			INSERT INTO todos (id, user_id, title, content, recurrence_rule, next_due_date, reminder_days_before)
+			VALUES (?, ?, ?, ?, ?, ?, ?)
+		`).bind(
+			todoId,
+			user.userId,
+			title,
+			content || null,
+			recurrence_rule || null,
+			next_due_date,
+			reminder_days_before || 0
+		).run();
 
 		logger.info({ userId: user.userId, todoId }, 'Todo created successfully');
-
 		return new Response(JSON.stringify({ success: true, id: todoId }), {
 			status: 201,
 			headers: { 'Content-Type': 'application/json' }
 		});
 	} catch (err) {
-		logger.error({
-			errMessage: err?.message,
-			errStack: err?.stack
-		}, 'Unhandled error in create todo');
+		logger.error({ errMessage: err?.message, errStack: err?.stack }, 'Unhandled error in create todo');
 		return new Response('Internal Server Error', { status: 500 });
 	}
+}
+
+function computeNextDue(baseDate, rule) {
+	const date = new Date(baseDate);
+	if (rule.endsWith('d')) {
+		date.setDate(date.getDate() + parseInt(rule));
+	} else if (rule.endsWith('m')) {
+		date.setMonth(date.getMonth() + parseInt(rule));
+	}
+	return date;
 }
 
 /**
@@ -117,24 +142,111 @@ async function getTodos(request, env, logger) {
 	}
 
 	try {
-		const result = await env.DB.prepare(`
-			SELECT id, title, content, completed, created_at
+		const { results } = await env.DB.prepare(`
+			SELECT *
 			FROM todos
 			WHERE user_id = ?
-			ORDER BY created_at DESC
 		`).bind(user.userId).all();
 
-		logger.info({ userId: user.userId, count: result.results.length }, 'Todos fetched successfully');
+		const now = new Date();
+		const grouped = {
+			reminding: [],
+			upcoming: [],
+			overdued: [],
+			completed: []
+		};
 
-		return new Response(JSON.stringify(result.results), {
+		for (const todo of results) {
+			if (todo.completed) {
+				grouped.completed.push(todo);
+				continue;
+			}
+
+			const dueDate = new Date(todo.next_due_date);
+			const remindDate = new Date(dueDate);
+			remindDate.setDate(dueDate.getDate() - (todo.reminder_days_before || 0));
+
+			if (now <= dueDate) {
+				if (now >= remindDate) {
+					grouped.reminding.push(todo);
+					continue;
+				} else {
+					grouped.upcoming.push(todo);
+					continue;
+				}
+			} else {
+				grouped.overdued.push(todo);
+				continue;
+			}
+		}
+
+		return new Response(JSON.stringify(grouped), {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' }
 		});
 	} catch (err) {
-		logger.error({
-			errMessage: err?.message,
-			errStack: err?.stack
-		}, 'Unhandled error in retrieve todos');
+		logger.error({ errMessage: err?.message, errStack: err?.stack }, 'Unhandled error in getTodos');
+		return new Response('Internal Server Error', { status: 500 });
+	}
+}
+
+async function updateTodo(request, env, logger, todoId) {
+	const user = await getAuthenticatedUser(request, env, logger);
+	if (!user) {
+		logger.warn('Unauthorized attempt to update todo');
+		return new Response('Unauthorized', { status: 401 });
+	}
+
+	try {
+		const updates = await request.json();
+		console.log(updates);
+
+		// Only allow updating specific fields
+		const allowed = ['title', 'content', 'completed', 'next_due_date', 'recurrence_rule', 'reminder_days_before'];
+		const fields = [];
+		const values = [];
+
+		for (const key of allowed) {
+			if (key in updates) {
+				fields.push(`${key} = ?`);
+				values.push(updates[key]);
+			}
+		}
+
+		if (fields.length === 0) {
+			return new Response('No valid fields to update', { status: 400 });
+		}
+
+		values.push(todoId, user.userId);
+
+		const query = `UPDATE todos SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`;
+
+		await env.DB.prepare(query).bind(...values).run();
+
+		logger.info({ userId: user.userId, todoId }, 'Todo updated successfully');
+		return new Response(JSON.stringify({ success: true }));
+	} catch (err) {
+		logger.error({ errMessage: err?.message, errStack: err?.stack }, 'Unhandled error in updateTodo');
+		return new Response('Internal Server Error', { status: 500 });
+	}
+}
+
+async function deleteTodo(request, env, logger, todoId) {
+	const user = await getAuthenticatedUser(request, env, logger);
+	if (!user) {
+		logger.warn('Unauthorized attempt to delete todo');
+		return new Response('Unauthorized', { status: 401 });
+	}
+
+	try {
+		await env.DB.prepare('DELETE FROM todos WHERE id = ? AND user_id = ?')
+			.bind(todoId, user.userId)
+			.run();
+
+		logger.info({ userId: user.userId, todoId }, 'Todo deleted');
+		return new Response(JSON.stringify({ success: true }));
+	} catch (err) {
+		logger.error({ errMessage: err?.message, errStack: err?.stack }, 'Unhandled error in deleteTodo');
 		return new Response('Internal Server Error', { status: 500 });
 	}
 }
