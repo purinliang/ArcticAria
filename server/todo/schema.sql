@@ -11,3 +11,5 @@ CREATE TABLE todos (
   next_due_date TEXT NOT NULL,    -- ISO date string, must be passed from frontend
   reminder_days_before INTEGER DEFAULT 0
 );
+
+ALTER TABLE todos ADD COLUMN category TEXT;
