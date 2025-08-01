@@ -88,7 +88,7 @@ async function createTodo(request, env, logger) {
 	}
 
 	try {
-		const { title, content, next_due_date, recurrence_rule, reminder_days_before } = await request.json();
+		const { title, content, category, next_due_date, recurrence_rule, reminder_days_before } = await request.json();
 
 		if (!title || !next_due_date) {
 			logger.warn('Missing title or next_due_date');
@@ -98,13 +98,14 @@ async function createTodo(request, env, logger) {
 		const todoId = crypto.randomUUID();
 
 		await env.DB.prepare(`
-			INSERT INTO todos (id, user_id, title, content, recurrence_rule, next_due_date, reminder_days_before)
-			VALUES (?, ?, ?, ?, ?, ?, ?)
+			INSERT INTO todos (id, user_id, title, content, category, recurrence_rule, next_due_date, reminder_days_before)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 		`).bind(
 			todoId,
 			user.userId,
 			title,
 			content || null,
+			category || null,
 			recurrence_rule || null,
 			next_due_date,
 			reminder_days_before || 0
@@ -202,7 +203,7 @@ async function updateTodo(request, env, logger, todoId) {
 		console.log(updates);
 
 		// Only allow updating specific fields
-		const allowed = ['title', 'content', 'completed', 'next_due_date', 'recurrence_rule', 'reminder_days_before'];
+		const allowed = ['title', 'content', 'category', 'completed', 'next_due_date', 'recurrence_rule', 'reminder_days_before'];
 		const fields = [];
 		const values = [];
 
