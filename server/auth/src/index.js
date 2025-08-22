@@ -187,7 +187,7 @@ async function login(request, env, logger) {
 		const jwt = await new SignJWT({ userId: user.id, email: user.email })
 			.setProtectedHeader({ alg: 'HS256' })
 			.setIssuedAt()
-			.setExpirationTime('7d')
+			.setExpirationTime('30d')
 			.sign(secret);
 
 		logger.info({ userId: user.id }, 'Login successful, JWT generated');
