@@ -18,7 +18,7 @@ export default function LoginPage() {
             console.log(`POST ${API_BASE}/login`);
             const res = await axios.post(`${API_BASE}/login`, form);
             localStorage.setItem('jwtToken', res.data.token);
-            alert('Login successful!');
+            // alert('Login successful!');
             navigate('/todo');
         } catch (err) {
             alert(`Login error: ${err.response?.data || err.message}`);
