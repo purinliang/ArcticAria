@@ -101,7 +101,7 @@ export default function TodoDetailPage() {
     }, [id, state]);
 
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="md">
             <Typography variant="h4" mt={4}>
                 {isEdit ? 'Edit Todo' : 'Add New Todo'}
             </Typography>
@@ -128,7 +128,7 @@ export default function TodoDetailPage() {
                         name="content"
                         fullWidth
                         multiline
-                        rows={3}
+                        rows={8}
                         value={form.content}
                         onChange={handleChange}
                     />

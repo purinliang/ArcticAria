@@ -25,7 +25,6 @@ export default function TodoPage() {
             const res = await axios.get(`${API_BASE}/todo`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log(res.data);
             setTodos(res.data);
         } catch (err) {
             alert(`Failed to fetch todos: ${err.response?.data || err.message}`);
@@ -90,8 +89,7 @@ export default function TodoPage() {
                             onDelete={handleDelete}
                         />
                     ))
-                )
-                }
+                )}
             </>
         );
     }

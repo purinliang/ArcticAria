@@ -27,7 +27,17 @@ export default function TodoCard({ todo, onToggleComplete, onDelete }) {
                         color="primary"
                     />
                 </Box>
-                <Typography>{todo.content}</Typography>
+                <Typography sx={{ mt: 1, mb: 2 }}>
+                    {todo.content ? (
+                        todo.content.split('\n').map((line, index) => (
+                            <Box key={index}>
+                                {line}
+                            </Box>
+                        ))
+                    ) : (
+                        <Box />
+                    )}
+                </Typography>
                 <Typography variant="body2" color="textSecondary">
                     🗓️ Next Due: {new Date(todo.next_due_date).toLocaleDateString()}
                     &nbsp;({daysUntil(todo.next_due_date)})
