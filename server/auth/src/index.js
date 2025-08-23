@@ -39,6 +39,10 @@ export default {
 			const path = url.pathname;
 			const method = request.method;
 
+			if (path === '/') {
+				return new Response('Worker: Auth', { status: 200, headers: corsHeaders });
+			}
+
 			// Handle OPTIONS preflight request
 			if (method === 'OPTIONS') {
 				reqLogger.debug('Handling OPTIONS preflight request');

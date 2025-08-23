@@ -28,6 +28,10 @@ export default {
 			const path = url.pathname;
 			const method = request.method;
 
+			if (path === '/') {
+				return new Response('Worker: Todo', { status: 200, headers: corsHeaders });
+			}
+
 			if (method === 'OPTIONS') {
 				reqLogger.debug('Handling CORS preflight');
 				return new Response(null, { status: 204, headers: corsHeaders });
