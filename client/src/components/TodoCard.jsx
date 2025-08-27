@@ -1,55 +1,140 @@
 import { Card, CardContent, Typography, Checkbox, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { lightBlue, deepOrange, green } from '@mui/material/colors';
+import dayjs from 'dayjs';
 
 export default function TodoCard({ todo, onToggleComplete, onDelete }) {
     const navigate = useNavigate();
 
+    /**
+     * Calculates the number of days until a due date.
+     * @param {string} dueDateStr The due date string.
+     * @returns {string} A string indicating days left or overdue status.
+     */
     const daysUntil = (dueDateStr) => {
-        const due = new Date(dueDateStr);
-        const now = new Date();
-        const diff = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
-        return diff >= 0 ? `${diff} day(s) left` : `Overdue by ${-diff} day(s)`;
+        const due = dayjs(dueDateStr);
+        const now = dayjs();
+        const diffDays = due.diff(now, 'day');
+
+        if (diffDays >= 0) {
+            return `${diffDays} day(s) left`;
+        } else {
+            return `Overdue by ${-diffDays} day(s)`;
+        }
+    };
+
+    /**
+     * Determines the color of the card based on the todo's status.
+     * @param {object} todo The todo object.
+     * @returns {string} The background color string.
+     */
+    const getCardColor = (todo) => {
+        if (todo.completed) {
+            return green[50];
+        }
+        const diffDays = dayjs(todo.next_due_date).diff(dayjs(), 'day');
+        if (diffDays <= 0) {
+            return deepOrange[50];
+        }
+        if (diffDays <= todo.reminder_days_before) {
+            return lightBlue[50];
+        }
+        return '#ffffff'; // Default white
     };
 
     return (
-        <Card sx={{ mt: 2, cursor: 'pointer' }} onClick={() =>
-            navigate(`/todos/${todo.id}`, { state: { todo } })}>
+        <Card
+            sx={{
+                mt: 2,
+                cursor: 'pointer',
+                borderRadius: '12px',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                transition: 'transform 0.2s',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 6px 12px rgba(0,0,0,0.15)'
+                },
+                bgcolor: getCardColor(todo)
+            }}
+            // Re-add the click handler to the entire card
+            onClick={() => navigate(`/todos/${todo.id}`, { state: { todo } })}
+        >
             <CardContent>
                 <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Typography variant="h6">{todo.title}</Typography>
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            fontWeight: 'bold',
+                            textDecoration: todo.completed ? 'line-through' : 'none',
+                            color: todo.completed ? 'text.secondary' : 'text.primary'
+                        }}
+                    >
+                        {todo.title}
+                    </Typography>
                     <Checkbox
                         checked={!!todo.completed}
+                        // Ensure checkbox click doesn't trigger card navigation
                         onClick={(e) => e.stopPropagation()}
                         onChange={(e) => {
                             e.stopPropagation();
-                            onToggleComplete(todo.id, todo.completed);
+                            onToggleComplete();
                         }}
                         color="primary"
                     />
                 </Box>
-                <Typography sx={{ mt: 1, mb: 2 }}>
-                    {todo.content ? (
-                        todo.content.split('\n').map((line, index) => (
-                            <Box key={index}>
-                                {line}
-                            </Box>
-                        ))
-                    ) : (
-                        <Box />
-                    )}
+                <Typography
+                    variant="body2"
+                    sx={{
+                        mt: 1,
+                        mb: 2,
+                        whiteSpace: 'pre-wrap',
+                        textDecoration: todo.completed ? 'line-through' : 'none',
+                        color: todo.completed ? 'text.secondary' : 'text.primary'
+                    }}
+                >
+                    {todo.content}
                 </Typography>
-                <Typography variant="body2" color="textSecondary">
-                    🗓️ Next Due: {new Date(todo.next_due_date).toLocaleDateString()}
-                    &nbsp;({daysUntil(todo.next_due_date)})
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                    🔁 Recurrence: {todo.recurrence_rule || 'None'}
-                </Typography>
-                {todo.category && (
-                    <Typography variant="body2" color="textSecondary">
-                        🏷️ Category: {todo.category}
+                <Box sx={{ color: 'text.secondary' }}>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>
+                        🗓️ Due: {dayjs(todo.next_due_date).format('DD/MM/YYYY')}
+                        &nbsp;({daysUntil(todo.next_due_date)})
                     </Typography>
-                )}
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>
+                        🔁 Recurrence: {todo.recurrence_rule || 'None'}
+                    </Typography>
+                    {todo.category && (
+                        <Typography variant="body2" sx={{ mb: 0.5 }}>
+                            🏷️ Category: {todo.category}
+                        </Typography>
+                    )}
+                </Box>
+                <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={(e) => {
+                            // Ensure button click doesn't trigger card navigation
+                            e.stopPropagation();
+                            navigate(`/todos/${todo.id}`, { state: { todo } });
+                        }}
+                        sx={{ borderRadius: '8px' }}
+                    >
+                        Edit
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={(e) => {
+                            // Ensure button click doesn't trigger card navigation
+                            e.stopPropagation();
+                            onDelete();
+                        }}
+                        sx={{ borderRadius: '8px' }}
+                    >
+                        Delete
+                    </Button>
+                </Box>
             </CardContent>
         </Card >
     );
