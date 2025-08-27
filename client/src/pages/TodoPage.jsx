@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
-export default function App() {
+export default function TodoPage() {
     const navigate = useNavigate();
 
     const [todos, setTodos] = useState({
