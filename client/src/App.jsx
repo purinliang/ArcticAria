@@ -1,5 +1,5 @@
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, Button, Typography, Box, Divider, Link } from '@mui/material';
+import { AppBar, Toolbar, Button, Typography, Box, Divider, Link, useTheme, useMediaQuery } from '@mui/material';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import TodoPage from './pages/TodoPage';
@@ -12,6 +12,9 @@ import { useAuth } from './AuthContext';
 function App() {
   const { isLoggedIn, username, logout } = useAuth();
   const navigate = useNavigate();
+  const theme = useTheme();
+  // Use a media query to check for screen size. 'md' is a good breakpoint for tablets/desktops.
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
 
   /**
    * Handles the logout action.
@@ -26,18 +29,20 @@ function App() {
     <Box>
       <AppBar position="static" sx={{ bgcolor: 'white', color: 'black', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
         <Toolbar sx={{ maxWidth: '1120px', width: '100%', mx: 'auto' }}>
-          {/* Logo and App Name */}
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/arctic_aria.svg" alt="Arctic Aria Logo" style={{ height: '32px', marginRight: '8px' }} />
-            <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-              <Button onClick={() => navigate('/')} color="primary" sx={{ fontWeight: 'bold', fontSize: '1.5rem', textTransform: 'none' }}>
-                ArcticAria
-              </Button>
-            </Typography>
-          </Box>
+          {/* Logo and App Name - Hidden on mobile */}
+          {!isMobile && (
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <img src="/arctic_aria.svg" alt="Arctic Aria Logo" style={{ height: '32px', marginRight: '8px' }} />
+              <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                <Button onClick={() => navigate('/')} color="primary" sx={{ fontWeight: 'bold', fontSize: '1.5rem', textTransform: 'none' }}>
+                  ArcticAria
+                </Button>
+              </Typography>
+            </Box>
+          )}
 
           {/* Navigation Links */}
-          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 4, gap: 2 }}>
+          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: isMobile ? 0 : 4, gap: 2 }}>
             <Button onClick={() => navigate('/todos')} color="inherit" sx={{ fontWeight: 'bold', textTransform: 'none' }}>
               Todos
             </Button>
@@ -47,29 +52,30 @@ function App() {
           </Box>
 
           {/* Auth buttons or user info. Fixed width to prevent CLS. */}
-          <Box sx={{ minWidth: '160px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ minWidth: '160px', display: 'flex', justifyContent: !isMobile ? 'flex-end' : 'none', alignItems: 'center', gap: 1 }} >
             {isLoggedIn ? (
               <>
-                <Typography variant="body1" component="span" sx={{ mr: 1, fontWeight: 'medium' }}>
-                  {username}
-                </Typography>
+                {/* Username hidden on mobile */}
+                {!isMobile && (
+                  <Typography variant="body1" component="span" sx={{ mr: 1, fontWeight: 'medium' }}>
+                    {username}
+                  </Typography>
+                )}
                 <Button variant="contained" color="error" onClick={handleLogout} sx={{ textTransform: 'none' }}>
                   Sign out
                 </Button>
               </>
             ) : (
-              <>
-                <Button variant="contained" color="primary" onClick={() => navigate('/login')} sx={{ textTransform: 'none' }}>
-                  Sign in
-                </Button>
-              </>
+              <Button variant="contained" color="primary" onClick={() => navigate('/login')} sx={{ textTransform: 'none' }}>
+                Sign in
+              </Button>
             )}
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Main content routes */}
-      <Box component="main" sx={{ p: 3, mb: 8, maxWidth: '960px', mx: 'auto' }}>
+      {/* Main content routes. Adjust padding based on screen size. */}
+      <Box component="main" sx={{ p: isMobile ? 1 : 3, mb: 8, maxWidth: '960px', mx: 'auto' }}>
         <Routes>
           <Route path="/" element={<TodoPage />} />
           <Route path="/register" element={<RegisterPage />} />
