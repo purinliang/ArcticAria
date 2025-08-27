@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
 import { AppBar, Toolbar, Button, Typography, Box, Divider, Link } from '@mui/material';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import TodoPage from './pages/TodoPage';
 import TodoDetailPage from './pages/TodoDetailPage';
 import BlogPage from './pages/BlogPage';
+import PostEditPage from './pages/PostEditPage';
+import PostDetailPage from './pages/PostDetailPage';
 import { useAuth } from './AuthContext';
 
 function App() {
@@ -78,6 +78,8 @@ function App() {
           <Route path="/todos/new" element={<TodoDetailPage />} />
           <Route path="/todos/:id" element={<TodoDetailPage />} />
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/new" element={<PostEditPage />} />
+          <Route path="/blog/:id" element={<PostDetailPage />} />
         </Routes>
       </Box>
 
