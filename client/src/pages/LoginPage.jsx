@@ -65,7 +65,7 @@ export default function LoginPage() {
                 }}
             >
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                    Welcome Back
+                    Login
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom sx={{ color: 'text.secondary' }}>
                     Please log in to continue.
