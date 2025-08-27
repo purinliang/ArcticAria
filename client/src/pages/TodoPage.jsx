@@ -30,8 +30,8 @@ export default function TodoPage() {
         if (!token) {
             // If there's no token, a red message will be displayed, and after 3 seconds,
             // the user will be redirected to the login page.
-            setError('You are not logged in. Redirecting to login page...');
-            setTimeout(() => navigate('/login'), 3000);
+            setError('You are not logged in. Please log in first...');
+            // setTimeout(() => navigate('/login'), 3000);
             return;
         }
         try {
