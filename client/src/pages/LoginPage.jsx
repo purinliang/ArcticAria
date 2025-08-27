@@ -4,13 +4,12 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { red } from '@mui/material/colors';
 
-// Assumes `import.meta.env.VITE_AUTH_API_BASE` is correctly configured in your project
 const API_BASE = import.meta.env.VITE_AUTH_API_BASE;
 
-export default function App() {
-    const [form, setForm] = useState({ email: '', password: '' });
-    // Add a new state variable to hold the error message
+export default function LoginPage() {
+    const [form, setForm] = useState({ username: '', password: '' });
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState(''); // Added success state
     const navigate = useNavigate();
 
     /**
@@ -18,8 +17,8 @@ export default function App() {
      * @param {React.ChangeEvent<HTMLInputElement>} e The change event from the input.
      */
     const handleChange = e => {
-        // Clear the error message when the user starts typing
         setError('');
+        setSuccess(''); // Clear success message on input change
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
@@ -28,8 +27,8 @@ export default function App() {
      * Sends a POST request to the login endpoint and handles the response.
      */
     const handleLogin = async () => {
-        // Clear any previous error message before a new attempt
         setError('');
+        setSuccess('');
 
         try {
             console.log(`POST ${API_BASE}/login`);
@@ -38,8 +37,10 @@ export default function App() {
             // Store the JWT token upon successful login
             localStorage.setItem('jwtToken', res.data.token);
 
-            // Navigate to the todos page
-            navigate('/todos');
+            setSuccess('Login successful! Redirecting to todos page...'); // Set success message
+            // Navigate to the todos page after a delay
+            setTimeout(() => navigate('/todos'), 2000);
+
         } catch (err) {
             console.log(`Login error: ${err}`);
             // Check if the error has a response and data to get a more specific message
@@ -64,11 +65,18 @@ export default function App() {
                 }}
             >
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                    Welcome
+                    Welcome Back
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom sx={{ color: 'text.secondary' }}>
                     Please log in to continue.
                 </Typography>
+
+                {/* Conditionally render the success message */}
+                {success && (
+                    <Alert severity="success" sx={{ width: '100%', mb: 2, borderRadius: '8px' }}>
+                        {success}
+                    </Alert>
+                )}
 
                 {/* Conditionally render the error message if the `error` state is not empty */}
                 {error && (
@@ -89,11 +97,14 @@ export default function App() {
                 <TextField
                     fullWidth
                     margin="normal"
-                    label="Email"
-                    name="email"
-                    value={form.email}
+                    label="Username"
+                    name="username"
+                    type="text"
+                    value={form.username}
                     onChange={handleChange}
                     required
+                    // Add autocomplete for better browser support
+                    autoComplete="username"
                 />
                 <TextField
                     fullWidth
@@ -104,6 +115,8 @@ export default function App() {
                     value={form.password}
                     onChange={handleChange}
                     required
+                    // Use "current-password" for login forms
+                    autoComplete="current-password"
                 />
                 <Button
                     variant="contained"
@@ -114,6 +127,11 @@ export default function App() {
                 >
                     Login
                 </Button>
+                <Box textAlign="center" sx={{ mt: 2, width: '100%' }}>
+                    <Typography variant="body2" color="textSecondary">
+                        Don't have an account? <Button onClick={() => navigate('/register')}>Register</Button>
+                    </Typography>
+                </Box>
             </Box>
         </Container>
     );
