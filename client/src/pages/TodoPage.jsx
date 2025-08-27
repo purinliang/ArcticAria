@@ -1,116 +1,184 @@
 import { useEffect, useState } from 'react';
 import {
-    Container, Typography, Button, Divider
+    Container, Typography, Button, Divider, Alert, Box
 } from '@mui/material';
-import 'dayjs/locale/en-gb'; // force dd/MM/yyyy locale
+import { red } from '@mui/material/colors';
 import axios from 'axios';
 import TodoCard from '../components/TodoCard';
 import { useNavigate } from 'react-router-dom';
 
-
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
-export default function TodoPage() {
+export default function App() {
     const navigate = useNavigate();
 
     const [todos, setTodos] = useState({
         reminding: [], upcoming: [],
         overdued: [], completed: []
     });
+    // Add a new state variable for displaying errors
+    const [error, setError] = useState('');
 
-    const token = localStorage.getItem('jwtToken');
-
+    /**
+     * Fetches the user's todos from the API.
+     * If the JWT token is invalid, it redirects the user to the login page.
+     */
     const fetchTodos = async () => {
+        // Clear any previous error messages
+        setError('');
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            // If there's no token, a red message will be displayed, and after 3 seconds,
+            // the user will be redirected to the login page.
+            setError('You are not logged in. Redirecting to login page...');
+            setTimeout(() => navigate('/login'), 3000);
+            return;
+        }
         try {
             const res = await axios.get(`${API_BASE}/todo`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTodos(res.data);
         } catch (err) {
-            alert(`Failed to fetch todos: ${err.response?.data || err.message}`);
+            console.error('Failed to fetch todos:', err);
+            // Check for a 401 Unauthorized status code
+            if (err.response && err.response.status === 401) {
+                // Clear the invalid token from localStorage
+                localStorage.removeItem('jwtToken');
+                // Display a red message, then redirect to the login page
+                setError('Session expired or unauthorized. Please log in again.');
+                setTimeout(() => navigate('/login'), 3000);
+            } else {
+                // Handle other types of errors
+                setError(`Failed to fetch todos: ${err.response?.data || err.message}`);
+            }
         }
     };
 
-    function renderTodoGroup(todos, label) {
-        if (!todos || !Array.isArray(todos)) return null;
+    /**
+     * Toggles the completion status of a todo.
+     * @param {string} id The ID of the todo.
+     * @param {boolean} currentStatus The current completion status.
+     */
+    const handleToggleComplete = async (id, currentStatus) => {
+        setError('');
+        try {
+            const token = localStorage.getItem('jwtToken');
+            console.log(`PUT ${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`);
+            await axios.put(`${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`, {
+                completed: !currentStatus
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            fetchTodos(); // Call fetchTodos to update the list immediately
+        } catch (err) {
+            console.error('Failed to update todo:', err);
+            setError('Failed to update todo.');
+        }
+    };
 
-        const handleToggleComplete = async (id, currentStatus) => {
-            try {
-                const token = localStorage.getItem('jwtToken');
-                console.log(`PUT ${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`);
-                await axios.put(`${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`, {
-                    completed: !currentStatus
-                }, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                window.location.reload();   // debug only
-            } catch (err) {
-                alert('Failed to update todo');
-                console.error(err);
-            }
-        };
+    /**
+     * Deletes a todo.
+     * @param {string} id The ID of the todo.
+     */
+    const handleDelete = async (id) => {
+        setError('');
+        try {
+            const token = localStorage.getItem('jwtToken');
+            console.log(`DELETE ${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`);
+            await axios.delete(`${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            fetchTodos(); // Call fetchTodos to update the list immediately
+        } catch (err) {
+            console.error('Failed to delete todo:', err);
+            setError('Failed to delete todo.');
+        }
+    };
 
-        const handleDelete = async (id) => {
-            try {
-                const token = localStorage.getItem('jwtToken');
-                console.log(`DELETE ${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`);
-                await axios.delete(`${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                window.location.reload();   // debug only
-            } catch (err) {
-                alert('Failed to delete todo');
-                console.error(err);
-            }
-        };
+    /**
+     * Calculates the days until a due date.
+     * @param {string} dueDateStr The due date string.
+     * @returns {string} The formatted string showing days left or overdue.
+     */
+    const daysUntil = (dueDateStr) => {
+        const due = new Date(dueDateStr);
+        const now = new Date();
+        const diff = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
+        return diff >= 0 ? `${diff} day(s) left` : `Overdue by ${-diff} day(s)`;
+    };
 
-        const daysUntil = (dueDateStr) => {
-            const due = new Date(dueDateStr);
-            const now = new Date();
-            const diff = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
-            return diff >= 0 ? `${diff} day(s) left` : `Overdue by ${-diff} day(s)`;
-        };
+    /**
+     * Renders a group of todos with a label.
+     * @param {Array<object>} todoItems The array of todos to render.
+     * @param {string} label The label for the group.
+     */
+    function renderTodoGroup(todoItems, label) {
+        if (!todoItems || !Array.isArray(todoItems)) return null;
 
         return (
-            <>
-                <Typography variant="h6" sx={{ mt: 4 }}>{label}</Typography>
-                {todos.length === 0 ? (
-                    <Typography color="textSecondary">No items</Typography>
+            <Box sx={{ my: 2 }}>
+                <Typography variant="h6" sx={{ mt: 4, mb: 1, fontWeight: 'bold' }}>
+                    {label}
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                {todoItems.length === 0 ? (
+                    <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
+                        No items in this group.
+                    </Typography>
                 ) : (
-                    todos.map(todo => (
+                    todoItems.map(todo => (
                         <TodoCard
                             key={todo.id}
                             todo={todo}
-                            onToggleComplete={handleToggleComplete}
-                            onDelete={handleDelete}
+                            onToggleComplete={() => handleToggleComplete(todo.id, todo.completed)}
+                            onDelete={() => handleDelete(todo.id)}
                         />
                     ))
                 )}
-            </>
+            </Box>
         );
     }
 
+    // Fetch todos on component mount
     useEffect(() => {
         fetchTodos();
-    }, []);
+    }, []); // Empty dependency array means this runs only once
 
     return (
-        <Container maxWidth="md">
-            <Typography variant="h4" mt={4}>My Todo List</Typography>
+        <Container maxWidth="md" sx={{ mt: 4, mb: 4, p: 2 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                My Todo List
+            </Typography>
+
+            {/* Conditionally render the error message with Alert component */}
+            {error && (
+                <Alert
+                    severity="error"
+                    sx={{
+                        width: '100%',
+                        mt: 2,
+                        mb: 2,
+                        borderRadius: '8px',
+                        backgroundColor: red[50]
+                    }}
+                >
+                    {error}
+                </Alert>
+            )}
 
             <Button
-                variant="outlined"
-                sx={{ mt: 2 }}
+                variant="contained"
+                color="primary"
+                sx={{ mt: 3, mb: 2, py: 1.5, borderRadius: '8px' }}
                 onClick={() => navigate('/todos/new')}
             >
                 ➕ Add New Todo
             </Button>
-
-            <Divider sx={{ my: 4 }} />
 
             {todos ? (
                 <>

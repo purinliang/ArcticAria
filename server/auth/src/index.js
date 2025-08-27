@@ -102,23 +102,24 @@ function withCORS(response) {
  */
 async function register(request, env, logger) {
 	try {
-		const { email, password } = await request.json();
-		logger.info({ email }, 'Registration attempt');
+		// Change from 'email' to 'username'
+		const { username, password } = await request.json();
+		logger.info({ username }, 'Registration attempt');
 
 		// Validate input
-		if (!email || !password) {
+		if (!username || !password) {
 			logger.warn('Missing required fields in registration request');
 			return new Response('Missing fields', { status: 400 });
 		}
 
-		// Check if user already exists
+		// Check if user already exists based on 'username', but in current database, it is called 'email'
 		const existing = await env.DB.prepare('SELECT 1 FROM users WHERE email = ?')
-			.bind(email)
+			.bind(username)
 			.first();
 
 		if (existing) {
-			logger.warn({ email }, 'Email already registered');
-			return new Response('Email already registered', { status: 409 });
+			logger.warn({ username }, 'Username already registered');
+			return new Response('Username already registered', { status: 409 });
 		}
 
 		// Generate UUID using Web Crypto API
@@ -129,14 +130,14 @@ async function register(request, env, logger) {
 		const password_hash = await hash(password, 10);
 		logger.debug('Password hashed successfully');
 
-		// Create new user
+		// Create new user, inserting 'username', but in current database, it is called 'email'
 		await env.DB.prepare(
 			'INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)'
 		)
-			.bind(userId, email, password_hash)
+			.bind(userId, username, password_hash)
 			.run();
 
-		logger.info({ userId, email }, 'User registered successfully');
+		logger.info({ userId, username }, 'User registered successfully');
 
 		return new Response(JSON.stringify({
 			success: true,
@@ -166,29 +167,30 @@ async function register(request, env, logger) {
  */
 async function login(request, env, logger) {
 	try {
-		const { email, password } = await request.json();
-		logger.info({ email }, 'Login attempt');
+		// Change from 'email' to 'username'
+		const { username, password } = await request.json();
+		logger.info({ username }, 'Login attempt');
 
-		// Find user in database
+		// Find user in database based on 'username', but in current database, it is called 'email'
 		const user = await env.DB.prepare('SELECT * FROM users WHERE email = ?')
-			.bind(email)
+			.bind(username)
 			.first();
 
 		if (!user) {
-			logger.warn({ email }, 'User not found during login');
+			logger.warn({ username }, 'User not found during login');
 			return new Response('Invalid credentials', { status: 401 });
 		}
 
 		// Verify password
 		const passwordMatch = await compare(password, user.password_hash);
 		if (!passwordMatch) {
-			logger.warn({ email }, 'Invalid password provided');
+			logger.warn({ username }, 'Invalid password provided');
 			return new Response('Invalid credentials', { status: 401 });
 		}
 
 		// Generate JWT token
 		const secret = new TextEncoder().encode(env.JWT_SECRET);
-		const jwt = await new SignJWT({ userId: user.id, email: user.email })
+		const jwt = await new SignJWT({ userId: user.id, username: user.username })
 			.setProtectedHeader({ alg: 'HS256' })
 			.setIssuedAt()
 			.setExpirationTime('30d')
@@ -219,8 +221,9 @@ async function login(request, env, logger) {
 async function verifyJWT(token, env, logger) {
 	try {
 		const secret = new TextEncoder().encode(env.JWT_SECRET);
+		// Change to look for 'username' in the payload
 		const { payload } = await jwtVerify(token, secret);
-		logger.info({ email: payload.email }, 'JWT verification successful');
+		logger.info({ username: payload.username }, 'JWT verification successful');
 		return payload;
 	} catch (err) {
 		logger.warn({
@@ -254,7 +257,7 @@ async function verifyToken(request, env, logger) {
 			return new Response('Unauthorized', { status: 401 });
 		}
 
-		logger.info({ email: payload.email }, 'Token verification successful');
+		logger.info({ username: payload.username }, 'Token verification successful');
 		return new Response(JSON.stringify(payload), {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' },
