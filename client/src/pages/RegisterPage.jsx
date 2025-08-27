@@ -64,7 +64,7 @@ export default function RegisterPage() {
                 }}
             >
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                    Register
+                    Sign up
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom sx={{ color: 'text.secondary' }}>
                     Create an account to get started.
@@ -129,7 +129,8 @@ export default function RegisterPage() {
                 </Button>
                 <Box textAlign="center" sx={{ mt: 2, width: '100%' }}>
                     <Typography variant="body2" color="textSecondary">
-                        Already have an account? <Button onClick={() => navigate('/login')}>Login</Button>
+                        Already have an account? <Button onClick={() => navigate('/login')}>Sign in
+                        </Button>
                     </Typography>
                 </Box>
             </Box>

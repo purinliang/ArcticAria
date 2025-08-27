@@ -3,44 +3,53 @@ import { TextField, Button, Box, Typography, Container, Alert } from '@mui/mater
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { red } from '@mui/material/colors';
+import { useAuth } from '../AuthContext';
+import { jwtDecode } from 'jwt-decode';
 
 const API_BASE = import.meta.env.VITE_AUTH_API_BASE;
 
 export default function LoginPage() {
     const [form, setForm] = useState({ username: '', password: '' });
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState(''); // Added success state
+    const [success, setSuccess] = useState('');
     const navigate = useNavigate();
+    const { setIsLoggedIn, setUsername } = useAuth(); // Use the auth context
 
     /**
-     * Handles changes in the form input fields.
-     * @param {React.ChangeEvent<HTMLInputElement>} e The change event from the input.
+     * Handles form input changes.
+     * @param {Event} e The event object.
      */
     const handleChange = e => {
         setError('');
-        setSuccess(''); // Clear success message on input change
+        setSuccess('');
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     /**
-     * Handles the login button click.
-     * Sends a POST request to the login endpoint and handles the response.
+     * Handles the login process.
      */
     const handleLogin = async () => {
         setError('');
         setSuccess('');
-
         try {
             console.log(`POST ${API_BASE}/login`);
             const res = await axios.post(`${API_BASE}/login`, form);
+            const { token } = res.data;
+            localStorage.setItem('jwtToken', token);
 
-            // Store the JWT token upon successful login
-            localStorage.setItem('jwtToken', res.data.token);
+            const decodedToken = jwtDecode(token);
+            console.log('Decoded JWT Payload:', decodedToken); // Log the decoded payload for debugging
 
-            setSuccess('Login successful! Redirecting to todos page...'); // Set success message
-            // Navigate to the todos page after a delay
+            // Check for the 'username' field in the decoded token
+            if (decodedToken.username) {
+                setUsername(decodedToken.username); // Update username in context
+                setIsLoggedIn(true); // Update login status in context
+            } else {
+                console.error("Username field not found in JWT token. Please check your backend.");
+            }
+
+            setSuccess('Logged in successfully! Redirecting to todos...');
             setTimeout(() => navigate('/todos'), 2000);
-
         } catch (err) {
             console.log(`Login error: ${err}`);
             // Check if the error has a response and data to get a more specific message
@@ -65,31 +74,20 @@ export default function LoginPage() {
                 }}
             >
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                    Login
+                    Sign in
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom sx={{ color: 'text.secondary' }}>
-                    Please log in to continue.
+                    Welcome back! Please log in to your account.
                 </Typography>
 
-                {/* Conditionally render the success message */}
+                {/* Display success and error alerts */}
                 {success && (
                     <Alert severity="success" sx={{ width: '100%', mb: 2, borderRadius: '8px' }}>
                         {success}
                     </Alert>
                 )}
-
-                {/* Conditionally render the error message if the `error` state is not empty */}
                 {error && (
-                    <Alert
-                        severity="error"
-                        sx={{
-                            width: '100%',
-                            mt: 2,
-                            mb: 2,
-                            borderRadius: '8px',
-                            backgroundColor: red[50]
-                        }}
-                    >
+                    <Alert severity="error" sx={{ width: '100%', mb: 2, borderRadius: '8px', backgroundColor: red[50] }}>
                         {error}
                     </Alert>
                 )}
@@ -129,7 +127,7 @@ export default function LoginPage() {
                 </Button>
                 <Box textAlign="center" sx={{ mt: 2, width: '100%' }}>
                     <Typography variant="body2" color="textSecondary">
-                        Don't have an account? <Button onClick={() => navigate('/register')}>Register</Button>
+                        Don't have an account? <Button onClick={() => navigate('/register')}>Sign up</Button>
                     </Typography>
                 </Box>
             </Box>

@@ -190,7 +190,8 @@ async function login(request, env, logger) {
 
 		// Generate JWT token
 		const secret = new TextEncoder().encode(env.JWT_SECRET);
-		const jwt = await new SignJWT({ userId: user.id, username: user.username })
+		// Return username, but in current database, it is called 'email'
+		const jwt = await new SignJWT({ userId: user.id, username: user.email, email: user.email })
 			.setProtectedHeader({ alg: 'HS256' })
 			.setIssuedAt()
 			.setExpirationTime('30d')
