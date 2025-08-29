@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Container, Typography, Button, Divider, Box, Card, CardContent, Link, IconButton, Tooltip } from '@mui/material';
+import { Container, Typography, Box, Card, CardContent, Link, IconButton, Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
+import { Masonry } from '@mui/lab';
 
 const API_BASE = import.meta.env.VITE_BLOG_API_BASE;
 
@@ -25,6 +26,19 @@ const formatPostDate = (dateString) => {
         minute: '2-digit',
         timeZoneName: 'short'
     });
+};
+
+/**
+ * A helper function to truncate a string and add ellipsis.
+ * @param {string} str The string to truncate.
+ * @param {number} maxLength The maximum allowed length.
+ * @returns {string} The truncated string with an ellipsis, or the original string.
+ */
+const truncateString = (str, maxLength) => {
+    if (str && str.length > maxLength) {
+        return str.substring(0, maxLength) + '...';
+    }
+    return str;
 };
 
 export default function BlogPage() {
@@ -56,19 +70,10 @@ export default function BlogPage() {
         fetchAllPosts();
     }, []);
 
-    // A helper function to truncate a string and add ellipsis
-    const truncateString = (str, maxLength) => {
-        if (str && str.length > maxLength) {
-            return str.substring(0, maxLength) + '...';
-        }
-        return str;
-    };
-
     const renderPost = (post) => (
         <Card
             key={post.id}
             sx={{
-                mb: 3,
                 boxShadow: 3,
                 '&:hover': {
                     boxShadow: 6,
@@ -84,7 +89,7 @@ export default function BlogPage() {
                     sx={{
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center', // This aligns items vertically in the middle
+                        alignItems: 'center',
                         mb: 1
                     }}
                 >
@@ -93,20 +98,13 @@ export default function BlogPage() {
                     </Typography>
                     <Box sx={{ flexShrink: 0 }}>
                         <Typography variant="caption" display="block" color="text.secondary" >
-                            Author: {truncateString(post.userId, 16)}
+                            Author: {truncateString(post.userId, 13)}
                         </Typography>
                     </Box>
                 </Box>
-
                 <Box
                     sx={{
-                        // Calculate max height for 8 lines (8 * 1.5rem)
-                        maxHeight: '18rem',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 12,
-                        WebkitBoxOrient: 'vertical',
+                        // With Masonry, we no longer need a fixed maxHeight or lineClamp
                         whiteSpace: 'pre-wrap',
                         color: 'text.primary',
                         fontSize: '1rem',
@@ -134,7 +132,6 @@ export default function BlogPage() {
                 <Typography variant="caption" display="block" color="text.secondary" >
                     Updated: {formatPostDate(post.updatedAt)}
                 </Typography>
-
             </CardContent>
         </Card >
     );
@@ -167,7 +164,7 @@ export default function BlogPage() {
             {loading && <Typography align="center">Loading posts...</Typography>}
             {error && <Typography color="error" align="center">{error}</Typography>}
             {!loading && !error && (
-                <Box>
+                <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={2}>
                     {posts.length > 0 ? (
                         posts.map(renderPost)
                     ) : (
@@ -175,7 +172,7 @@ export default function BlogPage() {
                             There are no discussions yet. Be the first to share your thoughts!
                         </Typography>
                     )}
-                </Box>
+                </Masonry>
             )}
         </Container>
     );
