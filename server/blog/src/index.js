@@ -113,6 +113,7 @@ async function createPost(request, env, logger) {
 
 		const postId = crypto.randomUUID();
 
+		// The database columns use `snake_case` (`user_id`).
 		await env.DB.prepare(`
             INSERT INTO posts (id, user_id, title, content)
             VALUES (?, ?, ?, ?)
@@ -135,6 +136,22 @@ async function createPost(request, env, logger) {
 }
 
 /**
+ * Helper function to map database post object to camelCase
+ * @param {object} post 
+ * @returns {object}
+ */
+const mapPostToCamelCase = (post) => {
+	return {
+		id: post.id,
+		title: post.title,
+		content: post.content,
+		userId: post.user_id,
+		createdAt: post.created_at,
+		updatedAt: post.updated_at
+	};
+};
+
+/**
  * Retrieves all public blog posts. No user authentication is required.
  */
 async function getPublicPosts(request, env, logger) {
@@ -145,8 +162,11 @@ async function getPublicPosts(request, env, logger) {
             ORDER BY created_at DESC
         `).all();
 
+		// Map database results to camelCase
+		const posts = results.map(mapPostToCamelCase);
+
 		logger.info('Public posts retrieved successfully');
-		return new Response(JSON.stringify(results), {
+		return new Response(JSON.stringify(posts), {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' }
 		});
@@ -172,8 +192,11 @@ async function getPublicPost(request, env, logger, postId) {
 			return new Response('Not Found', { status: 404 });
 		}
 
+		// Map database result to camelCase
+		const post = mapPostToCamelCase(results[0]);
+
 		logger.info({ postId }, 'Single public post retrieved successfully');
-		return new Response(JSON.stringify(results[0]), {
+		return new Response(JSON.stringify(post), {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' }
 		});
@@ -195,8 +218,11 @@ async function getAuthorPosts(request, env, logger, authorId) {
             ORDER BY created_at DESC
         `).bind(authorId).all();
 
-		logger.info({ authorId, postCount: results.length }, 'Author posts retrieved successfully');
-		return new Response(JSON.stringify(results), {
+		// Map database results to camelCase
+		const posts = results.map(mapPostToCamelCase);
+
+		logger.info({ authorId, postCount: posts.length }, 'Author posts retrieved successfully');
+		return new Response(JSON.stringify(posts), {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' }
 		});

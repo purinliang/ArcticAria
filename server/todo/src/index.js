@@ -92,27 +92,29 @@ async function createTodo(request, env, logger) {
 	}
 
 	try {
-		const { title, content, category, next_due_date, recurrence_rule, reminder_days_before } = await request.json();
+		// Incoming request body uses camelCase
+		const { title, content, category, nextDueDate, recurrenceRule, reminderDaysBefore } = await request.json();
 
-		if (!title || !next_due_date) {
-			logger.warn('Missing title or next_due_date');
+		if (!title || !nextDueDate) {
+			logger.warn('Missing title or nextDueDate');
 			return new Response('Missing required fields', { status: 400 });
 		}
 
 		const todoId = crypto.randomUUID();
 
+		// The database columns use `snake_case`.
 		await env.DB.prepare(`
-			INSERT INTO todos (id, user_id, title, content, category, recurrence_rule, next_due_date, reminder_days_before)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-		`).bind(
+            INSERT INTO todos (id, user_id, title, content, category, recurrence_rule, next_due_date, reminder_days_before)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
 			todoId,
 			user.userId,
 			title,
 			content || null,
 			category || null,
-			recurrence_rule || null,
-			next_due_date,
-			reminder_days_before || 0
+			recurrenceRule || null, // Map from camelCase to snake_case for DB insert
+			nextDueDate,
+			reminderDaysBefore || 0
 		).run();
 
 		logger.info({ userId: user.userId, todoId }, 'Todo created successfully');
@@ -125,6 +127,25 @@ async function createTodo(request, env, logger) {
 		return new Response('Internal Server Error', { status: 500 });
 	}
 }
+
+/**
+ * Helper function to map database todo object to camelCase
+ * @param {object} todo 
+ * @returns {object}
+ */
+const mapTodoToCamelCase = (todo) => {
+	return {
+		id: todo.id,
+		userId: todo.user_id,
+		title: todo.title,
+		content: todo.content,
+		category: todo.category,
+		recurrenceRule: todo.recurrence_rule,
+		nextDueDate: todo.next_due_date,
+		reminderDaysBefore: todo.reminder_days_before,
+		completed: todo.completed
+	};
+};
 
 function computeNextDue(baseDate, rule) {
 	const date = new Date(baseDate);
@@ -148,10 +169,13 @@ async function getTodos(request, env, logger) {
 
 	try {
 		const { results } = await env.DB.prepare(`
-			SELECT *
-			FROM todos
-			WHERE user_id = ?
-		`).bind(user.userId).all();
+            SELECT *
+            FROM todos
+            WHERE user_id = ?
+        `).bind(user.userId).all();
+
+		// Map database results to camelCase
+		const todos = results.map(mapTodoToCamelCase);
 
 		const now = new Date();
 		const grouped = {
@@ -161,15 +185,15 @@ async function getTodos(request, env, logger) {
 			completed: []
 		};
 
-		for (const todo of results) {
+		for (const todo of todos) {
 			if (todo.completed) {
 				grouped.completed.push(todo);
 				continue;
 			}
 
-			const dueDate = new Date(todo.next_due_date);
+			const dueDate = new Date(todo.nextDueDate);
 			const remindDate = new Date(dueDate);
-			remindDate.setDate(dueDate.getDate() - (todo.reminder_days_before || 0));
+			remindDate.setDate(dueDate.getDate() - (todo.reminderDaysBefore || 0));
 
 			if (now <= dueDate) {
 				if (now >= remindDate) {
@@ -207,13 +231,15 @@ async function updateTodo(request, env, logger, todoId) {
 		console.log(updates);
 
 		// Only allow updating specific fields
-		const allowed = ['title', 'content', 'category', 'completed', 'next_due_date', 'recurrence_rule', 'reminder_days_before'];
+		const allowed = ['title', 'content', 'category', 'completed', 'nextDueDate', 'recurrenceRule', 'reminderDaysBefore'];
 		const fields = [];
 		const values = [];
 
 		for (const key of allowed) {
 			if (key in updates) {
-				fields.push(`${key} = ?`);
+				// Map from camelCase to snake_case for the SQL query
+				const dbKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+				fields.push(`${dbKey} = ?`);
 				values.push(updates[key]);
 			}
 		}
@@ -224,6 +250,7 @@ async function updateTodo(request, env, logger, todoId) {
 
 		values.push(todoId, user.userId);
 
+		// The query uses snake_case column names, and we need to pass the values in the correct order.
 		const query = `UPDATE todos SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`;
 
 		await env.DB.prepare(query).bind(...values).run();
@@ -295,4 +322,3 @@ async function getAuthenticatedUser(request, env, logger) {
 		return null;
 	}
 }
-

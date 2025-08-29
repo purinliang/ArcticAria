@@ -102,7 +102,7 @@ function withCORS(response) {
  */
 async function register(request, env, logger) {
 	try {
-		// Change from 'email' to 'username'
+		// In backend code, we use `username`, but the database column is named `email`
 		const { username, password } = await request.json();
 		logger.info({ username }, 'Registration attempt');
 
@@ -112,7 +112,7 @@ async function register(request, env, logger) {
 			return new Response('Missing fields', { status: 400 });
 		}
 
-		// Check if user already exists based on 'username', but in current database, it is called 'email'
+		// Check if user already exists based on `email` column
 		const existing = await env.DB.prepare('SELECT 1 FROM users WHERE email = ?')
 			.bind(username)
 			.first();
@@ -127,14 +127,14 @@ async function register(request, env, logger) {
 		logger.debug({ userId }, 'Generated user ID');
 
 		// Hash password
-		const password_hash = await hash(password, 10);
+		const passwordHash = await hash(password, 10);
 		logger.debug('Password hashed successfully');
 
-		// Create new user, inserting 'username', but in current database, it is called 'email'
+		// Create new user, inserting `username` into the `email` column
 		await env.DB.prepare(
 			'INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)'
 		)
-			.bind(userId, username, password_hash)
+			.bind(userId, username, passwordHash)
 			.run();
 
 		logger.info({ userId, username }, 'User registered successfully');
@@ -167,29 +167,35 @@ async function register(request, env, logger) {
  */
 async function login(request, env, logger) {
 	try {
-		// Change from 'email' to 'username'
 		const { username, password } = await request.json();
 		logger.info({ username }, 'Login attempt');
 
-		// Find user in database based on 'username', but in current database, it is called 'email'
-		const user = await env.DB.prepare('SELECT * FROM users WHERE email = ?')
+		// Find user in database based on `email` column
+		const userResult = await env.DB.prepare('SELECT * FROM users WHERE email = ?')
 			.bind(username)
 			.first();
 
-		if (!user) {
+		if (!userResult) {
 			logger.warn({ username }, 'User not found during login');
 			return new Response('Invalid credentials', { status: 401 });
 		}
 
+		// Map database result to camelCase properties for consistency
+		const user = {
+			id: userResult.id,
+			email: userResult.email,
+			passwordHash: userResult.password_hash // Map snake_case to camelCase
+		};
+
 		// Verify password
-		const passwordMatch = await compare(password, user.password_hash);
+		const passwordMatch = await compare(password, user.passwordHash);
 		if (!passwordMatch) {
 			logger.warn({ username }, 'Invalid password provided');
 			return new Response('Invalid credentials', { status: 401 });
 		}
 
 		// Generate JWT token
-		const secret = new TextEncoder().encode(env.JWT_SECRET);
+		const secret = new TextEncoder().encode(env.JWT_SECRET);// Return username, but in current database, it is called 'email'
 		// Return username, but in current database, it is called 'email'
 		const jwt = await new SignJWT({ userId: user.id, username: user.email, email: user.email })
 			.setProtectedHeader({ alg: 'HS256' })
@@ -222,7 +228,6 @@ async function login(request, env, logger) {
 async function verifyJWT(token, env, logger) {
 	try {
 		const secret = new TextEncoder().encode(env.JWT_SECRET);
-		// Change to look for 'username' in the payload
 		const { payload } = await jwtVerify(token, secret);
 		logger.info({ username: payload.username }, 'JWT verification successful');
 		return payload;
