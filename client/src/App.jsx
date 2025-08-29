@@ -127,7 +127,7 @@ function App() {
       </AppBar>
 
       {/* Main content routes. Adjust padding based on screen size. */}
-      <Box component="main" sx={{ p: isMobile ? 1 : 3, mb: 8, maxWidth: '960px', mx: 'auto' }}>
+      <Box component="main" sx={{ p: isMobile ? 1 : 2, maxWidth: '960px', mx: 'auto' }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -143,8 +143,8 @@ function App() {
       </Box>
 
       {/* Footer */}
-      <Divider sx={{ mb: 1 }} />
-      <Box component="footer" sx={{ p: 2, maxWidth: '1120px', mx: 'auto', textAlign: 'center' }}>
+      <Divider sx={{ mt: 4, mb: 1 }} />
+      <Box component="footer" sx={{ mb: 4, p: 2, maxWidth: '1120px', mx: 'auto', textAlign: 'center' }}>
         <Typography variant="body2" color="text.secondary" gutterBottom>
           &copy; {new Date().getFullYear()} ArcticAria. All rights reserved.
         </Typography>
