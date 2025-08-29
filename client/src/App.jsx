@@ -138,6 +138,7 @@ function App() {
           <Route path="/discover" element={<DiscoverPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/new" element={<PostEditPage />} />
+          <Route path="/blog/edit/:id" element={<PostEditPage />} />
           <Route path="/blog/:id" element={<PostDetailPage />} />
         </Routes>
       </Box>

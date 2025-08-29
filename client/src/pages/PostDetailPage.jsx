@@ -119,7 +119,7 @@ export default function PostDetailPage() {
                 </IconButton>
                 {isLoggedIn && isAuthor && (
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        <IconButton onClick={() => navigate(`/blog/new?edit=${post.id}`)} color="primary">
+                        <IconButton onClick={() => navigate(`/blog/edit/${post.id}`)} color="primary">
                             <EditIcon />
                         </IconButton>
                         <IconButton onClick={() => setOpenDialog(true)} color="error">

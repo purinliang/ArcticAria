@@ -64,12 +64,18 @@ export default function PostEditPage() {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setMessage('Post updated successfully!');
+                setTimeout(() => {
+                    navigate(`/blog/${id}`);
+                }, 1000);
             } else {
                 await axios.post(`${API_BASE}/posts`, post, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setMessage('Post created successfully!');
-                setPost({ title: '', content: '' }); // Clear form for new post
+
+                setTimeout(() => {
+                    navigate('/blog');
+                }, 2000);
             }
         } catch (err) {
             console.error('Failed to submit post:', err);
