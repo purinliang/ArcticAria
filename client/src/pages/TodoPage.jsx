@@ -6,6 +6,7 @@ import { red } from '@mui/material/colors';
 import axios from 'axios';
 import TodoCard from '../components/TodoCard';
 import { useNavigate } from 'react-router-dom';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
@@ -18,6 +19,10 @@ export default function TodoPage() {
     });
     // Add a new state variable for displaying errors
     const [error, setError] = useState('');
+    // State to manage the confirmation dialog
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    // State to store the ID of the todo to be deleted
+    const [todoToDeleteId, setTodoToDeleteId] = useState(null);
 
     /**
      * Fetches the user's todos from the API.
@@ -80,23 +85,51 @@ export default function TodoPage() {
     };
 
     /**
-     * Deletes a todo.
-     * @param {string} id The ID of the todo.
+     * Handles the delete button click by opening the confirmation dialog.
+     * It does NOT perform the deletion.
+     * @param {string} id The ID of the todo to be deleted.
      */
-    const handleDelete = async (id) => {
+    const handleDelete = (id) => {
+        setTodoToDeleteId(id);
+        setIsDeleteDialogOpen(true);
+    };
+
+    /**
+     * Closes the confirmation dialog and resets the state.
+     */
+    const handleCloseDeleteDialog = () => {
+        setIsDeleteDialogOpen(false);
+        setTodoToDeleteId(null);
+    };
+
+    /**
+     * Executes the actual deletion after user confirmation.
+     * This function is called from the ConfirmationDialog.
+     */
+    const handleConfirmDelete = async () => {
+        if (!todoToDeleteId) {
+            handleCloseDeleteDialog();
+            return;
+        }
+
         setError('');
         try {
             const token = localStorage.getItem('jwtToken');
-            console.log(`DELETE ${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`);
-            await axios.delete(`${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+            await axios.delete(`${API_BASE}/todo/${todoToDeleteId}`, {
+                headers: { Authorization: `Bearer ${token}` }
             });
             fetchTodos(); // Call fetchTodos to update the list immediately
         } catch (err) {
             console.error('Failed to delete todo:', err);
-            setError('Failed to delete todo.');
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem('jwtToken');
+                setError('Session expired or unauthorized. Please log in again.');
+                setTimeout(() => navigate('/login'), 3000);
+            } else {
+                setError('Failed to delete todo.');
+            }
+        } finally {
+            handleCloseDeleteDialog(); // Always close the dialog
         }
     };
 
@@ -190,6 +223,16 @@ export default function TodoPage() {
             ) : (
                 <Typography>Loading...</Typography>
             )}
+
+            <ConfirmationDialog
+                open={isDeleteDialogOpen}
+                onClose={handleCloseDeleteDialog}
+                onConfirm={handleConfirmDelete}
+                title="Confirm Deletion"
+                contentText="This action is permanent. Are you sure you want to delete this todo?"
+                confirmText="Delete"
+                cancelText="Cancel"
+            />
         </Container>
     );
 }
