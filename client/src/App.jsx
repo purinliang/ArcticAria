@@ -7,8 +7,10 @@ import TodoDetailPage from './pages/TodoDetailPage';
 import BlogPage from './pages/BlogPage';
 import PostEditPage from './pages/PostEditPage';
 import PostDetailPage from './pages/PostDetailPage';
+import DiscoverPage from './pages/DiscoverPage';
 import { useAuth } from './AuthContext';
 import { useEffect, useState } from 'react';
+import HomePage from './pages/HomePage';
 
 function App() {
   const { isLoggedIn, username, logout } = useAuth();
@@ -93,8 +95,11 @@ function App() {
             <Button onClick={() => navigate('/todos')} color="inherit" sx={{ fontWeight: 'bold', textTransform: 'none' }}>
               Todos
             </Button>
+            <Button onClick={() => navigate('/discover')} color="inherit" sx={{ fontWeight: 'bold', textTransform: 'none' }}>
+              Discover
+            </Button>
             <Button onClick={() => navigate('/blog')} color="inherit" sx={{ fontWeight: 'bold', textTransform: 'none' }}>
-              Blog
+              Discuss
             </Button>
           </Box>
 
@@ -124,12 +129,13 @@ function App() {
       {/* Main content routes. Adjust padding based on screen size. */}
       <Box component="main" sx={{ p: isMobile ? 1 : 3, mb: 8, maxWidth: '960px', mx: 'auto' }}>
         <Routes>
-          <Route path="/" element={<TodoPage />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/todos" element={<TodoPage />} />
           <Route path="/todos/new" element={<TodoDetailPage />} />
           <Route path="/todos/:id" element={<TodoDetailPage />} />
+          <Route path="/discover" element={<DiscoverPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/new" element={<PostEditPage />} />
           <Route path="/blog/:id" element={<PostDetailPage />} />
