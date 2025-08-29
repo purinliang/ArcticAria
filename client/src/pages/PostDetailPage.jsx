@@ -147,7 +147,9 @@ export default function PostDetailPage() {
                         mx: 'auto'
                     }
                 }}>
-                    {post.content}
+                    <ReactMarkdown remarkPlugins={[gfm]}>
+                        {post.content}
+                    </ReactMarkdown>
                 </Typography>
             </Box>
 
