@@ -96,7 +96,7 @@ export default function BlogPage() {
         <Container maxWidth="md">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, mt: 4 }}>
                 <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                    All Blog Posts
+                    All Posts
                 </Typography>
                 {isLoggedIn && (
                     <Button
