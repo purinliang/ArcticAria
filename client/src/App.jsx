@@ -1,5 +1,5 @@
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, Button, Typography, Box, Divider, Link, useTheme, useMediaQuery } from '@mui/material';
+import { AppBar, Toolbar, Button, Typography, Box, Divider, Link, useTheme, useMediaQuery, Tooltip } from '@mui/material';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import TodoPage from './pages/TodoPage';
@@ -8,6 +8,7 @@ import BlogPage from './pages/BlogPage';
 import PostEditPage from './pages/PostEditPage';
 import PostDetailPage from './pages/PostDetailPage';
 import { useAuth } from './AuthContext';
+import { useEffect, useState } from 'react';
 
 function App() {
   const { isLoggedIn, username, logout } = useAuth();
@@ -25,20 +26,66 @@ function App() {
     navigate('/login');
   };
 
+  const emailAddress = 'purinliang@gmail.com';
+  // State to manage the special "copied" tooltip and its text
+  const [copiedTooltipOpen, setCopiedTooltipOpen] = useState(false);
+  const [tooltipText, setTooltipText] = useState(`Click to copy: ${emailAddress}`);
+
+  const handleEmailClick = async () => {
+    try {
+      // Use document.execCommand for better cross-browser compatibility in iframes
+      const textarea = document.createElement('textarea');
+      textarea.value = emailAddress;
+      textarea.style.position = 'fixed'; // Avoid scrolling to the bottom of the page
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      // On success, set tooltip text and open state
+      setTooltipText('Copied to clipboard!');
+      setCopiedTooltipOpen(true);
+    } catch (err) {
+      console.error('Failed to copy text:', err);
+      setTooltipText('Failed to copy!');
+      setCopiedTooltipOpen(true);
+    } finally {
+      // Hide the tooltip and revert text after 2 seconds
+      setTimeout(() => {
+        setCopiedTooltipOpen(false);
+      }, 2000);
+      setTimeout(() => {
+        setTooltipText(`Click to copy: ${emailAddress}`);
+      }, 2500);
+    }
+  };
+
+  const handleHoverOpen = () => {
+    // Only open the tooltip on hover if it's not currently in the "copied" state
+    if (!copiedTooltipOpen) {
+      setCopiedTooltipOpen(true);
+    }
+  };
+
+  const handleHoverClose = () => {
+    // Only close the tooltip on hover if it's not currently in the "copied" state
+    if (!copiedTooltipOpen) {
+      setCopiedTooltipOpen(false);
+    }
+  };
+
   return (
     <Box>
       <AppBar position="static" sx={{ bgcolor: 'white', color: 'black', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
         <Toolbar sx={{ maxWidth: '1120px', width: '100%', mx: 'auto' }}>
           {/* Logo and App Name - Hidden on mobile */}
           {!isMobile && (
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Button onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.5rem', textTransform: 'none' }}>
               <img src="/arctic_aria.svg" alt="Arctic Aria Logo" style={{ height: '32px', marginRight: '8px' }} />
               <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-                <Button onClick={() => navigate('/')} color="primary" sx={{ fontWeight: 'bold', fontSize: '1.5rem', textTransform: 'none' }}>
-                  ArcticAria
-                </Button>
+                ArcticAria
               </Typography>
-            </Box>
+            </Button>
           )}
 
           {/* Navigation Links */}
@@ -96,13 +143,28 @@ function App() {
           &copy; {new Date().getFullYear()} ArcticAria. All rights reserved.
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          <Link href="mailto:purinliang@gmail.com" color="inherit" sx={{ mr: 1 }}>
-            Contact Us
-          </Link>
+          Contact me: {" "}
+          <a href="https://github.com/purinliang" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', marginRight: '8px' }}>
+            GitHub
+          </a>
           |
-          <Link href="#" color="inherit" sx={{ ml: 1 }}>
-            Privacy Policy
-          </Link>
+          <Box component="span" sx={{ position: 'relative', display: 'inline-block' }}>
+            <Tooltip
+              title={tooltipText}
+              open={copiedTooltipOpen}
+              onOpen={handleHoverOpen}
+              onClose={handleHoverClose}
+              disableFocusListener
+              disableTouchListener
+            >
+              <a
+                onClick={handleEmailClick}
+                style={{ color: 'inherit', textDecoration: 'none', marginLeft: '8px', cursor: 'pointer' }}
+              >
+                Email
+              </a>
+            </Tooltip>
+          </Box>
         </Typography>
       </Box>
     </Box>
