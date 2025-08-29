@@ -92,9 +92,18 @@ export default function PostDetailPage() {
     }
 
     // Format the date to show US English format but in the local timezone
-    const formattedDate = new Date(post.created_at).toLocaleString('en-US', {
+    const formattedCreatedDate = new Date(post.createdAt + 'Z').toLocaleString({
         year: 'numeric',
-        month: 'long',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short'
+    });
+
+    const formattedUpdatedDate = new Date(post.updatedAt + 'Z').toLocaleString({
+        year: 'numeric',
+        month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
@@ -131,7 +140,10 @@ export default function PostDetailPage() {
                     Author: {post.userId}
                 </Typography>
                 <Typography variant="caption" display="block" color="text.secondary">
-                    Published: {formattedDate}
+                    Published: {formattedCreatedDate}
+                </Typography>
+                <Typography variant="caption" display="block" color="text.secondary">
+                    Updated: {formattedUpdatedDate}
                 </Typography>
             </Box>
 

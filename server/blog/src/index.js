@@ -260,7 +260,7 @@ async function updatePost(request, env, logger, postId) {
 			return new Response('No valid fields to update', { status: 400 });
 		}
 
-		// 验证用户是否为文章作者
+		// check whether the user is the author of the post
 		const { results } = await env.DB.prepare('SELECT user_id FROM posts WHERE id = ?').bind(postId).all();
 		if (results.length === 0 || results[0].user_id !== user.userId) {
 			logger.warn({ userId: user.userId, postId }, 'Attempt to update post owned by another user');
@@ -291,7 +291,7 @@ async function deletePost(request, env, logger, postId) {
 	}
 
 	try {
-		// 验证用户是否为文章作者
+		// check whether the user is the author of the post
 		const { results } = await env.DB.prepare('SELECT user_id FROM posts WHERE id = ?').bind(postId).all();
 		if (results.length === 0 || results[0].user_id !== user.userId) {
 			logger.warn({ userId: user.userId, postId }, 'Attempt to delete post owned by another user');
