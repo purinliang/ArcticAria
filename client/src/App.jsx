@@ -1,5 +1,5 @@
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, Button, Typography, Box, Divider, Link, useTheme, useMediaQuery, Tooltip } from '@mui/material';
+import { AppBar, Toolbar, Button, Typography, Box, Divider, useTheme, useMediaQuery, Tooltip } from '@mui/material';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import TodoPage from './pages/TodoPage';
@@ -9,7 +9,7 @@ import PostEditPage from './pages/PostEditPage';
 import PostDetailPage from './pages/PostDetailPage';
 import DiscoverPage from './pages/DiscoverPage';
 import { useAuth } from './AuthContext';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import HomePage from './pages/HomePage';
 
 function App() {
@@ -91,7 +91,7 @@ function App() {
           )}
 
           {/* Navigation Links */}
-          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: isMobile ? 0 : 4, gap: 2 }}>
+          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: isMobile ? 0 : 4, gap: isMobile ? 0.5 : 2 }}>
             <Button onClick={() => navigate('/todos')} color="inherit" sx={{ fontWeight: 'bold', textTransform: 'none' }}>
               Todos
             </Button>
@@ -127,7 +127,7 @@ function App() {
       </AppBar>
 
       {/* Main content routes. Adjust padding based on screen size. */}
-      <Box component="main" sx={{ p: isMobile ? 1 : 2, maxWidth: '960px', mx: 'auto' }}>
+      <Box component="main" sx={{ p: isMobile ? 0.5 : 2, maxWidth: '960px', mx: 'auto' }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
