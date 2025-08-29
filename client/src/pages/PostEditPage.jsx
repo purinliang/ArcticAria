@@ -27,6 +27,7 @@ export default function PostEditPage() {
             navigate('/login');
             return;
         }
+        console.log(id)
 
         if (isEditMode) {
             const fetchPost = async () => {
@@ -46,7 +47,14 @@ export default function PostEditPage() {
             };
             fetchPost();
         }
+
     }, [id, isLoggedIn, navigate, token, isEditMode]);
+
+    useEffect(() => {
+        if (!isEditMode) {
+            setPost({ title: '', content: '' });
+        }
+    }, [isEditMode]);
 
     const handleChange = (e) => {
         setPost({ ...post, [e.target.name]: e.target.value });
