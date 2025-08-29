@@ -1,5 +1,5 @@
 import { useEffect, useState, createContext, useContext } from 'react';
-import { Container, Typography, Box, Button, CircularProgress, Alert, useTheme, useMediaQuery, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { Container, Typography, Box, Button, CircularProgress, Alert, Tooltip, useTheme, useMediaQuery, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -117,30 +117,33 @@ export default function PostDetailPage() {
                 {/* <IconButton onClick={() => navigate('/blog')} color="primary">
                     <ArrowBackIcon />
                 </IconButton> */}
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main', mb: 1 }}>
+                    {post.title}
+                </Typography>
+
                 {isLoggedIn && isAuthor && (
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        <IconButton onClick={() => navigate(`/blog/edit/${post.id}`)} color="primary">
-                            <EditIcon />
-                        </IconButton>
-                        <IconButton onClick={() => setOpenDialog(true)} color="error">
-                            <DeleteIcon />
-                        </IconButton>
+                        <Tooltip title="Edit Post">
+                            <IconButton onClick={() => navigate(`/blog/edit/${post.id}`)} color="primary">
+                                <EditIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete Post">
+                            <IconButton onClick={() => setOpenDialog(true)} color="error">
+                                <DeleteIcon />
+                            </IconButton>
+                        </Tooltip>
                     </Box>
                 )}
             </Box>
 
-            {/* Second line: Post title */}
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main', mb: 1 }}>
-                {post.title}
-            </Typography>
-
-            {/* Third line: Author and publication date */}
+            {/* Second line: Author and publication date */}
             <Box sx={{ mb: 2 }}>
                 <Typography variant="caption" display="block" color="text.secondary">
-                    Author: {post.userId}
+                    Author:  {post.userId}
                 </Typography>
                 <Typography variant="caption" display="block" color="text.secondary">
-                    Published: {formattedCreatedDate}
+                    Created: {formattedCreatedDate}
                 </Typography>
                 <Typography variant="caption" display="block" color="text.secondary">
                     Updated: {formattedUpdatedDate}

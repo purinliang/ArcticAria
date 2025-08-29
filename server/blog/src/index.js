@@ -157,7 +157,7 @@ const mapPostToCamelCase = (post) => {
 async function getPublicPosts(request, env, logger) {
 	try {
 		const { results } = await env.DB.prepare(`
-            SELECT id, title, user_id, created_at, updated_at
+            SELECT id, title, content, user_id, created_at, updated_at
             FROM posts
             ORDER BY created_at DESC
         `).all();
