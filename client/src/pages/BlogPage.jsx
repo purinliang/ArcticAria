@@ -85,23 +85,9 @@ export default function BlogPage() {
             onClick={() => navigate(`/blog/${post.id}`)}
         >
             <CardContent>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        mb: 1
-                    }}
-                >
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', flexGrow: 1, mr: 2 }}>
-                        {post.title}
-                    </Typography>
-                    <Box sx={{ flexShrink: 0 }}>
-                        <Typography variant="caption" display="block" color="text.secondary" >
-                            Author: {truncateString(post.userId, 13)}
-                        </Typography>
-                    </Box>
-                </Box>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', flexGrow: 1, mr: 2 }}>
+                    {post.title}
+                </Typography>
                 <Box
                     sx={{
                         // With Masonry, we no longer need a fixed maxHeight or lineClamp
@@ -126,7 +112,10 @@ export default function BlogPage() {
                         </ReactMarkdown>
                     </Typography>
                 </Box>
-                <Typography variant="caption" display="block" color="text.secondary" sx={{ mt: 1 }}>
+                <Typography variant="caption" display="block" color="text.secondary" >
+                    Author: {truncateString(post.userId, 13)}
+                </Typography>
+                <Typography variant="caption" display="block" color="text.secondary">
                     Created: {formatPostDate(post.createdAt)}
                 </Typography>
                 <Typography variant="caption" display="block" color="text.secondary" >
