@@ -114,9 +114,9 @@ export default function PostDetailPage() {
         <Container maxWidth="md" sx={{ mt: 4 }}>
             {/* First line: Back arrow and author action buttons */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <IconButton onClick={() => navigate('/blog')} color="primary">
+                {/* <IconButton onClick={() => navigate('/blog')} color="primary">
                     <ArrowBackIcon />
-                </IconButton>
+                </IconButton> */}
                 {isLoggedIn && isAuthor && (
                     <Box sx={{ display: 'flex', gap: 1 }}>
                         <IconButton onClick={() => navigate(`/blog/edit/${post.id}`)} color="primary">

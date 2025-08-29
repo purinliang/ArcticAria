@@ -114,9 +114,9 @@ export default function PostEditPage() {
     return (
         <Container maxWidth="md" sx={{ mt: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <IconButton onClick={() => navigate('/blog')} sx={{ mr: 1 }}>
+                {/* <IconButton onClick={() => navigate('/blog')} sx={{ mr: 1 }}>
                     <ArrowBackIcon />
-                </IconButton>
+                </IconButton> */}
                 <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                     {isEditMode ? 'Edit Blog Post' : 'Create New Blog Post'}
                 </Typography>
