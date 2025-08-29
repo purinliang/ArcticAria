@@ -21,9 +21,9 @@ export default function TodoDetailPage() {
     const [form, setForm] = useState({
         title: '',
         content: '',
-        next_due_date: dayjs().format('YYYY-MM-DD'),
-        recurrence_rule: 'one-time',
-        reminder_days_before: 0,
+        nextDueDate: dayjs().format('YYYY-MM-DD'),
+        recurrenceRule: 'one-time',
+        reminderDaysBefore: 0,
         category: '',
         completed: false
     });
@@ -194,9 +194,9 @@ export default function TodoDetailPage() {
                         <DatePicker
                             label="Due Date"
                             format="DD/MM/YYYY"
-                            value={form.next_due_date ? dayjs(form.next_due_date) : null}
+                            value={form.nextDueDate ? dayjs(form.nextDueDate) : null}
                             onChange={(date) =>
-                                setForm({ ...form, next_due_date: date ? date.format('YYYY-MM-DD') : '' })
+                                setForm({ ...form, nextDueDate: date ? date.format('YYYY-MM-DD') : '' })
                             }
                             slotProps={{
                                 textField: {
@@ -223,10 +223,10 @@ export default function TodoDetailPage() {
                 <Grid item xs={12}>
                     <TextField
                         label="Recurrence Rule"
-                        name="recurrence_rule"
+                        name="recurrenceRule"
                         select
                         fullWidth
-                        value={form.recurrence_rule}
+                        value={form.recurrenceRule}
                         onChange={handleChange}
                         variant="outlined"
                         sx={{ borderRadius: '8px' }}
@@ -251,10 +251,10 @@ export default function TodoDetailPage() {
                 <Grid item xs={12}>
                     <TextField
                         label="Remind Days Before"
-                        name="reminder_days_before"
+                        name="reminderDaysBefore"
                         type="number"
                         fullWidth
-                        value={form.reminder_days_before}
+                        value={form.reminderDaysBefore}
                         onChange={handleChange}
                         variant="outlined"
                         sx={{ borderRadius: '8px' }}

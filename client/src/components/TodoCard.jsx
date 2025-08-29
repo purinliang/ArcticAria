@@ -32,11 +32,11 @@ export default function TodoCard({ todo, onToggleComplete, onDelete }) {
         if (todo.completed) {
             return green[50];
         }
-        const diffDays = dayjs(todo.next_due_date).diff(dayjs(), 'day');
+        const diffDays = dayjs(todo.nextDueDate).diff(dayjs(), 'day');
         if (diffDays <= 0) {
             return deepOrange[50];
         }
-        if (diffDays <= todo.reminder_days_before) {
+        if (diffDays <= todo.reminderDaysBefore) {
             return lightBlue[50];
         }
         return '#ffffff'; // Default white
@@ -96,11 +96,11 @@ export default function TodoCard({ todo, onToggleComplete, onDelete }) {
                 </Typography>
                 <Box sx={{ color: 'text.secondary' }}>
                     <Typography variant="body2" sx={{ mb: 0.5 }}>
-                        🗓️ Due: {dayjs(todo.next_due_date).format('DD/MM/YYYY')}
-                        &nbsp;({daysUntil(todo.next_due_date)})
+                        🗓️ Due: {dayjs(todo.nextDueDate).format('DD/MM/YYYY')}
+                        &nbsp;({daysUntil(todo.nextDueDate)})
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 0.5 }}>
-                        🔁 Recurrence: {todo.recurrence_rule || 'None'}
+                        🔁 Recurrence: {todo.recurrenceRule || 'None'}
                     </Typography>
                     {todo.category && (
                         <Typography variant="body2" sx={{ mb: 0.5 }}>

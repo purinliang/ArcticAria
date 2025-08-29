@@ -27,6 +27,7 @@ export default function PostEditPage() {
             navigate('/login');
             return;
         }
+        console.log(id)
 
         if (isEditMode) {
             const fetchPost = async () => {
@@ -46,7 +47,14 @@ export default function PostEditPage() {
             };
             fetchPost();
         }
+
     }, [id, isLoggedIn, navigate, token, isEditMode]);
+
+    useEffect(() => {
+        if (!isEditMode) {
+            setPost({ title: '', content: '' });
+        }
+    }, [isEditMode]);
 
     const handleChange = (e) => {
         setPost({ ...post, [e.target.name]: e.target.value });
@@ -64,12 +72,18 @@ export default function PostEditPage() {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setMessage('Post updated successfully!');
+                setTimeout(() => {
+                    navigate(`/blog/${id}`);
+                }, 1000);
             } else {
                 await axios.post(`${API_BASE}/posts`, post, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setMessage('Post created successfully!');
-                setPost({ title: '', content: '' }); // Clear form for new post
+
+                setTimeout(() => {
+                    navigate('/blog');
+                }, 2000);
             }
         } catch (err) {
             console.error('Failed to submit post:', err);
@@ -100,9 +114,9 @@ export default function PostEditPage() {
     return (
         <Container maxWidth="md" sx={{ mt: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <IconButton onClick={() => navigate('/blog')} sx={{ mr: 1 }}>
+                {/* <IconButton onClick={() => navigate('/blog')} sx={{ mr: 1 }}>
                     <ArrowBackIcon />
-                </IconButton>
+                </IconButton> */}
                 <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                     {isEditMode ? 'Edit Blog Post' : 'Create New Blog Post'}
                 </Typography>

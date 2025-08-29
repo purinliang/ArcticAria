@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Container, Typography, Box, Button, CircularProgress, Alert, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { useEffect, useState, createContext, useContext } from 'react';
+import { Container, Typography, Box, Button, CircularProgress, Alert, Tooltip, useTheme, useMediaQuery, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -24,6 +24,8 @@ export default function PostDetailPage() {
     const [openDialog, setOpenDialog] = useState(false);
 
     const token = localStorage.getItem('jwtToken');
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -33,10 +35,9 @@ export default function PostDetailPage() {
                 setPost(res.data);
                 setError(null);
 
-                // Check if the current logged-in user is the author
                 if (token) {
                     const decodedToken = jwtDecode(token);
-                    if (decodedToken.user_id === res.data.user_id) {
+                    if (decodedToken.userId === res.data.userId) {
                         setIsAuthor(true);
                     } else {
                         setIsAuthor(false);
@@ -90,33 +91,77 @@ export default function PostDetailPage() {
         return null;
     }
 
+    // Format the date to show US English format but in the local timezone
+    const formattedCreatedDate = new Date(post.createdAt + 'Z').toLocaleString({
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short'
+    });
+
+    const formattedUpdatedDate = new Date(post.updatedAt + 'Z').toLocaleString({
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short'
+    });
+
     return (
         <Container maxWidth="md" sx={{ mt: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <IconButton onClick={() => navigate('/blog')} sx={{ mr: 1 }}>
+            {/* First line: Back arrow and author action buttons */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                {/* <IconButton onClick={() => navigate('/blog')} color="primary">
                     <ArrowBackIcon />
-                </IconButton>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                </IconButton> */}
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main', mb: 1 }}>
                     {post.title}
                 </Typography>
+
                 {isLoggedIn && isAuthor && (
-                    <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
-                        <IconButton onClick={() => navigate(`/blog/new?edit=${post.id}`)} color="primary">
-                            <EditIcon />
-                        </IconButton>
-                        <IconButton onClick={() => setOpenDialog(true)} color="error">
-                            <DeleteIcon />
-                        </IconButton>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Tooltip title="Edit Post">
+                            <IconButton onClick={() => navigate(`/blog/edit/${post.id}`)} color="primary">
+                                <EditIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete Post">
+                            <IconButton onClick={() => setOpenDialog(true)} color="error">
+                                <DeleteIcon />
+                            </IconButton>
+                        </Tooltip>
                     </Box>
                 )}
             </Box>
 
-            <Typography variant="caption" display="block" color="text.secondary" sx={{ mb: 2 }}>
-                Author: {post.user_id} | Published: {new Date(post.created_at).toLocaleString()}
-            </Typography>
+            {/* Second line: Author and publication date */}
+            <Box sx={{ mb: 2 }}>
+                <Typography variant="caption" display="block" color="text.secondary">
+                    Author:  {post.userId}
+                </Typography>
+                <Typography variant="caption" display="block" color="text.secondary">
+                    Created: {formattedCreatedDate}
+                </Typography>
+                <Typography variant="caption" display="block" color="text.secondary">
+                    Updated: {formattedUpdatedDate}
+                </Typography>
+            </Box>
 
-            <Box sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: '8px', boxShadow: 1, backgroundColor: 'white' }}>
-                <Typography component="div" sx={{ whiteSpace: 'pre-wrap', lineHeight: '1.6rem' }}>
+            {/* Markdown content box with image styling */}
+            <Box sx={{ p: isMobile ? 1 : 2, border: '1px solid #e0e0e0', borderRadius: '8px', boxShadow: 1, backgroundColor: 'white' }}>
+                <Typography component="div" sx={{
+                    whiteSpace: 'pre-wrap',
+                    lineHeight: '1.6rem',
+                    '& img': {
+                        maxWidth: '100%',
+                        height: 'auto',
+                        display: 'block',
+                        mx: 'auto'
+                    }
+                }}>
                     <ReactMarkdown remarkPlugins={[gfm]}>
                         {post.content}
                     </ReactMarkdown>
