@@ -63,6 +63,7 @@ export default function LoginPage() {
         <Container maxWidth="sm">
             <Box
                 mt={6}
+                mb={2}
                 p={4}
                 sx={{
                     backgroundColor: 'white',
