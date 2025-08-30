@@ -115,9 +115,11 @@ function App() {
   const renderNavButtons = () => (
     <Box
       sx={{
+        flexGrow: 1,
         display: "flex",
         alignItems: "center",
         gap: 2,
+        ml: 2
       }}
     >
       <Button
@@ -253,10 +255,12 @@ function App() {
                   alt="Arctic Aria Logo"
                   style={{ height: "32px" }}
                 />
+
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" />
                 <Typography
                   variant="h6"
                   component="div"
-                  sx={{ ml: "8px", fontWeight: "bold" }}
+                  sx={{ ml: "8px", fontWeight: "bold", fontFamily: 'Orbitron' }}
                 >
                   ArcticAria
                 </Typography>
@@ -280,30 +284,30 @@ function App() {
           >
             <List>
               <ListItem button onClick={() => handleNavigation("/todos")}>
-                <ListItemText primary="Todos" />
+                <ListItemText primary="Todos" primaryTypographyProps={{ sx: { fontWeight: "bold" } }} />
               </ListItem>
               <ListItem button onClick={() => handleNavigation("/discover")}>
-                <ListItemText primary="Discover" />
+                <ListItemText primary="Discover" primaryTypographyProps={{ sx: { fontWeight: "bold" } }} />
               </ListItem>
               <ListItem button onClick={() => handleNavigation("/blog")}>
-                <ListItemText primary="Discuss" />
+                <ListItemText primary="Discuss" primaryTypographyProps={{ sx: { fontWeight: "bold" } }} />
               </ListItem>
               <Divider sx={{ my: 1 }} />
               {isLoggedIn ? (
                 <>
                   <ListItem>
-                    <ListItemText primary={`Welcome, ${username}`} />
+                    <ListItemText primary={`${username}`} />
                   </ListItem>
                   {/* Sign out button with error color */}
                   <ListItem button onClick={handleLogout}>
-                    <ListItemText primary="Sign out" sx={{ color: "error.main" }} />
+                    <ListItemText primary="Sign out" primaryTypographyProps={{ sx: { fontWeight: "bold", color: "error.main" } }} />
                   </ListItem>
                 </>
               ) : (
                 <>
                   {/* Sign in button with primary color */}
                   <ListItem button onClick={() => handleNavigation("/login")}>
-                    <ListItemText primary="Sign in" sx={{ color: "primary.main" }} />
+                    <ListItemText primary="Sign in" primaryTypographyProps={{ sx: { fontWeight: "bold", color: "primary.main" } }} />
                   </ListItem>
                 </>
               )}
