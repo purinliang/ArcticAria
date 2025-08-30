@@ -17,7 +17,7 @@ function App() {
   const navigate = useNavigate();
   const theme = useTheme();
   // Use a media query to check for screen size. 'md' is a good breakpoint for tablets/desktops.
-  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   /**
    * Handles the logout action.
@@ -79,49 +79,52 @@ function App() {
   return (
     <Box>
       <AppBar position="static" sx={{ bgcolor: 'white', color: 'black', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-        <Toolbar sx={{ maxWidth: '1120px', width: '100%', mx: 'auto' }}>
+        <Toolbar sx={{ maxWidth: '1120px', width: isMobile ? '90%' : '90%', mx: 'auto' }}>
           {/* Logo and App Name - Hidden on mobile */}
-          {!isMobile && (
-            <Button onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.5rem', textTransform: 'none' }}>
-              <img src="/arctic_aria.svg" alt="Arctic Aria Logo" style={{ height: '32px', marginRight: '8px' }} />
-              <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+
+          <Button onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.5rem', textTransform: 'none' }}>
+            <img src="/arctic_aria.svg" alt="Arctic Aria Logo" style={{ height: '32px' }} />
+            {!isMobile && (
+              <Typography variant="h6" component="div" sx={{ ml: '8px', fontWeight: 'bold' }}>
                 ArcticAria
               </Typography>
-            </Button>
-          )}
-
-          {/* Navigation Links */}
-          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: isMobile ? 0 : 4, gap: isMobile ? 0.5 : 2 }}>
-            <Button onClick={() => navigate('/todos')} color="inherit" sx={{ fontWeight: 'bold', textTransform: 'none' }}>
-              Todos
-            </Button>
-            <Button onClick={() => navigate('/discover')} color="inherit" sx={{ fontWeight: 'bold', textTransform: 'none' }}>
-              Discover
-            </Button>
-            <Button onClick={() => navigate('/blog')} color="inherit" sx={{ fontWeight: 'bold', textTransform: 'none' }}>
-              Discuss
-            </Button>
-          </Box>
-
-          {/* Auth buttons or user info. Fixed width to prevent CLS. */}
-          <Box sx={{ minWidth: '160px', display: 'flex', justifyContent: !isMobile ? 'flex-end' : 'none', alignItems: 'center', gap: 1 }} >
-            {isLoggedIn ? (
-              <>
-                {/* Username hidden on mobile */}
-                {!isMobile && (
-                  <Typography variant="body1" component="span" sx={{ mr: 1, fontWeight: 'medium' }}>
-                    {username}
-                  </Typography>
-                )}
-                <Button variant="contained" color="error" onClick={handleLogout} sx={{ textTransform: 'none' }}>
-                  Sign out
-                </Button>
-              </>
-            ) : (
-              <Button variant="contained" color="primary" onClick={() => navigate('/login')} sx={{ textTransform: 'none' }}>
-                Sign in
-              </Button>
             )}
+          </Button>
+
+          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            {/* Navigation Links - flexGrow: 1 pushes auth buttons to the right */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: isMobile ? 0.5 : 2 }}>
+              <Button onClick={() => navigate('/todos')} color="inherit" sx={{ fontSize: isMobile ? '0.75rem' : '1rem', fontWeight: 'bold', textTransform: 'none' }}>
+                Todos
+              </Button>
+              <Button onClick={() => navigate('/discover')} color="inherit" sx={{ fontSize: isMobile ? '0.75rem' : '1rem', fontWeight: 'bold', textTransform: 'none' }}>
+                Discover
+              </Button>
+              <Button onClick={() => navigate('/blog')} color="inherit" sx={{ fontSize: isMobile ? '0.75rem' : '1rem', fontWeight: 'bold', textTransform: 'none' }}>
+                Discuss
+              </Button>
+            </Box>
+
+            {/* Auth buttons or user info. Fixed width to prevent CLS. */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1 }}>
+              {isLoggedIn ? (
+                <>
+                  {/* Username hidden on mobile */}
+                  {!isMobile && (
+                    <Typography variant="body1" component="span" sx={{ mr: 1, fontWeight: 'medium' }}>
+                      {username}
+                    </Typography>
+                  )}
+                  <Button variant="contained" color="error" onClick={handleLogout} sx={{ fontSize: isMobile ? '0.75rem' : '1rem', textTransform: 'none' }}>
+                    Sign out
+                  </Button>
+                </>
+              ) : (
+                <Button variant="contained" color="primary" onClick={() => navigate('/login')} sx={{ fontSize: isMobile ? '0.75rem' : '1rem', textTransform: 'none' }}>
+                  Sign in
+                </Button>
+              )}
+            </Box>
           </Box>
         </Toolbar>
       </AppBar>

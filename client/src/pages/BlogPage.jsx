@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Container, Typography, Box, Card, CardContent, Link, IconButton, Tooltip } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
@@ -134,14 +134,11 @@ export default function BlogPage() {
                 {isLoggedIn && (
                     <Tooltip title="Create new post">
                         <IconButton
+                            variant="contained"
                             color="primary"
                             onClick={() => navigate('/blog/new')}
-                            sx={{
-                                border: '1px solid',
-                                borderColor: 'primary.main'
-                            }}
                         >
-                            <AddIcon />
+                            <PostAddIcon />
                         </IconButton>
                     </Tooltip>
                 )}
@@ -152,17 +149,21 @@ export default function BlogPage() {
 
             {loading && <Typography align="center">Loading posts...</Typography>}
             {error && <Typography color="error" align="center">{error}</Typography>}
-            {!loading && !error && (
-                <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={2}>
-                    {posts.length > 0 ? (
-                        posts.map(renderPost)
-                    ) : (
-                        <Typography color="text.secondary" align="center">
-                            There are no discussions yet. Be the first to share your thoughts!
-                        </Typography>
-                    )}
-                </Masonry>
-            )}
-        </Container>
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: '0', m: '0' }}>
+                {
+                    !loading && !error && (
+                        <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={2}>
+                            {posts.length > 0 ? (
+                                posts.map(renderPost)
+                            ) : (
+                                <Typography color="text.secondary" align="center">
+                                    There are no discussions yet. Be the first to share your thoughts!
+                                </Typography>
+                            )}
+                        </Masonry>
+                    )
+                }
+            </Box>
+        </Container >
     );
 }
