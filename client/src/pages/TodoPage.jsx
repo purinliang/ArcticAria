@@ -117,9 +117,13 @@ export default function TodoPage() {
                     remindDate.setDate(remindDate.getDate() - (todo.reminderDaysBefore || 0));
                 }
 
-                if (remindDate && now >= remindDate && now <= dueDate) {
+                // Get the start of the current day to compare dates correctly
+                const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                // Classify todos based on dates
+                if (remindDate && startOfToday.getTime() >= remindDate.getTime() && startOfToday.getTime() <= dueDate.getTime()) {
                     reminding.push(todo);
-                } else if (dueDate && now > dueDate) {
+                } else if (dueDate && startOfToday.getTime() > dueDate.getTime()) {
                     overdued.push(todo);
                 } else {
                     upcoming.push(todo);
