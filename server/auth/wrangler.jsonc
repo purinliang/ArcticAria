@@ -38,7 +38,7 @@
 	 */
 	// "vars": { "MY_VARIABLE": "production_value" },
 	"vars": {
-		"JWT_SECRET": "local-test-secret-key"
+		"JWT_SECRET": "local-test-secret-key",
 	},
 	/**
 	 * Note: Use secrets to store sensitive data.
