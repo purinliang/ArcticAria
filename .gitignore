@@ -1,3 +1,6 @@
 # .gitignore
 # common
 node_modules
+
+# client
+/client/.env
