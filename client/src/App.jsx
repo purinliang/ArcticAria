@@ -27,6 +27,8 @@ import DiscoverPage from "./pages/DiscoverPage";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { useState } from "react";
 import HomePage from "./pages/HomePage";
+import ArcticAriaLogo from "./assets/arctic-aria-logo.png";
+import ArcticAriaTitle from "./components/ArcticAriaTitle";
 
 function App() {
   const { isLoggedIn, username, logout } = useAuth();
@@ -250,16 +252,17 @@ function App() {
                   textTransform: "none",
                 }}
               >
-                {/* Logo icon as a Typography component */}
                 <img
-                  src="/arctic_aria.svg"
+                  src={ArcticAriaLogo}
                   alt="Arctic Aria Logo"
                   style={{ height: "32px" }}
                 />
-                <img
-                  src="/arctic_aria_title.svg"
-                  alt="Arctic Aria Title"
-                  style={{ height: "32px", marginLeft: "4px" }}
+                <ArcticAriaTitle
+                  width="auto"
+                  height="24px"
+                  fill="#000000"
+                  stroke="#000000"
+                  style={{ marginLeft: "8px" }}
                 />
               </Button>
             </Box>
