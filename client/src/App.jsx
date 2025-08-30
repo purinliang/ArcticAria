@@ -250,23 +250,17 @@ function App() {
                   textTransform: "none",
                 }}
               >
+                {/* Logo icon as a Typography component */}
                 <img
                   src="/arctic_aria.svg"
                   alt="Arctic Aria Logo"
                   style={{ height: "32px" }}
                 />
-
-                <link
-                  rel="stylesheet"
-                  href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
+                <img
+                  src="/arctic_aria_title.svg"
+                  alt="Arctic Aria Title"
+                  style={{ height: "32px", marginLeft: "4px" }}
                 />
-                <Typography
-                  variant="h6"
-                  component="div"
-                  sx={{ ml: "8px", fontWeight: "bold", fontFamily: "Orbitron" }}
-                >
-                  ArcticAria
-                </Typography>
               </Button>
             </Box>
 
