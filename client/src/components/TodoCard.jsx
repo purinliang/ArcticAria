@@ -65,8 +65,6 @@ export default function TodoCard({ todo, onToggleComplete }) {
                         variant="h6"
                         sx={{
                             fontWeight: 'bold',
-                            textDecoration: todo.completed ? 'line-through' : 'none',
-                            color: todo.completed ? 'text.secondary' : 'text.primary'
                         }}
                     >
                         {todo.title}
@@ -88,8 +86,6 @@ export default function TodoCard({ todo, onToggleComplete }) {
                         mt: 1,
                         mb: 2,
                         whiteSpace: 'pre-wrap',
-                        textDecoration: todo.completed ? 'line-through' : 'none',
-                        color: todo.completed ? 'text.secondary' : 'text.primary'
                     }}
                 >
                     {todo.content}
