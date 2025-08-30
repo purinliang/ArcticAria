@@ -37,9 +37,9 @@
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
 	 */
 	// "vars": { "MY_VARIABLE": "production_value" },
-	"vars": {
-		"JWT_SECRET": "local-test-secret-key",
-	},
+	// "vars": {
+	// 	"JWT_SECRET": "local-test-secret-key",
+	// },
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
