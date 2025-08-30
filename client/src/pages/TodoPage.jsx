@@ -1,14 +1,22 @@
-import { useEffect, useState, useMemo } from 'react';
 import {
-    Container, Typography, Button, Divider, Alert, Box, Switch, FormControlLabel,
-    Tooltip,
+    Container, Typography, Button, Divider, Alert, Box
 } from '@mui/material';
 import { red } from '@mui/material/colors';
 import axios from 'axios';
 import TodoCard from '../components/TodoCard';
 import { useNavigate } from 'react-router-dom';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import { useEffect, useState } from 'react';
 import { Masonry } from '@mui/lab';
+import WarningIcon from '@mui/icons-material/Warning';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import StarsIcon from '@mui/icons-material/Stars';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Tooltip from '@mui/material/Tooltip';
+import Switch from '@mui/material/Switch';
+
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
@@ -140,24 +148,28 @@ export default function TodoPage() {
 
         console.log("Grouped todos:", sortedGroups);
         setGroupedTodos(sortedGroups);
-    }, [todos, sortByCategory]);
+    }, [todos, sortTodosByDate]);
 
     /**
      * Renders a group of todos with a label in a single list.
      * @param {Array<object>} todoItems The array of todos to render.
      * @param {string} label The label for the group.
+     * @param {React.ReactElement} icon The Material-UI icon for the label.
      */
-    const renderTodoGroup = (todoItems, label) => {
+    const renderTodoGroup = (todoItems, label, icon) => {
         if (!todoItems || !Array.isArray(todoItems)) return null;
         if (todoItems.length === 0) return null;
 
         return (
             <Box key={label} sx={{ my: 2 }}>
-                <Typography variant="h6" sx={{ mt: 4, mb: 1, fontWeight: 'bold' }}>
-                    {label}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mt: 4, mb: 1 }}>
+                    {icon && <Box component="span" sx={{ mr: 1, fontSize: '1.2rem' }}>{icon}</Box>}
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                        {label}
+                    </Typography>
+                </Box>
                 <Divider sx={{ mb: 2 }} />
-                <Masonry columns={{ xs: 1, sm: 2 }} spacing={2}>
+                <Masonry columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} spacing={2}>
                     {todoItems.map(todo => (
                         <TodoCard
                             key={todo.id}
@@ -181,7 +193,7 @@ export default function TodoPage() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                 <Box>
                     <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: 'primary.main', mb: 1 }}>
-                        My Todo List 📝
+                        My Todo List
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary">
                         Manage your tasks and stay on top of your schedule.
@@ -228,15 +240,15 @@ export default function TodoPage() {
                 </Alert>
             )}
 
-            {todos && todos.length > 0 ? (
+            {todos.length > 0 ? (
                 <>
-                    {renderTodoGroup(groupedTodos.overdued, '⚠️ Overdue')}
-                    {renderTodoGroup(groupedTodos.reminding, '🔔 Reminding')}
-                    {renderTodoGroup(groupedTodos.upcoming, '📅 Upcoming')}
-                    {renderTodoGroup(groupedTodos.completed, '✅ Completed')}
+                    {renderTodoGroup(groupedTodos.overdued, 'Overdue', <WarningIcon color="error" />)}
+                    {renderTodoGroup(groupedTodos.reminding, 'Reminding', <NotificationsActiveIcon color="primary" />)}
+                    {renderTodoGroup(groupedTodos.upcoming, 'Upcoming', <CalendarTodayIcon color="primary" />)}
+                    {renderTodoGroup(groupedTodos.completed, 'Completed', <CheckCircleOutlineIcon color="success" />)}
                     {allGroupsEmpty && (
                         <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4 }}>
-                            All caught up! ✨
+                            All caught up! <StarsIcon color="secondary" sx={{ verticalAlign: 'middle' }} />
                         </Typography>
                     )}
                 </>
