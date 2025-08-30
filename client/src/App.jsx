@@ -79,7 +79,7 @@ function App() {
   return (
     <Box>
       <AppBar position="static" sx={{ bgcolor: 'white', color: 'black', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-        <Toolbar sx={{ maxWidth: '1120px', width: isMobile ? '90%' : '80%', mx: 'auto' }}>
+        <Toolbar sx={{ maxWidth: '1120px', width: isMobile ? '90%' : '90%', mx: 'auto' }}>
           {/* Logo and App Name - Hidden on mobile */}
 
           <Button onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.5rem', textTransform: 'none' }}>
