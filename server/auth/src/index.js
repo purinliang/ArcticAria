@@ -10,9 +10,9 @@ const logger = pino({
 		options: {
 			colorize: true,
 			translateTime: 'SYS:yyyy-mm-dd HH:MM:ss',
-			ignore: 'pid,hostname'
-		}
-	}
+			ignore: 'pid,hostname',
+		},
+	},
 });
 
 // CORS headers configuration
@@ -32,7 +32,7 @@ export default {
 			reqLogger.info({
 				method: request.method,
 				url: request.url,
-				msg: 'Request received'
+				msg: 'Request received',
 			});
 
 			const url = new URL(request.url);
@@ -67,15 +67,14 @@ export default {
 
 			reqLogger.warn({ path }, 'Route not found');
 			return new Response('Not Found', { status: 404, headers: corsHeaders });
-
 		} catch (error) {
 			reqLogger.error({
 				err: error,
-				msg: 'Unhandled exception in request processing'
+				msg: 'Unhandled exception in request processing',
 			});
 			return new Response('Internal Server Error', {
 				status: 500,
-				headers: corsHeaders
+				headers: corsHeaders,
 			});
 		}
 	},
@@ -95,9 +94,9 @@ function withCORS(response) {
 
 /**
  * Handles user registration
- * @param {Request} request 
- * @param {Env} env 
- * @param {pino.Logger} logger 
+ * @param {Request} request
+ * @param {Env} env
+ * @param {pino.Logger} logger
  * @returns {Promise<Response>}
  */
 async function register(request, env, logger) {
@@ -113,9 +112,7 @@ async function register(request, env, logger) {
 		}
 
 		// Check if user already exists based on `email` column
-		const existing = await env.DB.prepare('SELECT 1 FROM users WHERE email = ?')
-			.bind(username)
-			.first();
+		const existing = await env.DB.prepare('SELECT 1 FROM users WHERE email = ?').bind(username).first();
 
 		if (existing) {
 			logger.warn({ username }, 'Username already registered');
@@ -131,38 +128,39 @@ async function register(request, env, logger) {
 		logger.debug('Password hashed successfully');
 
 		// Create new user, inserting `username` into the `email` column
-		await env.DB.prepare(
-			'INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)'
-		)
-			.bind(userId, username, passwordHash)
-			.run();
+		await env.DB.prepare('INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)').bind(userId, username, passwordHash).run();
 
 		logger.info({ userId, username }, 'User registered successfully');
 
-		return new Response(JSON.stringify({
-			success: true,
-			userId
-		}), {
-			status: 201,
-			headers: { 'Content-Type': 'application/json' }
-		});
-
+		return new Response(
+			JSON.stringify({
+				success: true,
+				userId,
+			}),
+			{
+				status: 201,
+				headers: { 'Content-Type': 'application/json' },
+			},
+		);
 	} catch (error) {
 		logger.error({ error }, 'Registration failed');
-		return new Response(JSON.stringify({
-			error: 'Registration failed'
-		}), {
-			status: 500,
-			headers: { 'Content-Type': 'application/json' }
-		});
+		return new Response(
+			JSON.stringify({
+				error: 'Registration failed',
+			}),
+			{
+				status: 500,
+				headers: { 'Content-Type': 'application/json' },
+			},
+		);
 	}
 }
 
 /**
  * Handles user login and JWT generation
- * @param {Request} request 
- * @param {Env} env 
- * @param {pino.Logger} logger 
+ * @param {Request} request
+ * @param {Env} env
+ * @param {pino.Logger} logger
  * @returns {Promise<Response>}
  */
 async function login(request, env, logger) {
@@ -171,9 +169,7 @@ async function login(request, env, logger) {
 		logger.info({ username }, 'Login attempt');
 
 		// Find user in database based on `email` column
-		const userResult = await env.DB.prepare('SELECT * FROM users WHERE email = ?')
-			.bind(username)
-			.first();
+		const userResult = await env.DB.prepare('SELECT * FROM users WHERE email = ?').bind(username).first();
 
 		if (!userResult) {
 			logger.warn({ username }, 'User not found during login');
@@ -184,7 +180,7 @@ async function login(request, env, logger) {
 		const user = {
 			id: userResult.id,
 			email: userResult.email,
-			passwordHash: userResult.password_hash // Map snake_case to camelCase
+			passwordHash: userResult.password_hash, // Map snake_case to camelCase
 		};
 
 		// Verify password
@@ -195,7 +191,7 @@ async function login(request, env, logger) {
 		}
 
 		// Generate JWT token
-		const secret = new TextEncoder().encode(env.JWT_SECRET);// Return username, but in current database, it is called 'email'
+		const secret = new TextEncoder().encode(env.JWT_SECRET); // Return username, but in current database, it is called 'email'
 		// Return username, but in current database, it is called 'email'
 		const jwt = await new SignJWT({ userId: user.id, username: user.email, email: user.email })
 			.setProtectedHeader({ alg: 'HS256' })
@@ -209,11 +205,10 @@ async function login(request, env, logger) {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' },
 		});
-
 	} catch (error) {
 		logger.error({
 			err: error,
-			msg: 'Login failed'
+			msg: 'Login failed',
 		});
 		return new Response('Login failed', { status: 500 });
 	}
@@ -221,8 +216,8 @@ async function login(request, env, logger) {
 
 /**
  * Verifies JWT token
- * @param {string} token 
- * @param {Env} env 
+ * @param {string} token
+ * @param {Env} env
  * @returns {Promise<object|null>}
  */
 async function verifyJWT(token, env, logger) {
@@ -234,7 +229,7 @@ async function verifyJWT(token, env, logger) {
 	} catch (err) {
 		logger.warn({
 			err,
-			msg: 'JWT verification failed'
+			msg: 'JWT verification failed',
 		});
 		return null;
 	}
@@ -242,9 +237,9 @@ async function verifyJWT(token, env, logger) {
 
 /**
  * Handles token verification requests
- * @param {Request} request 
- * @param {Env} env 
- * @param {pino.Logger} logger 
+ * @param {Request} request
+ * @param {Env} env
+ * @param {pino.Logger} logger
  * @returns {Promise<Response>}
  */
 async function verifyToken(request, env, logger) {
@@ -268,11 +263,10 @@ async function verifyToken(request, env, logger) {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' },
 		});
-
 	} catch (error) {
 		logger.error({
 			err: error,
-			msg: 'Token verification error'
+			msg: 'Token verification error',
 		});
 		return new Response('Token verification error', { status: 500 });
 	}

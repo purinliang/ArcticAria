@@ -7,9 +7,9 @@ const logger = pino({
 		options: {
 			colorize: true,
 			translateTime: 'SYS:yyyy-mm-dd HH:MM:ss',
-			ignore: 'pid,hostname'
-		}
-	}
+			ignore: 'pid,hostname',
+		},
+	},
 });
 
 const corsHeaders = {
@@ -58,16 +58,19 @@ export default {
 			reqLogger.warn({ path }, 'Route not found');
 			return new Response('Not Found', { status: 404, headers: corsHeaders });
 		} catch (err) {
-			reqLogger.error({
-				errMessage: err?.message,
-				errStack: err?.stack
-			}, 'Unhandled error in fetch handler');
+			reqLogger.error(
+				{
+					errMessage: err?.message,
+					errStack: err?.stack,
+				},
+				'Unhandled error in fetch handler',
+			);
 			return new Response('Internal Server Error', {
 				status: 500,
-				headers: corsHeaders
+				headers: corsHeaders,
 			});
 		}
-	}
+	},
 };
 
 function withCORS(response) {
@@ -103,24 +106,28 @@ async function createTodo(request, env, logger) {
 		const todoId = crypto.randomUUID();
 
 		// The database columns use `snake_case`.
-		await env.DB.prepare(`
+		await env.DB.prepare(
+			`
             INSERT INTO todos (id, user_id, title, content, category, recurrence_rule, next_due_date, reminder_days_before)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(
-			todoId,
-			user.userId,
-			title,
-			content || null,
-			category || null,
-			recurrenceRule || null, // Map from camelCase to snake_case for DB insert
-			nextDueDate,
-			reminderDaysBefore || 0
-		).run();
+        `,
+		)
+			.bind(
+				todoId,
+				user.userId,
+				title,
+				content || null,
+				category || null,
+				recurrenceRule || null, // Map from camelCase to snake_case for DB insert
+				nextDueDate,
+				reminderDaysBefore || 0,
+			)
+			.run();
 
 		logger.info({ userId: user.userId, todoId }, 'Todo created successfully');
 		return new Response(JSON.stringify({ success: true, id: todoId }), {
 			status: 201,
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
 		});
 	} catch (err) {
 		logger.error({ errMessage: err?.message, errStack: err?.stack }, 'Unhandled error in create todo');
@@ -130,7 +137,7 @@ async function createTodo(request, env, logger) {
 
 /**
  * Helper function to map database todo object to camelCase
- * @param {object} todo 
+ * @param {object} todo
  * @returns {object}
  */
 const mapTodoToCamelCase = (todo) => {
@@ -143,7 +150,7 @@ const mapTodoToCamelCase = (todo) => {
 		recurrenceRule: todo.recurrence_rule,
 		nextDueDate: todo.next_due_date,
 		reminderDaysBefore: todo.reminder_days_before,
-		completed: todo.completed
+		completed: todo.completed,
 	};
 };
 
@@ -168,11 +175,15 @@ async function getTodos(request, env, logger) {
 	}
 
 	try {
-		const { results } = await env.DB.prepare(`
+		const { results } = await env.DB.prepare(
+			`
             SELECT *
             FROM todos
             WHERE user_id = ?
-        `).bind(user.userId).all();
+        `,
+		)
+			.bind(user.userId)
+			.all();
 
 		// Map database results to camelCase
 		const todos = results.map(mapTodoToCamelCase);
@@ -180,7 +191,7 @@ async function getTodos(request, env, logger) {
 		// Return the full, flat list of todos
 		return new Response(JSON.stringify(todos), {
 			status: 200,
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
 		});
 	} catch (err) {
 		logger.error({ errMessage: err?.message, errStack: err?.stack }, 'Unhandled error in getTodos');
@@ -207,7 +218,7 @@ async function updateTodo(request, env, logger, todoId) {
 		for (const key of allowed) {
 			if (key in updates) {
 				// Map from camelCase to snake_case for the SQL query
-				const dbKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+				const dbKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 				fields.push(`${dbKey} = ?`);
 				values.push(updates[key]);
 			}
@@ -222,7 +233,9 @@ async function updateTodo(request, env, logger, todoId) {
 		// The query uses snake_case column names, and we need to pass the values in the correct order.
 		const query = `UPDATE todos SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`;
 
-		await env.DB.prepare(query).bind(...values).run();
+		await env.DB.prepare(query)
+			.bind(...values)
+			.run();
 
 		logger.info({ userId: user.userId, todoId }, 'Todo updated successfully');
 		return new Response(JSON.stringify({ success: true }));
@@ -240,9 +253,7 @@ async function deleteTodo(request, env, logger, todoId) {
 	}
 
 	try {
-		await env.DB.prepare('DELETE FROM todos WHERE id = ? AND user_id = ?')
-			.bind(todoId, user.userId)
-			.run();
+		await env.DB.prepare('DELETE FROM todos WHERE id = ? AND user_id = ?').bind(todoId, user.userId).run();
 
 		logger.info({ userId: user.userId, todoId }, 'Todo deleted');
 		return new Response(JSON.stringify({ success: true }));
@@ -263,15 +274,14 @@ async function getAuthenticatedUser(request, env, logger) {
 	}
 
 	try {
-
 		logger.info({ authHeader }, 'Sending token to auth server');
 		logger.warn({ hasAuth: !!env.AUTH, fetchType: typeof env.AUTH?.fetch }, 'AUTH binding check');
 
-
-		const res = await env.AUTH.fetch(new Request('https://auth/verify', {
-			headers: { Authorization: authHeader }
-		}));
-
+		const res = await env.AUTH.fetch(
+			new Request('https://auth/verify', {
+				headers: { Authorization: authHeader },
+			}),
+		);
 
 		logger.info({ status: res.status }, 'Received response from auth server');
 
@@ -284,10 +294,13 @@ async function getAuthenticatedUser(request, env, logger) {
 		logger.debug({ userId: payload.userId }, 'User authenticated via auth server');
 		return payload;
 	} catch (err) {
-		logger.error({
-			errMessage: err?.message,
-			errStack: err?.stack
-		}, 'Unhandled error in verifying token via auth worker');
+		logger.error(
+			{
+				errMessage: err?.message,
+				errStack: err?.stack,
+			},
+			'Unhandled error in verifying token via auth worker',
+		);
 		return null;
 	}
 }

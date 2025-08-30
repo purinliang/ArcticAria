@@ -9,14 +9,13 @@
 		"test": "vitest"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.8.19",
-		"vitest": "~3.2.0",
-		"wrangler": "^4.26.0"
+		"@cloudflare/vitest-pool-workers": "^0.8.68",
+		"vitest": "~3.2.4",
+		"wrangler": "^4.33.1"
 	},
 	"dependencies": {
 		"bcryptjs": "^3.0.2",
-		"crypto": "^1.0.1",
-		"jose": "^6.0.12",
-		"pino": "^9.7.0"
+		"jose": "^6.1.0",
+		"pino": "^9.9.0"
 	}
 }

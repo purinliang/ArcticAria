@@ -1,23 +1,33 @@
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, Button, Typography, Box, Divider, useTheme, useMediaQuery, Tooltip } from '@mui/material';
-import RegisterPage from './pages/RegisterPage';
-import LoginPage from './pages/LoginPage';
-import TodoPage from './pages/TodoPage';
-import TodoDetailPage from './pages/TodoDetailPage';
-import BlogPage from './pages/BlogPage';
-import PostEditPage from './pages/PostEditPage';
-import PostDetailPage from './pages/PostDetailPage';
-import DiscoverPage from './pages/DiscoverPage';
-import { useAuth } from './AuthContext';
-import { useState } from 'react';
-import HomePage from './pages/HomePage';
+import { Routes, Route, useNavigate } from "react-router-dom";
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  Typography,
+  Box,
+  Divider,
+  useTheme,
+  useMediaQuery,
+  Tooltip,
+} from "@mui/material";
+import RegisterPage from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
+import TodoPage from "./pages/TodoPage";
+import TodoDetailPage from "./pages/TodoDetailPage";
+import BlogPage from "./pages/BlogPage";
+import PostEditPage from "./pages/PostEditPage";
+import PostDetailPage from "./pages/PostDetailPage";
+import DiscoverPage from "./pages/DiscoverPage";
+import { useAuth } from "./AuthContext";
+import { useState } from "react";
+import HomePage from "./pages/HomePage";
 
 function App() {
   const { isLoggedIn, username, logout } = useAuth();
   const navigate = useNavigate();
   const theme = useTheme();
   // Use a media query to check for screen size. 'md' is a good breakpoint for tablets/desktops.
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   /**
    * Handles the logout action.
@@ -25,31 +35,33 @@ function App() {
    */
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
-  const emailAddress = 'purinliang@gmail.com';
+  const emailAddress = "purinliang@gmail.com";
   // State to manage the special "copied" tooltip and its text
   const [copiedTooltipOpen, setCopiedTooltipOpen] = useState(false);
-  const [tooltipText, setTooltipText] = useState(`Click to copy: ${emailAddress}`);
+  const [tooltipText, setTooltipText] = useState(
+    `Click to copy: ${emailAddress}`,
+  );
 
   const handleEmailClick = async () => {
     try {
       // Use document.execCommand for better cross-browser compatibility in iframes
-      const textarea = document.createElement('textarea');
+      const textarea = document.createElement("textarea");
       textarea.value = emailAddress;
-      textarea.style.position = 'fixed'; // Avoid scrolling to the bottom of the page
+      textarea.style.position = "fixed"; // Avoid scrolling to the bottom of the page
       document.body.appendChild(textarea);
       textarea.select();
-      document.execCommand('copy');
+      document.execCommand("copy");
       document.body.removeChild(textarea);
 
       // On success, set tooltip text and open state
-      setTooltipText('Copied to clipboard!');
+      setTooltipText("Copied to clipboard!");
       setCopiedTooltipOpen(true);
     } catch (err) {
-      console.error('Failed to copy text:', err);
-      setTooltipText('Failed to copy!');
+      console.error("Failed to copy text:", err);
+      setTooltipText("Failed to copy!");
       setCopiedTooltipOpen(true);
     } finally {
       // Hide the tooltip and revert text after 2 seconds
@@ -78,49 +90,143 @@ function App() {
 
   return (
     <Box>
-      <AppBar position="static" sx={{ bgcolor: 'white', color: 'black', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-        <Toolbar sx={{ maxWidth: '1120px', width: isMobile ? '90%' : '90%', mx: 'auto' }}>
+      <AppBar
+        position="static"
+        sx={{
+          bgcolor: "white",
+          color: "black",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        }}
+      >
+        <Toolbar
+          sx={{
+            maxWidth: "1120px",
+            width: isMobile ? "90%" : "90%",
+            mx: "auto",
+          }}
+        >
           {/* Logo and App Name - Hidden on mobile */}
 
-          <Button onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.5rem', textTransform: 'none' }}>
-            <img src="/arctic_aria.svg" alt="Arctic Aria Logo" style={{ height: '32px' }} />
+          <Button
+            onClick={() => navigate("/")}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              fontWeight: "bold",
+              fontSize: "1.5rem",
+              textTransform: "none",
+            }}
+          >
+            <img
+              src="/arctic_aria.svg"
+              alt="Arctic Aria Logo"
+              style={{ height: "32px" }}
+            />
             {!isMobile && (
-              <Typography variant="h6" component="div" sx={{ ml: '8px', fontWeight: 'bold' }}>
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ ml: "8px", fontWeight: "bold" }}
+              >
                 ArcticAria
               </Typography>
             )}
           </Button>
 
-          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             {/* Navigation Links - flexGrow: 1 pushes auth buttons to the right */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: isMobile ? 0.5 : 2 }}>
-              <Button onClick={() => navigate('/todos')} color="inherit" sx={{ fontSize: isMobile ? '0.75rem' : '1rem', fontWeight: 'bold', textTransform: 'none' }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: isMobile ? 0.5 : 2,
+              }}
+            >
+              <Button
+                onClick={() => navigate("/todos")}
+                color="inherit"
+                sx={{
+                  fontSize: isMobile ? "0.75rem" : "1rem",
+                  fontWeight: "bold",
+                  textTransform: "none",
+                }}
+              >
                 Todos
               </Button>
-              <Button onClick={() => navigate('/discover')} color="inherit" sx={{ fontSize: isMobile ? '0.75rem' : '1rem', fontWeight: 'bold', textTransform: 'none' }}>
+              <Button
+                onClick={() => navigate("/discover")}
+                color="inherit"
+                sx={{
+                  fontSize: isMobile ? "0.75rem" : "1rem",
+                  fontWeight: "bold",
+                  textTransform: "none",
+                }}
+              >
                 Discover
               </Button>
-              <Button onClick={() => navigate('/blog')} color="inherit" sx={{ fontSize: isMobile ? '0.75rem' : '1rem', fontWeight: 'bold', textTransform: 'none' }}>
+              <Button
+                onClick={() => navigate("/blog")}
+                color="inherit"
+                sx={{
+                  fontSize: isMobile ? "0.75rem" : "1rem",
+                  fontWeight: "bold",
+                  textTransform: "none",
+                }}
+              >
                 Discuss
               </Button>
             </Box>
 
             {/* Auth buttons or user info. Fixed width to prevent CLS. */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
               {isLoggedIn ? (
                 <>
                   {/* Username hidden on mobile */}
                   {!isMobile && (
-                    <Typography variant="body1" component="span" sx={{ mr: 1, fontWeight: 'medium' }}>
+                    <Typography
+                      variant="body1"
+                      component="span"
+                      sx={{ mr: 1, fontWeight: "medium" }}
+                    >
                       {username}
                     </Typography>
                   )}
-                  <Button variant="contained" color="error" onClick={handleLogout} sx={{ fontSize: isMobile ? '0.75rem' : '1rem', textTransform: 'none' }}>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleLogout}
+                    sx={{
+                      fontSize: isMobile ? "0.75rem" : "1rem",
+                      textTransform: "none",
+                    }}
+                  >
                     Sign out
                   </Button>
                 </>
               ) : (
-                <Button variant="contained" color="primary" onClick={() => navigate('/login')} sx={{ fontSize: isMobile ? '0.75rem' : '1rem', textTransform: 'none' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => navigate("/login")}
+                  sx={{
+                    fontSize: isMobile ? "0.75rem" : "1rem",
+                    textTransform: "none",
+                  }}
+                >
                   Sign in
                 </Button>
               )}
@@ -130,7 +236,10 @@ function App() {
       </AppBar>
 
       {/* Main content routes. Adjust padding based on screen size. */}
-      <Box component="main" sx={{ p: isMobile ? 0.5 : 2, maxWidth: '960px', mx: 'auto' }}>
+      <Box
+        component="main"
+        sx={{ p: isMobile ? 0.5 : 2, maxWidth: "960px", mx: "auto" }}
+      >
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -148,17 +257,38 @@ function App() {
 
       {/* Footer */}
       <Divider sx={{ mt: 4, mb: 1 }} />
-      <Box component="footer" sx={{ mb: 4, p: 2, maxWidth: '1120px', mx: 'auto', textAlign: 'center' }}>
+      <Box
+        component="footer"
+        sx={{
+          mb: 4,
+          p: 2,
+          maxWidth: "1120px",
+          mx: "auto",
+          textAlign: "center",
+        }}
+      >
         <Typography variant="body2" color="text.secondary" gutterBottom>
           &copy; {new Date().getFullYear()} ArcticAria. All rights reserved.
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Contact me: {" "}
-          <a href="https://github.com/purinliang" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', marginRight: '8px' }}>
+          Contact me:{" "}
+          <a
+            href="https://github.com/purinliang"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "inherit",
+              textDecoration: "none",
+              marginRight: "8px",
+            }}
+          >
             GitHub
           </a>
           |
-          <Box component="span" sx={{ position: 'relative', display: 'inline-block' }}>
+          <Box
+            component="span"
+            sx={{ position: "relative", display: "inline-block" }}
+          >
             <Tooltip
               title={tooltipText}
               open={copiedTooltipOpen}
@@ -169,7 +299,12 @@ function App() {
             >
               <a
                 onClick={handleEmailClick}
-                style={{ color: 'inherit', textDecoration: 'none', marginLeft: '8px', cursor: 'pointer' }}
+                style={{
+                  color: "inherit",
+                  textDecoration: "none",
+                  marginLeft: "8px",
+                  cursor: "pointer",
+                }}
               >
                 Email
               </a>

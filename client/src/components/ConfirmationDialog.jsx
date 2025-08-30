@@ -1,4 +1,11 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
 /**
  * A generic and reusable confirmation dialog component.
@@ -11,29 +18,36 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
  * @param {string} [props.cancelText='Cancel'] - The text for the cancel button.
  * @param {string} [props.confirmText='Confirm'] - The text for the confirm button.
  */
-export default function ConfirmationDialog({ open, onClose, onConfirm, title,
-    contentText, cancelText = 'Cancel', confirmText = 'Confirm' }) {
-    return (
-        <Dialog
-            open={open}
-            onClose={onClose}
-            aria-labelledby="confirmation-dialog-title"
-            aria-describedby="confirmation-dialog-description"
-        >
-            <DialogTitle id="confirmation-dialog-title">{title}</DialogTitle>
-            <DialogContent>
-                <DialogContentText id="confirmation-dialog-description">
-                    {contentText}
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} color="primary">
-                    {cancelText}
-                </Button>
-                <Button onClick={onConfirm} color="error" autoFocus>
-                    {confirmText}
-                </Button>
-            </DialogActions>
-        </Dialog>
-    );
-};
+export default function ConfirmationDialog({
+  open,
+  onClose,
+  onConfirm,
+  title,
+  contentText,
+  cancelText = "Cancel",
+  confirmText = "Confirm",
+}) {
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby="confirmation-dialog-title"
+      aria-describedby="confirmation-dialog-description"
+    >
+      <DialogTitle id="confirmation-dialog-title">{title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText id="confirmation-dialog-description">
+          {contentText}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="primary">
+          {cancelText}
+        </Button>
+        <Button onClick={onConfirm} color="error" autoFocus>
+          {confirmText}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
