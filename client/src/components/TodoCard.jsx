@@ -1,6 +1,6 @@
 import { Card, CardContent, Typography, Checkbox, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { lightBlue, deepOrange, green } from '@mui/material/colors';
+import { lightBlue, deepOrange, green, blue } from '@mui/material/colors';
 import dayjs from 'dayjs';
 
 export default function TodoCard({ todo, onToggleComplete }) {
@@ -32,11 +32,24 @@ export default function TodoCard({ todo, onToggleComplete }) {
         if (todo.completed) {
             return green[50];
         }
-        const diffDays = dayjs(todo.nextDueDate).diff(dayjs(), 'day');
-        if (diffDays <= 0) {
-            return deepOrange[50];
+        // Determine due and remind dates for sorting
+        const dueDate = todo.nextDueDate ? new Date(todo.nextDueDate) : null;
+        const remindDate = dueDate ? new Date(dueDate) : null;
+        if (remindDate) {
+            remindDate.setDate(remindDate.getDate() - (todo.reminderDaysBefore || 0));
         }
-        if (diffDays <= todo.reminderDaysBefore) {
+
+        const now = new Date();
+        // Get the start of the current day to compare dates correctly
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        // Classify todos based on dates
+        if (remindDate && startOfToday.getTime() >= remindDate.getTime() && startOfToday.getTime() <= dueDate.getTime()) {
+            // reminding
+            return blue[50];
+        } else if (dueDate && startOfToday.getTime() > dueDate.getTime()) {
+            return deepOrange[50];
+        } else {
             return lightBlue[50];
         }
         return '#ffffff'; // Default white

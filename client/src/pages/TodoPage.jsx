@@ -17,7 +17,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Tooltip from '@mui/material/Tooltip';
 import Switch from '@mui/material/Switch';
 
-
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
 // Helper function to sort todos by due date
@@ -163,7 +162,7 @@ export default function TodoPage() {
         return (
             <Box key={label} sx={{ my: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 4, mb: 1 }}>
-                    {icon && <Box component="span" sx={{ mr: 1, fontSize: '1.2rem' }}>{icon}</Box>}
+                    {icon && <Box component="span" sx={{ mr: 0.5, mt: 0.5, fontSize: '1.2rem' }}>{icon}</Box>}
                     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                         {label}
                     </Typography>
@@ -243,8 +242,8 @@ export default function TodoPage() {
             {todos.length > 0 ? (
                 <>
                     {renderTodoGroup(groupedTodos.overdued, 'Overdue', <WarningIcon color="error" />)}
-                    {renderTodoGroup(groupedTodos.reminding, 'Reminding', <NotificationsActiveIcon color="primary" />)}
-                    {renderTodoGroup(groupedTodos.upcoming, 'Upcoming', <CalendarTodayIcon color="primary" />)}
+                    {renderTodoGroup(groupedTodos.reminding, 'Reminding', <NotificationsActiveIcon color="info" />)}
+                    {renderTodoGroup(groupedTodos.upcoming, 'Upcoming', <CalendarTodayIcon sx={{ color: 'info' }} />)}
                     {renderTodoGroup(groupedTodos.completed, 'Completed', <CheckCircleOutlineIcon color="success" />)}
                     {allGroupsEmpty && (
                         <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4 }}>
