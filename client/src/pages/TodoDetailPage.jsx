@@ -1,11 +1,9 @@
 import {
-    Container, Typography, TextField, Button, Grid, MenuItem, Checkbox, FormControlLabel, Box, Alert
+    Container, Typography, TextField, Button, Grid, MenuItem, Checkbox, FormControlLabel, Box, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import axios from 'axios';
 import { red } from '@mui/material/colors';
 
@@ -27,8 +25,8 @@ export default function TodoDetailPage() {
         category: '',
         completed: false
     });
-    // Add a new state variable for displaying errors
     const [error, setError] = useState('');
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     /**
      * Handles changes to the form fields.
@@ -101,28 +99,6 @@ export default function TodoDetailPage() {
     };
 
     /**
-     * Deletes a todo.
-     */
-    const handleDelete = async () => {
-        setError('');
-        try {
-            await axios.delete(`${API_BASE}/todo/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            navigate('/todos');
-        } catch (err) {
-            console.error('Delete failed:', err);
-            if (err.response && err.response.status === 401) {
-                localStorage.removeItem('jwtToken');
-                setError('Session expired or unauthorized. Please log in again.');
-                setTimeout(() => navigate('/login'), 3000);
-            } else {
-                setError('Delete failed');
-            }
-        }
-    };
-
-    /**
      * Toggles the completion status of a todo.
      */
     const toggleCompleted = async () => {
@@ -143,6 +119,44 @@ export default function TodoDetailPage() {
             } else {
                 setError('Failed to update status');
             }
+        }
+    };
+
+    /**
+     * Opens the confirmation dialog for deletion.
+     */
+    const handleOpenDeleteDialog = () => {
+        setIsDeleteDialogOpen(true);
+    };
+
+    /**
+     * Closes the confirmation dialog.
+     */
+    const handleCloseDeleteDialog = () => {
+        setIsDeleteDialogOpen(false);
+    };
+
+    /**
+     * Executes the actual deletion after user confirmation.
+     */
+    const handleConfirmDelete = async () => {
+        setError('');
+        try {
+            await axios.delete(`${API_BASE}/todo/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            navigate('/todos');
+        } catch (err) {
+            console.error('Failed to delete todo:', err);
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem('jwtToken');
+                setError('Session expired or unauthorized. Please log in again.');
+                setTimeout(() => navigate('/login'), 3000);
+            } else {
+                setError('Failed to delete todo.');
+            }
+        } finally {
+            handleCloseDeleteDialog();
         }
     };
 
@@ -190,22 +204,17 @@ export default function TodoDetailPage() {
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                            label="Due Date"
-                            format="DD/MM/YYYY"
-                            value={form.nextDueDate ? dayjs(form.nextDueDate) : null}
-                            onChange={(date) =>
-                                setForm({ ...form, nextDueDate: date ? date.format('YYYY-MM-DD') : '' })
-                            }
-                            slotProps={{
-                                textField: {
-                                    fullWidth: true,
-                                    sx: { borderRadius: '8px' }
-                                }
-                            }}
-                        />
-                    </LocalizationProvider>
+                    <TextField
+                        label="Due Date"
+                        name="nextDueDate"
+                        type="date"
+                        fullWidth
+                        value={form.nextDueDate}
+                        onChange={handleChange}
+                        variant="outlined"
+                        InputLabelProps={{ shrink: true }}
+                        sx={{ borderRadius: '8px' }}
+                    />
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
@@ -236,17 +245,6 @@ export default function TodoDetailPage() {
                         <MenuItem value="14d">Every 14 days</MenuItem>
                         <MenuItem value="monthly">Monthly</MenuItem>
                     </TextField>
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        label="Category"
-                        name="category"
-                        fullWidth
-                        value={form.category}
-                        onChange={handleChange}
-                        variant="outlined"
-                        sx={{ borderRadius: '8px' }}
-                    />
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
@@ -292,13 +290,35 @@ export default function TodoDetailPage() {
                             color="error"
                             fullWidth
                             sx={{ py: 1.5, borderRadius: '8px' }}
-                            onClick={handleDelete}
+                            onClick={handleOpenDeleteDialog}
                         >
                             Delete
                         </Button>
                     </Grid>
                 )}
             </Grid>
+
+            <Dialog
+                open={isDeleteDialogOpen}
+                onClose={handleCloseDeleteDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        This action is permanent. Are you sure you want to delete this todo?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteDialog} color="primary" autoFocus>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirmDelete} color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }
