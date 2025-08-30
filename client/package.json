@@ -8,6 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "dev:local": "vite --mode development",
+    "dev:prod": "vite --mode production",
     "deploy": "wrangler pages deploy dist --project-name=arcticaria"
   },
   "dependencies": {
