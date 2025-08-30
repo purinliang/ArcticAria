@@ -49,7 +49,7 @@ export default function LoginPage() {
             }
 
             setSuccess('Logged in successfully! Redirecting to todos...');
-            setTimeout(() => navigate('/todos'), 2000);
+            setTimeout(() => navigate('/'), 2000);
         } catch (err) {
             console.log(`Login error: ${err}`);
             // Check if the error has a response and data to get a more specific message
