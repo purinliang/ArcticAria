@@ -48,9 +48,9 @@ function App() {
   };
 
   /**
- * Handles the logout action.
- * Clears the JWT token from local storage and navigates to the login page.
- */
+   * Handles the logout action.
+   * Clears the JWT token from local storage and navigates to the login page.
+   */
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -119,7 +119,7 @@ function App() {
         display: "flex",
         alignItems: "center",
         gap: 2,
-        ml: 2
+        ml: 2,
       }}
     >
       <Button
@@ -256,11 +256,14 @@ function App() {
                   style={{ height: "32px" }}
                 />
 
-                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" />
+                <link
+                  rel="stylesheet"
+                  href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
+                />
                 <Typography
                   variant="h6"
                   component="div"
-                  sx={{ ml: "8px", fontWeight: "bold", fontFamily: 'Orbitron' }}
+                  sx={{ ml: "8px", fontWeight: "bold", fontFamily: "Orbitron" }}
                 >
                   ArcticAria
                 </Typography>
@@ -284,13 +287,22 @@ function App() {
           >
             <List>
               <ListItem button onClick={() => handleNavigation("/todos")}>
-                <ListItemText primary="Todos" primaryTypographyProps={{ sx: { fontWeight: "bold" } }} />
+                <ListItemText
+                  primary="Todos"
+                  primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
+                />
               </ListItem>
               <ListItem button onClick={() => handleNavigation("/discover")}>
-                <ListItemText primary="Discover" primaryTypographyProps={{ sx: { fontWeight: "bold" } }} />
+                <ListItemText
+                  primary="Discover"
+                  primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
+                />
               </ListItem>
               <ListItem button onClick={() => handleNavigation("/blog")}>
-                <ListItemText primary="Discuss" primaryTypographyProps={{ sx: { fontWeight: "bold" } }} />
+                <ListItemText
+                  primary="Discuss"
+                  primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
+                />
               </ListItem>
               <Divider sx={{ my: 1 }} />
               {isLoggedIn ? (
@@ -300,14 +312,24 @@ function App() {
                   </ListItem>
                   {/* Sign out button with error color */}
                   <ListItem button onClick={handleLogout}>
-                    <ListItemText primary="Sign out" primaryTypographyProps={{ sx: { fontWeight: "bold", color: "error.main" } }} />
+                    <ListItemText
+                      primary="Sign out"
+                      primaryTypographyProps={{
+                        sx: { fontWeight: "bold", color: "error.main" },
+                      }}
+                    />
                   </ListItem>
                 </>
               ) : (
                 <>
                   {/* Sign in button with primary color */}
                   <ListItem button onClick={() => handleNavigation("/login")}>
-                    <ListItemText primary="Sign in" primaryTypographyProps={{ sx: { fontWeight: "bold", color: "primary.main" } }} />
+                    <ListItemText
+                      primary="Sign in"
+                      primaryTypographyProps={{
+                        sx: { fontWeight: "bold", color: "primary.main" },
+                      }}
+                    />
                   </ListItem>
                 </>
               )}
