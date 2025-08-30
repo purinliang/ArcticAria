@@ -7,9 +7,9 @@ const logger = pino({
 		options: {
 			colorize: true,
 			translateTime: 'SYS:yyyy-mm-dd HH:MM:ss',
-			ignore: 'pid,hostname'
-		}
-	}
+			ignore: 'pid,hostname',
+		},
+	},
 });
 
 const corsHeaders = {
@@ -70,16 +70,19 @@ export default {
 			reqLogger.warn({ path }, 'Route not found');
 			return new Response('Not Found', { status: 404, headers: corsHeaders });
 		} catch (err) {
-			reqLogger.error({
-				errMessage: err?.message,
-				errStack: err?.stack
-			}, 'Unhandled error in fetch handler');
+			reqLogger.error(
+				{
+					errMessage: err?.message,
+					errStack: err?.stack,
+				},
+				'Unhandled error in fetch handler',
+			);
 			return new Response('Internal Server Error', {
 				status: 500,
-				headers: corsHeaders
+				headers: corsHeaders,
 			});
 		}
-	}
+	},
 };
 
 function withCORS(response) {
@@ -114,20 +117,19 @@ async function createPost(request, env, logger) {
 		const postId = crypto.randomUUID();
 
 		// The database columns use `snake_case` (`user_id`).
-		await env.DB.prepare(`
+		await env.DB.prepare(
+			`
             INSERT INTO posts (id, user_id, title, content)
             VALUES (?, ?, ?, ?)
-        `).bind(
-			postId,
-			user.userId,
-			title,
-			content
-		).run();
+        `,
+		)
+			.bind(postId, user.userId, title, content)
+			.run();
 
 		logger.info({ userId: user.userId, postId }, 'Post created successfully');
 		return new Response(JSON.stringify({ success: true, id: postId }), {
 			status: 201,
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
 		});
 	} catch (err) {
 		logger.error({ errMessage: err?.message, errStack: err?.stack }, 'Unhandled error in createPost');
@@ -137,7 +139,7 @@ async function createPost(request, env, logger) {
 
 /**
  * Helper function to map database post object to camelCase
- * @param {object} post 
+ * @param {object} post
  * @returns {object}
  */
 const mapPostToCamelCase = (post) => {
@@ -147,7 +149,7 @@ const mapPostToCamelCase = (post) => {
 		content: post.content,
 		userId: post.user_id,
 		createdAt: post.created_at,
-		updatedAt: post.updated_at
+		updatedAt: post.updated_at,
 	};
 };
 
@@ -156,11 +158,13 @@ const mapPostToCamelCase = (post) => {
  */
 async function getPublicPosts(request, env, logger) {
 	try {
-		const { results } = await env.DB.prepare(`
+		const { results } = await env.DB.prepare(
+			`
             SELECT id, title, content, user_id, created_at, updated_at
             FROM posts
             ORDER BY created_at DESC
-        `).all();
+        `,
+		).all();
 
 		// Map database results to camelCase
 		const posts = results.map(mapPostToCamelCase);
@@ -168,7 +172,7 @@ async function getPublicPosts(request, env, logger) {
 		logger.info('Public posts retrieved successfully');
 		return new Response(JSON.stringify(posts), {
 			status: 200,
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
 		});
 	} catch (err) {
 		logger.error({ errMessage: err?.message, errStack: err?.stack }, 'Unhandled error in getPublicPosts');
@@ -181,11 +185,15 @@ async function getPublicPosts(request, env, logger) {
  */
 async function getPublicPost(request, env, logger, postId) {
 	try {
-		const { results } = await env.DB.prepare(`
+		const { results } = await env.DB.prepare(
+			`
             SELECT *
             FROM posts
             WHERE id = ?
-        `).bind(postId).all();
+        `,
+		)
+			.bind(postId)
+			.all();
 
 		if (results.length === 0) {
 			logger.warn({ postId }, 'Post not found');
@@ -198,7 +206,7 @@ async function getPublicPost(request, env, logger, postId) {
 		logger.info({ postId }, 'Single public post retrieved successfully');
 		return new Response(JSON.stringify(post), {
 			status: 200,
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
 		});
 	} catch (err) {
 		logger.error({ errMessage: err?.message, errStack: err?.stack }, 'Unhandled error in getPublicPost');
@@ -211,12 +219,16 @@ async function getPublicPost(request, env, logger, postId) {
  */
 async function getAuthorPosts(request, env, logger, authorId) {
 	try {
-		const { results } = await env.DB.prepare(`
+		const { results } = await env.DB.prepare(
+			`
             SELECT id, title, created_at, updated_at
             FROM posts
             WHERE user_id = ?
             ORDER BY created_at DESC
-        `).bind(authorId).all();
+        `,
+		)
+			.bind(authorId)
+			.all();
 
 		// Map database results to camelCase
 		const posts = results.map(mapPostToCamelCase);
@@ -224,14 +236,13 @@ async function getAuthorPosts(request, env, logger, authorId) {
 		logger.info({ authorId, postCount: posts.length }, 'Author posts retrieved successfully');
 		return new Response(JSON.stringify(posts), {
 			status: 200,
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
 		});
 	} catch (err) {
 		logger.error({ errMessage: err?.message, errStack: err?.stack }, 'Unhandled error in getAuthorPosts');
 		return new Response('Internal Server Error', { status: 500 });
 	}
 }
-
 
 /**
  * Updates an existing blog post for the authenticated user, and verifies they are the author.
@@ -270,7 +281,9 @@ async function updatePost(request, env, logger, postId) {
 		values.push(postId, user.userId);
 		const query = `UPDATE posts SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?`;
 
-		await env.DB.prepare(query).bind(...values).run();
+		await env.DB.prepare(query)
+			.bind(...values)
+			.run();
 
 		logger.info({ userId: user.userId, postId }, 'Post updated successfully');
 		return new Response(JSON.stringify({ success: true }));
@@ -298,9 +311,7 @@ async function deletePost(request, env, logger, postId) {
 			return new Response('Forbidden', { status: 403 });
 		}
 
-		await env.DB.prepare('DELETE FROM posts WHERE id = ? AND user_id = ?')
-			.bind(postId, user.userId)
-			.run();
+		await env.DB.prepare('DELETE FROM posts WHERE id = ? AND user_id = ?').bind(postId, user.userId).run();
 
 		logger.info({ userId: user.userId, postId }, 'Post deleted');
 		return new Response(JSON.stringify({ success: true }));
@@ -324,9 +335,11 @@ async function getAuthenticatedUser(request, env, logger) {
 		logger.info({ authHeader }, 'Sending token to auth server');
 		logger.warn({ hasAuth: !!env.AUTH, fetchType: typeof env.AUTH?.fetch }, 'AUTH binding check');
 
-		const res = await env.AUTH.fetch(new Request('https://auth/verify', {
-			headers: { Authorization: authHeader }
-		}));
+		const res = await env.AUTH.fetch(
+			new Request('https://auth/verify', {
+				headers: { Authorization: authHeader },
+			}),
+		);
 
 		logger.info({ status: res.status }, 'Received response from auth server');
 
@@ -339,10 +352,13 @@ async function getAuthenticatedUser(request, env, logger) {
 		logger.debug({ userId: payload.userId }, 'User authenticated via auth server');
 		return payload;
 	} catch (err) {
-		logger.error({
-			errMessage: err?.message,
-			errStack: err?.stack
-		}, 'Unhandled error in verifying token via auth worker');
+		logger.error(
+			{
+				errMessage: err?.message,
+				errStack: err?.stack,
+			},
+			'Unhandled error in verifying token via auth worker',
+		);
 		return null;
 	}
 }

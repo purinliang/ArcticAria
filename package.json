@@ -4,5 +4,8 @@
   },
   "devDependencies": {
     "prettier": "3.6.2"
+  },
+  "scripts": {
+    "format": "prettier --write \"**/*.{js,mjs,cjs,jsx,ts,tsx,json,jsonc,css,scss,less,md,html,yml,yaml,vue,gql,graphql,liquid}\""
   }
 }
