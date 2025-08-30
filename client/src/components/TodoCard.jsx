@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { lightBlue, deepOrange, green } from '@mui/material/colors';
 import dayjs from 'dayjs';
 
-export default function TodoCard({ todo, onToggleComplete, onDelete }) {
+export default function TodoCard({ todo, onToggleComplete }) {
     const navigate = useNavigate();
 
     /**
@@ -107,33 +107,6 @@ export default function TodoCard({ todo, onToggleComplete, onDelete }) {
                             🏷️ Category: {todo.category}
                         </Typography>
                     )}
-                </Box>
-                <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={(e) => {
-                            // Ensure button click doesn't trigger card navigation
-                            e.stopPropagation();
-                            navigate(`/todos/${todo.id}`, { state: { todo } });
-                        }}
-                        sx={{ borderRadius: '8px' }}
-                    >
-                        Edit
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        onClick={(e) => {
-                            // Ensure button click doesn't trigger card navigation
-                            e.stopPropagation();
-                            onDelete();
-                        }}
-                        sx={{ borderRadius: '8px' }}
-                    >
-                        Delete
-                    </Button>
                 </Box>
             </CardContent>
         </Card >
