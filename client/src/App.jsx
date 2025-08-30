@@ -81,14 +81,14 @@ function App() {
       <AppBar position="static" sx={{ bgcolor: 'white', color: 'black', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
         <Toolbar sx={{ maxWidth: '1120px', width: '100%', mx: 'auto' }}>
           {/* Logo and App Name - Hidden on mobile */}
-          {!isMobile && (
+
             <Button onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.5rem', textTransform: 'none' }}>
-              <img src="/arctic_aria.svg" alt="Arctic Aria Logo" style={{ height: '32px', marginRight: '8px' }} />
+            <img src="/arctic_aria.svg" alt="Arctic Aria Logo" style={{ height: '32px', marginRight: '8px' }} />{!isMobile && (
               <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
                 ArcticAria
               </Typography>
+            )}
             </Button>
-          )}
 
           {/* Navigation Links */}
           <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: isMobile ? 0 : 4, gap: isMobile ? 0.5 : 2 }}>
