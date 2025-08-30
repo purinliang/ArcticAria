@@ -40,6 +40,7 @@ export default function TodoPage() {
 
   const [todos, setTodos] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
   const [groupedTodos, setGroupedTodos] = useState({
     reminding: [],
     upcoming: [],
@@ -55,9 +56,11 @@ export default function TodoPage() {
    */
   const fetchTodos = async () => {
     setError("");
+    setLoading(true);
     const token = localStorage.getItem("jwtToken");
     if (!token) {
       setError("You are not logged in. Please log in first...");
+      setLoading(false);
       return;
     }
     try {
@@ -74,6 +77,8 @@ export default function TodoPage() {
       } else {
         setError(`Failed to fetch todos: ${err.response?.data || err.message}`);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -190,9 +195,7 @@ export default function TodoPage() {
               {icon}
             </Box>
           )}
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            {label}
-          </Typography>
+          <Typography sx={{ fontWeight: "bold" }}>{label}</Typography>
         </Box>
         <Divider sx={{ mb: 2 }} />
         <Masonry columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} spacing={2}>
@@ -265,7 +268,6 @@ export default function TodoPage() {
           </Tooltip>
         </Box>
       </Box>
-
       {error && (
         <Alert
           severity="error"
@@ -280,43 +282,49 @@ export default function TodoPage() {
           {error}
         </Alert>
       )}
-
-      {todos.length > 0 ? (
+      {loading ? (
+        // State 1: Data is currently loading
+        <Typography sx={{ mt: 4 }} align="center">
+          Loading...
+        </Typography>
+      ) : (
+        // State 2: Data has finished loading
         <>
-          {renderTodoGroup(
-            groupedTodos.overdued,
-            "Overdue",
-            <WarningIcon color="error" />,
-          )}
-          {renderTodoGroup(
-            groupedTodos.reminding,
-            "Reminding",
-            <NotificationsActiveIcon color="info" />,
-          )}
-          {renderTodoGroup(
-            groupedTodos.upcoming,
-            "Upcoming",
-            <CalendarTodayIcon sx={{ color: "info" }} />,
-          )}
-          {renderTodoGroup(
-            groupedTodos.completed,
-            "Completed",
-            <CheckCircleOutlineIcon color="success" />,
-          )}
-          {allGroupsEmpty && (
+          {allGroupsEmpty ? (
+            // State 2a: The list is empty after loading
             <Typography
-              variant="body2"
               color="text.secondary"
               align="center"
-              sx={{ mt: 4 }}
+              sx={{ mt: 8, mb: 4 }}
             >
-              All caught up!{" "}
-              <StarsIcon color="secondary" sx={{ verticalAlign: "middle" }} />
+              No tasks found. Click the button above to add a new todo.
             </Typography>
+          ) : (
+            // State 2b: The list has items
+            <>
+              {renderTodoGroup(
+                groupedTodos.overdued,
+                "Overdue",
+                <WarningIcon color="error" />,
+              )}
+              {renderTodoGroup(
+                groupedTodos.reminding,
+                "Reminding",
+                <NotificationsActiveIcon color="info" />,
+              )}
+              {renderTodoGroup(
+                groupedTodos.upcoming,
+                "Upcoming",
+                <CalendarTodayIcon sx={{ color: "info" }} />,
+              )}
+              {renderTodoGroup(
+                groupedTodos.completed,
+                "Completed",
+                <CheckCircleOutlineIcon color="success" />,
+              )}
+            </>
           )}
         </>
-      ) : (
-        <Typography>Loading...</Typography>
       )}
     </Container>
   );
