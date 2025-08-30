@@ -10,6 +10,10 @@
 	"observability": {
 		"enabled": true,
 	},
+	"dev": {
+		"port": 8882,
+		"inspector_port": 9232,
+	},
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
