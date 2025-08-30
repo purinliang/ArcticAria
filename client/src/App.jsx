@@ -121,7 +121,7 @@ function App() {
         display: "flex",
         alignItems: "center",
         gap: 2,
-        ml: 2,
+        ml: 4,
       }}
     >
       <Button
@@ -262,7 +262,7 @@ function App() {
                   height="24px"
                   fill="#000000"
                   stroke="#000000"
-                  style={{ marginLeft: "8px" }}
+                  style={{ marginLeft: "6px" }}
                 />
               </Button>
             </Box>
