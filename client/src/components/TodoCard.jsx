@@ -1,9 +1,13 @@
-import { Card, CardContent, Typography, Checkbox, Box, Button } from '@mui/material';
+import { Card, CardContent, Typography, Checkbox, Box, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { lightBlue, deepOrange, green } from '@mui/material/colors';
+import { lightBlue, deepOrange, green, blue } from '@mui/material/colors';
 import dayjs from 'dayjs';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import RepeatIcon from '@mui/icons-material/Repeat';
+import LabelIcon from '@mui/icons-material/Label';
+import EditIcon from '@mui/icons-material/Edit';
 
-export default function TodoCard({ todo, onToggleComplete, onDelete }) {
+export default function TodoCard({ todo, onToggleComplete }) {
     const navigate = useNavigate();
 
     /**
@@ -15,11 +19,12 @@ export default function TodoCard({ todo, onToggleComplete, onDelete }) {
         const due = dayjs(dueDateStr);
         const now = dayjs();
         const diffDays = due.diff(now, 'day');
-
-        if (diffDays >= 0) {
-            return `${diffDays} day(s) left`;
+        if (diffDays === 0) {
+            return 'Due Today';
+        } else if (diffDays > 0) {
+            return `${diffDays} day${diffDays === 1 ? '' : 's'} left`;
         } else {
-            return `Overdue by ${-diffDays} day(s)`;
+            return `Overdue by ${-diffDays} day${-diffDays === 1 ? '' : 's'}`;
         }
     };
 
@@ -32,14 +37,26 @@ export default function TodoCard({ todo, onToggleComplete, onDelete }) {
         if (todo.completed) {
             return green[50];
         }
-        const diffDays = dayjs(todo.nextDueDate).diff(dayjs(), 'day');
-        if (diffDays <= 0) {
-            return deepOrange[50];
+        // Determine due and remind dates for sorting
+        const dueDate = todo.nextDueDate ? new Date(todo.nextDueDate) : null;
+        const remindDate = dueDate ? new Date(dueDate) : null;
+        if (remindDate) {
+            remindDate.setDate(remindDate.getDate() - (todo.reminderDaysBefore || 0));
         }
-        if (diffDays <= todo.reminderDaysBefore) {
+
+        const now = new Date();
+        // Get the start of the current day to compare dates correctly
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        // Classify todos based on dates
+        if (remindDate && startOfToday.getTime() >= remindDate.getTime() && startOfToday.getTime() <= dueDate.getTime()) {
+            // reminding
+            return blue[50];
+        } else if (dueDate && startOfToday.getTime() > dueDate.getTime()) {
+            return deepOrange[50];
+        } else {
             return lightBlue[50];
         }
-        return '#ffffff'; // Default white
     };
 
     return (
@@ -56,7 +73,6 @@ export default function TodoCard({ todo, onToggleComplete, onDelete }) {
                 },
                 bgcolor: getCardColor(todo)
             }}
-            // Re-add the click handler to the entire card
             onClick={() => navigate(`/todos/${todo.id}`, { state: { todo } })}
         >
             <CardContent>
@@ -65,22 +81,21 @@ export default function TodoCard({ todo, onToggleComplete, onDelete }) {
                         variant="h6"
                         sx={{
                             fontWeight: 'bold',
-                            textDecoration: todo.completed ? 'line-through' : 'none',
-                            color: todo.completed ? 'text.secondary' : 'text.primary'
                         }}
                     >
                         {todo.title}
                     </Typography>
-                    <Checkbox
-                        checked={!!todo.completed}
-                        // Ensure checkbox click doesn't trigger card navigation
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={(e) => {
-                            e.stopPropagation();
-                            onToggleComplete();
-                        }}
-                        color="primary"
-                    />
+                    <Box display="flex" alignItems="center">
+                        <Checkbox
+                            checked={!!todo.completed}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                                e.stopPropagation();
+                                onToggleComplete();
+                            }}
+                            color="primary"
+                        />
+                    </Box>
                 </Box>
                 <Typography
                     variant="body2"
@@ -88,52 +103,42 @@ export default function TodoCard({ todo, onToggleComplete, onDelete }) {
                         mt: 1,
                         mb: 2,
                         whiteSpace: 'pre-wrap',
-                        textDecoration: todo.completed ? 'line-through' : 'none',
-                        color: todo.completed ? 'text.secondary' : 'text.primary'
                     }}
                 >
                     {todo.content}
                 </Typography>
-                <Box sx={{ color: 'text.secondary' }}>
-                    <Typography variant="body2" sx={{ mb: 0.5 }}>
-                        🗓️ Due: {dayjs(todo.nextDueDate).format('DD/MM/YYYY')}
-                        &nbsp;({daysUntil(todo.nextDueDate)})
-                    </Typography>
-                    <Typography variant="body2" sx={{ mb: 0.5 }}>
-                        🔁 Recurrence: {todo.recurrenceRule || 'None'}
-                    </Typography>
+                <Box sx={{ color: 'text.secondary', mt: 4 }}>
                     {todo.category && (
-                        <Typography variant="body2" sx={{ mb: 0.5 }}>
-                            🏷️ Category: {todo.category}
-                        </Typography>
+                        <Box display="flex" alignItems="center" sx={{ mb: 0.5 }}>
+                            <Tooltip title='Category'>
+                                <LabelIcon sx={{ mr: 1.2, fontSize: '1.0rem', color: 'action' }} />
+                            </Tooltip>
+                            <Typography variant="body2">
+                                {todo.category}
+                            </Typography>
+                        </Box>
                     )}
-                </Box>
-                <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={(e) => {
-                            // Ensure button click doesn't trigger card navigation
-                            e.stopPropagation();
-                            navigate(`/todos/${todo.id}`, { state: { todo } });
-                        }}
-                        sx={{ borderRadius: '8px' }}
-                    >
-                        Edit
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        onClick={(e) => {
-                            // Ensure button click doesn't trigger card navigation
-                            e.stopPropagation();
-                            onDelete();
-                        }}
-                        sx={{ borderRadius: '8px' }}
-                    >
-                        Delete
-                    </Button>
+                    <Box display="flex" alignItems="center" sx={{ mb: 0.5 }}>
+                        <Tooltip title='Recurrence Rule'>
+                            <RepeatIcon sx={{ mr: 1.2, fontSize: '1.0rem', color: 'action' }} />
+                        </Tooltip>
+                        <Typography variant="body2">
+                            {todo.recurrenceRule || 'None'}
+                        </Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center-center" sx={{ mb: 0.5 }}>
+                        <Tooltip title='Next Due Date'>
+                            <CalendarMonthIcon sx={{ mr: 1.2, fontSize: '1.0rem', color: 'action' }} />
+                        </Tooltip>
+                        <Box>
+                            <Typography variant="body2">
+                                {dayjs(todo.nextDueDate).format('DD/MM/YYYY')}
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Typography variant="body1">
+                        {daysUntil(todo.nextDueDate)}
+                    </Typography>
                 </Box>
             </CardContent>
         </Card >

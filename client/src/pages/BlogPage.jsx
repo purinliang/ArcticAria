@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Container, Typography, Box, Card, CardContent, Link, IconButton, Tooltip } from '@mui/material';
+import { Container, Typography, Box, Card, CardContent, Button, Tooltip } from '@mui/material';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -133,13 +133,14 @@ export default function BlogPage() {
                 </Typography>
                 {isLoggedIn && (
                     <Tooltip title="Create new post">
-                        <IconButton
+                        <Button
                             variant="contained"
                             color="primary"
                             onClick={() => navigate('/blog/new')}
+                            sx={{ minWidth: 'auto', p: 1, borderRadius: '50%' }}
                         >
-                            <PostAddIcon />
-                        </IconButton>
+                            <PostAddIcon sx={{ fontSize: 24 }} />
+                        </Button>
                     </Tooltip>
                 )}
             </Box>

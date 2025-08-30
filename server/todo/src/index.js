@@ -177,39 +177,8 @@ async function getTodos(request, env, logger) {
 		// Map database results to camelCase
 		const todos = results.map(mapTodoToCamelCase);
 
-		const now = new Date();
-		const grouped = {
-			reminding: [],
-			upcoming: [],
-			overdued: [],
-			completed: []
-		};
-
-		for (const todo of todos) {
-			if (todo.completed) {
-				grouped.completed.push(todo);
-				continue;
-			}
-
-			const dueDate = new Date(todo.nextDueDate);
-			const remindDate = new Date(dueDate);
-			remindDate.setDate(dueDate.getDate() - (todo.reminderDaysBefore || 0));
-
-			if (now <= dueDate) {
-				if (now >= remindDate) {
-					grouped.reminding.push(todo);
-					continue;
-				} else {
-					grouped.upcoming.push(todo);
-					continue;
-				}
-			} else {
-				grouped.overdued.push(todo);
-				continue;
-			}
-		}
-
-		return new Response(JSON.stringify(grouped), {
+		// Return the full, flat list of todos
+		return new Response(JSON.stringify(todos), {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' }
 		});

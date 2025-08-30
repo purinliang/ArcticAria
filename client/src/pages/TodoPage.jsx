@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
     Container, Typography, Button, Divider, Alert, Box
 } from '@mui/material';
@@ -6,37 +5,52 @@ import { red } from '@mui/material/colors';
 import axios from 'axios';
 import TodoCard from '../components/TodoCard';
 import { useNavigate } from 'react-router-dom';
-import ConfirmationDialog from '../components/ConfirmationDialog';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import { useEffect, useState } from 'react';
+import { Masonry } from '@mui/lab';
+import WarningIcon from '@mui/icons-material/Warning';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import StarsIcon from '@mui/icons-material/Stars';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Tooltip from '@mui/material/Tooltip';
+import Switch from '@mui/material/Switch';
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
+
+// Helper function to sort todos by due date
+const sortTodosByDate = (todos) => {
+    return [...todos].sort((a, b) => {
+        // Handle cases where due_date is null or undefined
+        if (!a.nextDueDate && !b.nextDueDate) return 0;
+        if (!a.nextDueDate) return 1;
+        if (!b.nextDueDate) return -1;
+        return new Date(a.nextDueDate) - new Date(b.nextDueDate);
+    });
+};
 
 export default function TodoPage() {
     const navigate = useNavigate();
 
-    const [todos, setTodos] = useState({
+    const [todos, setTodos] = useState([]);
+    const [error, setError] = useState('');
+    const [groupedTodos, setGroupedTodos] = useState({
         reminding: [], upcoming: [],
         overdued: [], completed: []
     });
-    // Add a new state variable for displaying errors
-    const [error, setError] = useState('');
-    // State to manage the confirmation dialog
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    // State to store the ID of the todo to be deleted
-    const [todoToDeleteId, setTodoToDeleteId] = useState(null);
+    // State to manage the sorting preference: true for category, false for time
+    const [sortByCategory, setSortByCategory] = useState(true);
 
     /**
      * Fetches the user's todos from the API.
      * If the JWT token is invalid, it redirects the user to the login page.
      */
     const fetchTodos = async () => {
-        // Clear any previous error messages
         setError('');
         const token = localStorage.getItem('jwtToken');
         if (!token) {
-            // If there's no token, a red message will be displayed, and after 3 seconds,
-            // the user will be redirected to the login page.
             setError('You are not logged in. Please log in first...');
-            // setTimeout(() => navigate('/login'), 3000);
             return;
         }
         try {
@@ -46,15 +60,11 @@ export default function TodoPage() {
             setTodos(res.data);
         } catch (err) {
             console.error('Failed to fetch todos:', err);
-            // Check for a 401 Unauthorized status code
             if (err.response && err.response.status === 401) {
-                // Clear the invalid token from localStorage
                 localStorage.removeItem('jwtToken');
-                // Display a red message, then redirect to the login page
                 setError('Session expired or unauthorized. Please log in again.');
                 setTimeout(() => navigate('/login'), 3000);
             } else {
-                // Handle other types of errors
                 setError(`Failed to fetch todos: ${err.response?.data || err.message}`);
             }
         }
@@ -69,7 +79,6 @@ export default function TodoPage() {
         setError('');
         try {
             const token = localStorage.getItem('jwtToken');
-            console.log(`PUT ${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`);
             await axios.put(`${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`, {
                 completed: !currentStatus
             }, {
@@ -77,118 +86,144 @@ export default function TodoPage() {
                     Authorization: `Bearer ${token}`
                 }
             });
-            fetchTodos(); // Call fetchTodos to update the list immediately
+            fetchTodos();
         } catch (err) {
             console.error('Failed to update todo:', err);
             setError('Failed to update todo.');
         }
     };
 
-    /**
-     * Handles the delete button click by opening the confirmation dialog.
-     * It does NOT perform the deletion.
-     * @param {string} id The ID of the todo to be deleted.
-     */
-    const handleDelete = (id) => {
-        setTodoToDeleteId(id);
-        setIsDeleteDialogOpen(true);
+    const handleSortChange = (event) => {
+        setSortByCategory(event.target.checked);
     };
 
-    /**
-     * Closes the confirmation dialog and resets the state.
-     */
-    const handleCloseDeleteDialog = () => {
-        setIsDeleteDialogOpen(false);
-        setTodoToDeleteId(null);
-    };
-
-    /**
-     * Executes the actual deletion after user confirmation.
-     * This function is called from the ConfirmationDialog.
-     */
-    const handleConfirmDelete = async () => {
-        if (!todoToDeleteId) {
-            handleCloseDeleteDialog();
+    useEffect(() => {
+        // Ensure todos is a valid array before proceeding
+        if (!Array.isArray(todos) || todos.length === 0) {
+            setGroupedTodos({
+                reminding: [], upcoming: [],
+                overdued: [], completed: []
+            });
             return;
         }
 
-        setError('');
-        try {
-            const token = localStorage.getItem('jwtToken');
-            await axios.delete(`${API_BASE}/todo/${todoToDeleteId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            fetchTodos(); // Call fetchTodos to update the list immediately
-        } catch (err) {
-            console.error('Failed to delete todo:', err);
-            if (err.response && err.response.status === 401) {
-                localStorage.removeItem('jwtToken');
-                setError('Session expired or unauthorized. Please log in again.');
-                setTimeout(() => navigate('/login'), 3000);
-            } else {
-                setError('Failed to delete todo.');
-            }
-        } finally {
-            handleCloseDeleteDialog(); // Always close the dialog
-        }
-    };
-
-    /**
-     * Calculates the days until a due date.
-     * @param {string} dueDateStr The due date string.
-     * @returns {string} The formatted string showing days left or overdue.
-     */
-    const daysUntil = (dueDateStr) => {
-        const due = new Date(dueDateStr);
+        const reminding = [];
+        const upcoming = [];
+        const overdued = [];
+        const completed = [];
         const now = new Date();
-        const diff = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
-        return diff >= 0 ? `${diff} day(s) left` : `Overdue by ${-diff} day(s)`;
-    };
+
+        todos.forEach(todo => {
+            if (todo.completed) {
+                completed.push(todo);
+            } else {
+                // Determine due and remind dates for sorting
+                const dueDate = todo.nextDueDate ? new Date(todo.nextDueDate) : null;
+                const remindDate = dueDate ? new Date(dueDate) : null;
+                if (remindDate) {
+                    remindDate.setDate(remindDate.getDate() - (todo.reminderDaysBefore || 0));
+                }
+
+                // Get the start of the current day to compare dates correctly
+                const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                // Classify todos based on dates
+                if (remindDate && startOfToday.getTime() >= remindDate.getTime() && startOfToday.getTime() <= dueDate.getTime()) {
+                    reminding.push(todo);
+                } else if (dueDate && startOfToday.getTime() > dueDate.getTime()) {
+                    overdued.push(todo);
+                } else {
+                    upcoming.push(todo);
+                }
+            }
+        });
+
+        const sortedGroups = {
+            overdued: sortTodosByDate(overdued),
+            reminding: sortTodosByDate(reminding),
+            upcoming: sortTodosByDate(upcoming),
+            completed: sortTodosByDate(completed),
+        };
+
+        console.log("Grouped todos:", sortedGroups);
+        setGroupedTodos(sortedGroups);
+    }, [todos, sortTodosByDate]);
 
     /**
-     * Renders a group of todos with a label.
+     * Renders a group of todos with a label in a single list.
      * @param {Array<object>} todoItems The array of todos to render.
      * @param {string} label The label for the group.
+     * @param {React.ReactElement} icon The Material-UI icon for the label.
      */
-    function renderTodoGroup(todoItems, label) {
+    const renderTodoGroup = (todoItems, label, icon) => {
         if (!todoItems || !Array.isArray(todoItems)) return null;
+        if (todoItems.length === 0) return null;
 
         return (
-            <Box sx={{ my: 2 }}>
-                <Typography variant="h6" sx={{ mt: 4, mb: 1, fontWeight: 'bold' }}>
-                    {label}
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                {todoItems.length === 0 ? (
-                    <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
-                        No items in this group.
+            <Box key={label} sx={{ my: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mt: 4, mb: 1 }}>
+                    {icon && <Box component="span" sx={{ mr: 0.5, mt: 0.5, fontSize: '1.2rem' }}>{icon}</Box>}
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                        {label}
                     </Typography>
-                ) : (
-                    todoItems.map(todo => (
+                </Box>
+                <Divider sx={{ mb: 2 }} />
+                <Masonry columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} spacing={2}>
+                    {todoItems.map(todo => (
                         <TodoCard
                             key={todo.id}
                             todo={todo}
                             onToggleComplete={() => handleToggleComplete(todo.id, todo.completed)}
-                            onDelete={() => handleDelete(todo.id)}
                         />
-                    ))
-                )}
+                    ))}
+                </Masonry>
             </Box>
         );
-    }
+    };
 
-    // Fetch todos on component mount
     useEffect(() => {
         fetchTodos();
-    }, []); // Empty dependency array means this runs only once
+    }, []);
+
+    const allGroupsEmpty = Object.values(groupedTodos).every(group => group.length === 0);
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4, mb: 4, p: 2 }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                My Todo List
-            </Typography>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4, p: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+                <Box>
+                    <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: 'primary.main', mb: 1 }}>
+                        My Todo List
+                    </Typography>
+                    <Typography variant="subtitle1" color="text.secondary">
+                        Manage your tasks and stay on top of your schedule.
+                    </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={sortByCategory}
+                                onChange={handleSortChange}
+                                name="sortBySwitch"
+                                color="primary"
+                            />
+                        }
+                        label={sortByCategory ? "Sort by Category" : "Sort by Time"}
+                        sx={{ mr: 1 }}
+                    />
+                    <Tooltip title="Add New Todo">
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => navigate('/todos/new')}
+                            sx={{ minWidth: 'auto', p: 1, borderRadius: '50%' }}
+                        >
+                            <PlaylistAddIcon sx={{ fontSize: 24 }} />
+                        </Button>
+                    </Tooltip>
+                </Box>
+            </Box>
 
-            {/* Conditionally render the error message with Alert component */}
             {error && (
                 <Alert
                     severity="error"
@@ -204,35 +239,21 @@ export default function TodoPage() {
                 </Alert>
             )}
 
-            <Button
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3, mb: 2, py: 1.5, borderRadius: '8px' }}
-                onClick={() => navigate('/todos/new')}
-            >
-                ➕ Add New Todo
-            </Button>
-
-            {todos ? (
+            {todos.length > 0 ? (
                 <>
-                    {renderTodoGroup(todos.reminding, '🔔 Reminding')}
-                    {renderTodoGroup(todos.upcoming, '📅 Upcoming')}
-                    {renderTodoGroup(todos.overdued, '⚠️ Overdue')}
-                    {renderTodoGroup(todos.completed, '✅ Completed')}
+                    {renderTodoGroup(groupedTodos.overdued, 'Overdue', <WarningIcon color="error" />)}
+                    {renderTodoGroup(groupedTodos.reminding, 'Reminding', <NotificationsActiveIcon color="info" />)}
+                    {renderTodoGroup(groupedTodos.upcoming, 'Upcoming', <CalendarTodayIcon sx={{ color: 'info' }} />)}
+                    {renderTodoGroup(groupedTodos.completed, 'Completed', <CheckCircleOutlineIcon color="success" />)}
+                    {allGroupsEmpty && (
+                        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4 }}>
+                            All caught up! <StarsIcon color="secondary" sx={{ verticalAlign: 'middle' }} />
+                        </Typography>
+                    )}
                 </>
             ) : (
                 <Typography>Loading...</Typography>
             )}
-
-            <ConfirmationDialog
-                open={isDeleteDialogOpen}
-                onClose={handleCloseDeleteDialog}
-                onConfirm={handleConfirmDelete}
-                title="Confirm Deletion"
-                contentText="This action is permanent. Are you sure you want to delete this todo?"
-                confirmText="Delete"
-                cancelText="Cancel"
-            />
         </Container>
     );
 }
