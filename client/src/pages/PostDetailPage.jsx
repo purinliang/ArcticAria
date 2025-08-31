@@ -307,7 +307,10 @@ export default function PostDetailPage() {
               </IconButton>
             </Tooltip>
             <Tooltip title="Delete Post">
-              <IconButton onClick={() => setOpenPostDeleteDialog(true)} color="error">
+              <IconButton
+                onClick={() => setOpenPostDeleteDialog(true)}
+                color="error"
+              >
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
@@ -366,15 +369,17 @@ export default function PostDetailPage() {
           Comments
         </Typography>
         {commentError && (
-          <Alert severity="error" sx={{ mb: 2 }}>{commentError}</Alert>
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {commentError}
+          </Alert>
         )}
 
         {commentsLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
             <CircularProgress size={24} />
           </Box>
         ) : (
-          <Box sx={{ maxHeight: '400px', overflowY: 'auto', pr: 2 }}>
+          <Box sx={{ maxHeight: "400px", overflowY: "auto", pr: 2 }}>
             {comments.length > 0 ? (
               comments.map((comment) => (
                 <Box
@@ -404,12 +409,18 @@ export default function PostDetailPage() {
                     {isLoggedIn && myUserId === comment.userId && (
                       <Box sx={{ display: "flex", gap: 1 }}>
                         <Tooltip title="Edit Comment">
-                          <IconButton size="small" onClick={() => handleEditComment(comment)}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditComment(comment)}
+                          >
                             <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Delete Comment">
-                          <IconButton size="small" onClick={() => handleDeleteComment(comment)}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteComment(comment)}
+                          >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
@@ -419,7 +430,11 @@ export default function PostDetailPage() {
                 </Box>
               ))
             ) : (
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontStyle: "italic" }}
+              >
                 No comments yet. Be the first to comment!
               </Typography>
             )}
@@ -460,15 +475,22 @@ export default function PostDetailPage() {
       </Box>
 
       {/* Confirmation Dialog for Post Deletion */}
-      <Dialog open={openPostDeleteDialog} onClose={() => setOpenPostDeleteDialog(false)}>
+      <Dialog
+        open={openPostDeleteDialog}
+        onClose={() => setOpenPostDeleteDialog(false)}
+      >
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the post titled "{post.title}"? This action cannot be undone.
+            Are you sure you want to delete the post titled "{post.title}"? This
+            action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenPostDeleteDialog(false)} color="primary">
+          <Button
+            onClick={() => setOpenPostDeleteDialog(false)}
+            color="primary"
+          >
             Cancel
           </Button>
           <Button onClick={handleDeletePost} color="error" autoFocus>
@@ -478,7 +500,11 @@ export default function PostDetailPage() {
       </Dialog>
 
       {/* Dialog for Comment Edit */}
-      <Dialog open={openCommentEditDialog} onClose={() => setOpenCommentEditDialog(false)} fullWidth>
+      <Dialog
+        open={openCommentEditDialog}
+        onClose={() => setOpenCommentEditDialog(false)}
+        fullWidth
+      >
         <DialogTitle>Edit Comment</DialogTitle>
         <DialogContent>
           <TextField
@@ -494,25 +520,39 @@ export default function PostDetailPage() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenCommentEditDialog(false)} color="primary">
+          <Button
+            onClick={() => setOpenCommentEditDialog(false)}
+            color="primary"
+          >
             Cancel
           </Button>
-          <Button onClick={handleSaveComment} color="primary" variant="contained">
+          <Button
+            onClick={handleSaveComment}
+            color="primary"
+            variant="contained"
+          >
             Save
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Confirmation Dialog for Comment Deletion */}
-      <Dialog open={openCommentDeleteDialog} onClose={() => setOpenCommentDeleteDialog(false)}>
+      <Dialog
+        open={openCommentDeleteDialog}
+        onClose={() => setOpenCommentDeleteDialog(false)}
+      >
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this comment? This action cannot be undone.
+            Are you sure you want to delete this comment? This action cannot be
+            undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenCommentDeleteDialog(false)} color="primary">
+          <Button
+            onClick={() => setOpenCommentDeleteDialog(false)}
+            color="primary"
+          >
             Cancel
           </Button>
           <Button onClick={handleConfirmDeleteComment} color="error" autoFocus>
