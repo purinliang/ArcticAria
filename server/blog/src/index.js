@@ -159,7 +159,6 @@ const mapPostToCamelCase = (post) => {
  */
 async function getPublicPosts(request, env, logger) {
 	try {
-		// 使用 LEFT JOIN 从 users 表中获取 username
 		const { results } = await env.DB.prepare(
 			`
             SELECT p.id, p.title, p.content, p.user_id, p.created_at, p.updated_at, u.username
@@ -188,7 +187,6 @@ async function getPublicPosts(request, env, logger) {
  */
 async function getPublicPost(request, env, logger, postId) {
 	try {
-		// 使用 LEFT JOIN 从 users 表中获取 username
 		const { results } = await env.DB.prepare(
 			`
             SELECT p.*, u.username

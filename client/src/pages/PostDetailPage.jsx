@@ -205,7 +205,12 @@ export default function PostDetailPage() {
 
       {/* Second line: Author and publication date */}
       <Box sx={{ mb: 2.5 }}>
-        <Typography variant="caption" display="block" color="text.secondary" sx={{ mb: -0.5 }}>
+        <Typography
+          variant="caption"
+          display="block"
+          color="text.secondary"
+          sx={{ mb: -0.5 }}
+        >
           Author: {post.username}
         </Typography>
         <Typography variant="caption" display="block" color="text.secondary">
