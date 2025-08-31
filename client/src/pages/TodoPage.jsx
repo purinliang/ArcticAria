@@ -84,7 +84,25 @@ const fetcher = async (url) => {
 
 export default function TodoPage() {
   const navigate = useNavigate();
-  const [sortByCategory, setSortByCategory] = useState(false);
+
+  const [sortByCategory, setSortByCategory] = useState(() => {
+    try {
+      const storedSort = localStorage.getItem("sortByCategory");
+      return storedSort !== null ? JSON.parse(storedSort) : false;
+    } catch (e) {
+      console.error("Failed to load sort preference from localStorage", e);
+      return false;
+    }
+  });
+
+  // Use useEffect to save the sort state to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("sortByCategory", JSON.stringify(sortByCategory));
+    } catch (e) {
+      console.error("Failed to save sort preference to localStorage", e);
+    }
+  }, [sortByCategory]);
 
   // Use useSWR to fetch and manage todos data
   const {
@@ -242,6 +260,7 @@ export default function TodoPage() {
           sx={{
             textAlign: "left",
             mb: { xs: 2, sm: 0 },
+            // 在小屏幕上让标题和描述靠左
             alignSelf: { xs: "flex-start", sm: "auto" },
           }}
         >
@@ -267,22 +286,28 @@ export default function TodoPage() {
         >
           <Box
             sx={{
-              minWidth: "200px", // fixing width change when toggle switch
+              minWidth: "200px",
               display: "flex",
               alignItems: "center",
             }}
           >
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={sortByCategory}
-                  onChange={handleSortChange}
-                  name="sortBySwitch"
-                  color="primary"
-                />
+            <Tooltip
+              title={
+                sortByCategory ? "Switch to Sort by Time" : "Switch to Sort by Category"
               }
-              label={sortByCategory ? "Sort by Category" : "Sort by Time"}
-            />
+            >
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={sortByCategory}
+                    onChange={handleSortChange}
+                    name="sortBySwitch"
+                    color="primary"
+                  />
+                }
+                label={sortByCategory ? "Sort by Category" : "Sort by Time"}
+              />
+            </Tooltip>
           </Box>
           <Tooltip title="Add New Todo">
             <Button
