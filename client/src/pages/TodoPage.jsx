@@ -21,8 +21,22 @@ import Tooltip from "@mui/material/Tooltip";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import useSWR from "swr";
+import WorkIcon from "@mui/icons-material/Work";
+import BookIcon from "@mui/icons-material/Book";
+import HomeIcon from "@mui/icons-material/Home";
+import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
+import CategoryIcon from "@mui/icons-material/Category";
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
+
+// Define the categories and their corresponding icons for sorting
+const CATEGORY_GROUPS = [
+  { label: "Work", icon: <WorkIcon color="primary" />, key: "Work" },
+  { label: "Study", icon: <BookIcon color="info" />, key: "Study" },
+  { label: "Life", icon: <HomeIcon color="action" />, key: "Life" },
+  { label: "Play", icon: <SportsEsportsIcon color="secondary" />, key: "Play" },
+  { label: "Other", icon: <CategoryIcon />, key: "Other" },
+];
 
 // Helper function to sort todos by due date
 const sortTodosByDate = (todos) => {
@@ -33,6 +47,24 @@ const sortTodosByDate = (todos) => {
     if (!b.nextDueDate) return -1;
     return new Date(a.nextDueDate) - new Date(b.nextDueDate);
   });
+};
+
+// Helper function to group todos by category
+const groupTodosByCategory = (todos) => {
+  const grouped = {};
+  CATEGORY_GROUPS.forEach((group) => (grouped[group.key] = []));
+
+  todos.forEach((todo) => {
+    // If the category exists in our defined groups, add it there.
+    // Otherwise, it falls into the 'Other' category.
+    const categoryKey = CATEGORY_GROUPS.find(
+      (group) => group.key === todo.category,
+    )
+      ? todo.category
+      : "Other";
+    grouped[categoryKey].push(todo);
+  });
+  return grouped;
 };
 
 // SWR fetcher function with authentication headers
@@ -52,7 +84,7 @@ const fetcher = async (url) => {
 
 export default function TodoPage() {
   const navigate = useNavigate();
-  const [sortByCategory, setSortByCategory] = useState(true);
+  const [sortByCategory, setSortByCategory] = useState(false);
 
   // Use useSWR to fetch and manage todos data
   const {
@@ -104,7 +136,7 @@ export default function TodoPage() {
   };
 
   // Group and sort todos based on the fetched data
-  const groupedTodos = (() => {
+  const groupedTodosByTime = (() => {
     if (!todos || !Array.isArray(todos)) {
       return {
         reminding: [],
@@ -160,6 +192,8 @@ export default function TodoPage() {
     };
   })();
 
+  const groupedTodosByCategory = groupTodosByCategory(todos || []);
+
   const renderTodoGroup = (todoItems, label, icon) => {
     if (!todoItems || !Array.isArray(todoItems) || todoItems.length === 0)
       return null;
@@ -190,9 +224,9 @@ export default function TodoPage() {
     );
   };
 
-  const allGroupsEmpty = Object.values(groupedTodos).every(
-    (group) => group.length === 0,
-  );
+  const allGroupsEmpty =
+    Object.values(groupedTodosByTime).every((group) => group.length === 0) &&
+    Object.values(groupedTodosByCategory).every((group) => group.length === 0);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4, p: 2 }}>
@@ -273,25 +307,39 @@ export default function TodoPage() {
             </Typography>
           ) : (
             <>
-              {renderTodoGroup(
-                groupedTodos.overdued,
-                "Overdue",
-                <WarningIcon color="error" />,
-              )}
-              {renderTodoGroup(
-                groupedTodos.reminding,
-                "Reminding",
-                <NotificationsActiveIcon color="info" />,
-              )}
-              {renderTodoGroup(
-                groupedTodos.upcoming,
-                "Upcoming",
-                <CalendarTodayIcon sx={{ color: "info" }} />,
-              )}
-              {renderTodoGroup(
-                groupedTodos.completed,
-                "Completed",
-                <CheckCircleOutlineIcon color="success" />,
+              {sortByCategory ? (
+                // Render groups by category
+                CATEGORY_GROUPS.map((group) =>
+                  renderTodoGroup(
+                    groupedTodosByCategory[group.key],
+                    group.label,
+                    group.icon,
+                  ),
+                )
+              ) : (
+                // Render groups by time (default)
+                <>
+                  {renderTodoGroup(
+                    groupedTodosByTime.overdued,
+                    "Overdue",
+                    <WarningIcon color="error" />,
+                  )}
+                  {renderTodoGroup(
+                    groupedTodosByTime.reminding,
+                    "Reminding",
+                    <NotificationsActiveIcon color="info" />,
+                  )}
+                  {renderTodoGroup(
+                    groupedTodosByTime.upcoming,
+                    "Upcoming",
+                    <CalendarTodayIcon sx={{ color: "info" }} />,
+                  )}
+                  {renderTodoGroup(
+                    groupedTodosByTime.completed,
+                    "Completed",
+                    <CheckCircleOutlineIcon color="success" />,
+                  )}
+                </>
               )}
             </>
           )}
