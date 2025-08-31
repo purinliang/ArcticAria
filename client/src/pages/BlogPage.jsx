@@ -19,21 +19,39 @@ import useSWR from "swr";
 const API_BASE = import.meta.env.VITE_BLOG_API_BASE;
 
 /**
- * Formats a date string into a localized, human-readable format.
+ * Formats a date string into a relative, human-readable format.
  * @param {string} dateString The date string (e.g., from post.createdAt).
- * @returns {string} The formatted date string.
+ * @returns {string} The relative formatted date string.
  */
-const formatPostDate = (dateString) => {
-  // The date string from the backend is in ISO format, add 'Z' to treat it as UTC.
-  const date = new Date(dateString + "Z");
-  return date.toLocaleString({
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "short",
-  });
+const getRelativeTime = (dateString) => {
+  // Ensure the date string is treated as UTC if it doesn't have a 'Z'
+  const date = new Date(
+    dateString.endsWith("Z") ? dateString : dateString + "Z",
+  );
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 60) {
+    return "just now";
+  } else if (minutes < 60) {
+    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  } else if (hours < 24) {
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  } else if (days < 30) {
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  } else {
+    // For older posts, show a simple date format.
+    // The original date formatting logic uses 'Z' which is correct.
+    const olderDate = new Date(dateString + "Z");
+    return olderDate.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
 };
 
 /**
@@ -68,41 +86,45 @@ export default function BlogPage() {
 
   const loading = !posts && !error;
 
-  const renderPost = (post) => (
-    <Card
-      key={post.id}
-      sx={{
-        boxShadow: 3,
-        "&:hover": {
-          boxShadow: 6,
-          transform: "translateY(-2px)",
-          transition: "transform 0.2s",
-          cursor: "pointer",
-        },
-      }}
-      onClick={() => navigate(`/blog/${post.id}`)}
-    >
-      <CardContent>
-        <Typography
-          variant="h5"
-          sx={{ fontWeight: "bold", flexGrow: 1, mr: 2 }}
-        >
-          {post.title}
-        </Typography>
-        <Box
-          sx={{
-            // With Masonry, we no longer need a fixed maxHeight or lineClamp
-            whiteSpace: "pre-wrap",
-            color: "text.primary",
-            fontSize: "1rem",
-            lineHeight: "1.5rem",
-          }}
-        >
+  const renderPost = (post) => {
+    const createdAt = new Date(post.createdAt);
+    const updatedAt = new Date(post.updatedAt);
+    const fiveMinutesInMs = 5 * 60 * 1000;
+    const isRecentUpdate =
+      updatedAt.getTime() - createdAt.getTime() < fiveMinutesInMs;
+
+    const displayTimestamp = isRecentUpdate
+      ? getRelativeTime(post.createdAt)
+      : getRelativeTime(post.updatedAt);
+
+    const displayLabel = isRecentUpdate ? "Created" : "Updated";
+
+    return (
+      <Card
+        key={post.id}
+        sx={{
+          boxShadow: 3,
+          "&:hover": {
+            boxShadow: 6,
+            transform: "translateY(-2px)",
+            transition: "transform 0.2s",
+            cursor: "pointer",
+          },
+        }}
+        onClick={() => navigate(`/blog/${post.id}`)}
+      >
+        <CardContent>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: "bold", fontSize: "1.2rem", flexGrow: 1, mr: 2 }}
+          >
+            {post.title}
+          </Typography>
           <Typography
             component="div"
             sx={{
               whiteSpace: "pre-wrap",
-              lineHeight: "1.6rem",
+              fontSize: "0.9rem",
               "& img": {
                 maxWidth: "100%",
                 height: "auto",
@@ -113,19 +135,26 @@ export default function BlogPage() {
           >
             <ReactMarkdown remarkPlugins={[gfm]}>{post.content}</ReactMarkdown>
           </Typography>
-        </Box>
-        <Typography variant="caption" display="block" color="text.secondary">
-          Author: {truncateString(post.userId, 13)}
-        </Typography>
-        <Typography variant="caption" display="block" color="text.secondary">
-          Created: {formatPostDate(post.createdAt)}
-        </Typography>
-        <Typography variant="caption" display="block" color="text.secondary">
-          Updated: {formatPostDate(post.updatedAt)}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
+          <Typography
+            variant="caption"
+            display="block"
+            color="text.secondary"
+            sx={{ fontSize: "0.7rem", mt: 1 }}
+          >
+            Author: {truncateString(post.userId, 13)}
+          </Typography>
+          <Typography
+            variant="caption"
+            display="block"
+            color="text.secondary"
+            sx={{ fontSize: "0.7rem", mt: -0.25, mb: -1.5 }}
+          >
+            {displayLabel}: {displayTimestamp}
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <Container maxWidth="lg">
