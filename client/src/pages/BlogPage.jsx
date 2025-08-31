@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -15,6 +14,7 @@ import { useAuth } from "../AuthContext";
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
 import { Masonry } from "@mui/lab";
+import useSWR from "swr";
 
 const API_BASE = import.meta.env.VITE_BLOG_API_BASE;
 
@@ -49,34 +49,24 @@ const truncateString = (str, maxLength) => {
   return str;
 };
 
+// Define a fetcher function for useSWR
+const fetcher = async (url) => {
+  const res = await axios.get(url);
+  return res.data;
+};
+
 export default function BlogPage() {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  /**
-   * Fetches all blog posts from the backend.
-   */
-  const fetchAllPosts = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API_BASE}/posts`);
-      setPosts(res.data);
-      console.log(res.data);
-      setError(null);
-    } catch (err) {
-      console.error("Failed to fetch all posts:", err);
-      setError("Failed to load posts. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use useSWR to fetch and cache data
+  const { data: posts, error } = useSWR(`${API_BASE}/posts`, fetcher, {
+    dedupingInterval: 1000, // cache for 1 seconds
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
-  useEffect(() => {
-    fetchAllPosts();
-  }, []);
+  const loading = !posts && !error;
 
   const renderPost = (post) => (
     <Card
@@ -174,13 +164,13 @@ export default function BlogPage() {
       {loading && <Typography align="center">Loading posts...</Typography>}
       {error && (
         <Typography color="error" align="center">
-          {error}
+          Failed to load posts. Please try again later.
         </Typography>
       )}
       <Box sx={{ display: "flex", justifyContent: "center", p: "0", m: "0" }}>
         {!loading && !error && (
           <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={2}>
-            {posts.length > 0 ? (
+            {posts && posts.length > 0 ? (
               posts.map(renderPost)
             ) : (
               <Typography color="text.secondary" align="center">
