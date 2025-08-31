@@ -293,7 +293,9 @@ export default function TodoPage() {
           >
             <Tooltip
               title={
-                sortByCategory ? "Switch to Sort by Time" : "Switch to Sort by Category"
+                sortByCategory
+                  ? "Switch to Sort by Time"
+                  : "Switch to Sort by Category"
               }
             >
               <FormControlLabel
