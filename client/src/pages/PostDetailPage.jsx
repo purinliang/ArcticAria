@@ -28,6 +28,41 @@ import gfm from "remark-gfm";
 
 const API_BASE = import.meta.env.VITE_BLOG_API_BASE;
 
+/**
+ * Formats a date string into a relative, human-readable format.
+ * @param {string} dateString The date string (e.g., from post.createdAt).
+ * @returns {string} The relative formatted date string.
+ */
+const getRelativeTime = (dateString) => {
+  // Ensure the date string is treated as UTC if it doesn't have a 'Z'
+  const date = new Date(
+    dateString.endsWith("Z") ? dateString : dateString + "Z",
+  );
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 60) {
+    return "just now";
+  } else if (minutes < 60) {
+    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  } else if (hours < 24) {
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  } else if (days < 30) {
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  } else {
+    // For older posts, show a simple date format.
+    const olderDate = new Date(dateString + "Z");
+    return olderDate.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
+};
+
 export default function PostDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -120,24 +155,17 @@ export default function PostDetailPage() {
     return null;
   }
 
-  // Format the date to show US English format but in the local timezone
-  const formattedCreatedDate = new Date(post.createdAt + "Z").toLocaleString({
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "short",
-  });
+  const createdAt = new Date(post.createdAt);
+  const updatedAt = new Date(post.updatedAt);
+  const fiveMinutesInMs = 5 * 60 * 1000;
+  const isRecentUpdate =
+    updatedAt.getTime() - createdAt.getTime() < fiveMinutesInMs;
 
-  const formattedUpdatedDate = new Date(post.updatedAt + "Z").toLocaleString({
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "short",
-  });
+  const displayTimestamp = isRecentUpdate
+    ? getRelativeTime(post.createdAt)
+    : getRelativeTime(post.updatedAt);
+
+  const displayLabel = isRecentUpdate ? "Created" : "Updated";
 
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
@@ -150,9 +178,6 @@ export default function PostDetailPage() {
           mb: 2,
         }}
       >
-        {/* <IconButton onClick={() => navigate('/blog')} color="primary">
-                    <ArrowBackIcon />
-                </IconButton> */}
         <Typography
           variant="h4"
           sx={{ fontWeight: "bold", color: "primary.main", mb: 1 }}
@@ -182,13 +207,10 @@ export default function PostDetailPage() {
       {/* Second line: Author and publication date */}
       <Box sx={{ mb: 2 }}>
         <Typography variant="caption" display="block" color="text.secondary">
-          Author: {post.userId}
+          Author: {post.username}
         </Typography>
         <Typography variant="caption" display="block" color="text.secondary">
-          Created: {formattedCreatedDate}
-        </Typography>
-        <Typography variant="caption" display="block" color="text.secondary">
-          Updated: {formattedUpdatedDate}
+          {displayLabel}: {displayTimestamp}
         </Typography>
       </Box>
 
