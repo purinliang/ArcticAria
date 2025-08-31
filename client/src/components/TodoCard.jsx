@@ -92,16 +92,15 @@ export default function TodoCard({ todo, onToggleComplete }) {
             onClick={() => navigate(`/todos/${todo.id}`, { state: { todo } })}
         >
             <CardContent>
-                <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Typography
-                        variant="h6"
+                <Box sx={{ "&::after": { content: '""', display: "table", clear: "both" } }}>
+                    <Box
                         sx={{
-                            fontWeight: "bold",
+                            float: "right",
+                            mt: -1.8,
+                            mr: -1.8,
+                            mb: -2.4,
                         }}
                     >
-                        {todo.title}
-                    </Typography>
-                    <Box display="flex" alignItems="center">
                         <Checkbox
                             checked={!!todo.completed}
                             onClick={(e) => e.stopPropagation()}
@@ -112,6 +111,14 @@ export default function TodoCard({ todo, onToggleComplete }) {
                             color="primary"
                         />
                     </Box>
+                    <Typography
+                        variant="h7"
+                        sx={{
+                            fontWeight: "bold",
+                        }}
+                    >
+                        {todo.title}
+                    </Typography>
                 </Box>
                 <Typography
                     variant="body2"
@@ -121,7 +128,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         display: "-webkit-box",
-                        WebkitLineClamp: 16, // Set the number of lines to show
+                        WebkitLineClamp: 4, // Set the number of lines to show
                         WebkitBoxOrient: "vertical",
                     }}
                 >
@@ -129,7 +136,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
                 </Typography>
                 <Box sx={{ color: "text.secondary", mt: 4 }}>
                     {todo.category && (
-                        <Box display="flex" alignItems="center" sx={{ mb: 0.5 }}>
+                        <Box display="flex" alignItems="center" sx={{ mb: 0 }}>
                             <Tooltip title="Category">
                                 <LabelIcon
                                     sx={{ mr: 1.2, fontSize: "1.0rem", color: "action" }}
@@ -138,7 +145,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
                             <Typography variant="body2">{todo.category}</Typography>
                         </Box>
                     )}
-                    <Box display="flex" alignItems="center" sx={{ mb: 0.5 }}>
+                    <Box display="flex" alignItems="center" sx={{ mb: 0 }}>
                         <Tooltip title="Recurrence Rule">
                             <RepeatIcon
                                 sx={{ mr: 1.2, fontSize: "1.0rem", color: "action" }}
@@ -148,19 +155,23 @@ export default function TodoCard({ todo, onToggleComplete }) {
                             {todo.recurrenceRule || "None"}
                         </Typography>
                     </Box>
-                    <Box display="flex" alignItems="center-center" sx={{ mb: 0.5 }}>
+                    <Box display="flex" alignItems="center-center" sx={{ mb: 0 }}>
                         <Tooltip title="Next Due Date">
                             <CalendarMonthIcon
                                 sx={{ mr: 1.2, fontSize: "1.0rem", color: "action" }}
                             />
                         </Tooltip>
                         <Box>
-                            <Typography variant="body2">
+                            <Typography variant="body2" >
                                 {dayjs(todo.nextDueDate).format("DD/MM/YYYY")}
                             </Typography>
                         </Box>
                     </Box>
-                    <Typography variant="body1">{daysUntil(todo.nextDueDate)}</Typography>
+                    <Typography variant="body1"
+                        sx={{
+                            fontWeight: "bold",
+                            mb: -1.6
+                        }}>{daysUntil(todo.nextDueDate)}</Typography>
                 </Box>
             </CardContent>
         </Card>
