@@ -128,7 +128,7 @@ export default function BlogPage() {
   );
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="lg">
       <Box
         sx={{
           display: "flex",

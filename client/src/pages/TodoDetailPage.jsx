@@ -23,6 +23,9 @@ import { red } from "@mui/material/colors";
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
+// Define the four hardcoded categories as requested.
+const CATEGORIES = ["Work", "Study", "Life", "Play", "Other"];
+
 export default function TodoDetailPage() {
   const { id } = useParams();
   const isEdit = !!id;
@@ -36,7 +39,8 @@ export default function TodoDetailPage() {
     nextDueDate: dayjs().format("YYYY-MM-DD"),
     recurrenceRule: "one-time",
     reminderDaysBefore: 0,
-    category: "",
+    // Initialize category to an empty string.
+    category: "Other",
     completed: false,
   });
   const [error, setError] = useState("");
@@ -192,7 +196,7 @@ export default function TodoDetailPage() {
     <Container maxWidth="md" sx={{ mt: 4, mb: 4, p: 2, borderRadius: "12px" }}>
       <Typography
         variant="h4"
-        sx={{ fontWeight: "bold", color: "#1a237e", mb: 3 }}
+        sx={{ fontWeight: "bold", color: "primary.main", mb: 3 }}
       >
         {isEdit ? "Edit Todo" : "Add New Todo"}
       </Typography>
@@ -248,6 +252,7 @@ export default function TodoDetailPage() {
             onChange={handleChange}
             variant="outlined"
             sx={{ borderRadius: "8px" }}
+            helperText="Provide a detailed description of the task, including any specific requirements or notes."
           />
         </Grid>
         <Grid item xs={12}>
@@ -265,6 +270,25 @@ export default function TodoDetailPage() {
             <MenuItem value="7d">Every 7 days</MenuItem>
             <MenuItem value="14d">Every 14 days</MenuItem>
             <MenuItem value="monthly">Monthly</MenuItem>
+          </TextField>
+        </Grid>
+        {/* New Category field added here */}
+        <Grid item xs={12}>
+          <TextField
+            label="Category"
+            name="category"
+            select
+            fullWidth
+            value={form.category}
+            onChange={handleChange}
+            variant="outlined"
+            sx={{ borderRadius: "8px" }}
+          >
+            {CATEGORIES.map((category) => (
+              <MenuItem key={category} value={category}>
+                {category}
+              </MenuItem>
+            ))}
           </TextField>
         </Grid>
         <Grid item xs={12}>
