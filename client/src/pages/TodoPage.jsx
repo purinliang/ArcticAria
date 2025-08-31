@@ -235,10 +235,16 @@ export default function TodoPage() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          mb: 3,
+          flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <Box>
+        <Box
+          sx={{
+            textAlign: "left",
+            mb: { xs: 2, sm: 0 },
+            alignSelf: { xs: "flex-start", sm: "auto" },
+          }}
+        >
           <Typography
             variant="h4"
             component="h1"
@@ -250,19 +256,34 @@ export default function TodoPage() {
             Manage your tasks and stay on top of your schedule.
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={sortByCategory}
-                onChange={handleSortChange}
-                name="sortBySwitch"
-                color="primary"
-              />
-            }
-            label={sortByCategory ? "Sort by Category" : "Sort by Time"}
-            sx={{ mr: 1 }}
-          />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            justifyContent: "flex-end",
+            width: { xs: "100%", sm: "auto" },
+          }}
+        >
+          <Box
+            sx={{
+              minWidth: "200px", // fixing width change when toggle switch
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={sortByCategory}
+                  onChange={handleSortChange}
+                  name="sortBySwitch"
+                  color="primary"
+                />
+              }
+              label={sortByCategory ? "Sort by Category" : "Sort by Time"}
+            />
+          </Box>
           <Tooltip title="Add New Todo">
             <Button
               variant="contained"
