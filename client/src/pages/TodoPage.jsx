@@ -17,17 +17,17 @@ import WarningIcon from "@mui/icons-material/Warning";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import StarsIcon from "@mui/icons-material/Stars";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Tooltip from "@mui/material/Tooltip";
 import Switch from "@mui/material/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import useSWR from "swr";
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
 // Helper function to sort todos by due date
 const sortTodosByDate = (todos) => {
   return [...todos].sort((a, b) => {
-    // Handle cases where due_date is null or undefined
+    // Handle cases where nextDueDate is null or undefined
     if (!a.nextDueDate && !b.nextDueDate) return 0;
     if (!a.nextDueDate) return 1;
     if (!b.nextDueDate) return -1;
@@ -35,60 +35,49 @@ const sortTodosByDate = (todos) => {
   });
 };
 
+// SWR fetcher function with authentication headers
+const fetcher = async (url) => {
+  const token = localStorage.getItem("jwtToken");
+  if (!token) {
+    // If no token, throw an error to trigger SWR's error state
+    const error = new Error("Not authenticated");
+    error.status = 401;
+    throw error;
+  }
+  const res = await axios.get(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
 export default function TodoPage() {
   const navigate = useNavigate();
-
-  const [todos, setTodos] = useState([]);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [groupedTodos, setGroupedTodos] = useState({
-    reminding: [],
-    upcoming: [],
-    overdued: [],
-    completed: [],
-  });
-  // State to manage the sorting preference: true for category, false for time
   const [sortByCategory, setSortByCategory] = useState(true);
 
-  /**
-   * Fetches the user's todos from the API.
-   * If the JWT token is invalid, it redirects the user to the login page.
-   */
-  const fetchTodos = async () => {
-    setError("");
-    setLoading(true);
-    const token = localStorage.getItem("jwtToken");
-    if (!token) {
-      setError("You are not logged in. Please log in first...");
-      setLoading(false);
-      return;
+  // Use useSWR to fetch and manage todos data
+  const {
+    data: todos,
+    error: swrError,
+    isLoading,
+    mutate, // The mutate function is crucial for revalidation
+  } = useSWR(`${API_BASE}/todo`, fetcher, {
+    dedupingInterval: 1000, // cache for 1 seconds
+    revalidateOnFocus: false, // Prevents re-fetching on window focus
+    revalidateOnReconnect: false, // Prevents re-fetching on network reconnect
+  });
+
+  // Handle authentication errors
+  useEffect(() => {
+    if (swrError && swrError.status === 401) {
+      localStorage.removeItem("jwtToken");
     }
-    try {
-      const res = await axios.get(`${API_BASE}/todo`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setTodos(res.data);
-    } catch (err) {
-      console.error("Failed to fetch todos:", err);
-      if (err.response && err.response.status === 401) {
-        localStorage.removeItem("jwtToken");
-        setError("Session expired or unauthorized. Please log in again.");
-        setTimeout(() => navigate("/login"), 3000);
-      } else {
-        setError(`Failed to fetch todos: ${err.response?.data || err.message}`);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [swrError, navigate]);
 
   /**
    * Toggles the completion status of a todo.
-   * @param {string} id The ID of the todo.
-   * @param {boolean} currentStatus The current completion status.
+   * We'll use mutate() to re-fetch and update the data after a successful change.
    */
   const handleToggleComplete = async (id, currentStatus) => {
-    setError("");
     try {
       const token = localStorage.getItem("jwtToken");
       await axios.put(
@@ -102,10 +91,11 @@ export default function TodoPage() {
           },
         },
       );
-      fetchTodos();
+      // Re-fetch data after a successful update to show the latest state
+      mutate();
     } catch (err) {
       console.error("Failed to update todo:", err);
-      setError("Failed to update todo.");
+      // Optionally handle specific errors here
     }
   };
 
@@ -113,16 +103,15 @@ export default function TodoPage() {
     setSortByCategory(event.target.checked);
   };
 
-  useEffect(() => {
-    // Ensure todos is a valid array before proceeding
-    if (!Array.isArray(todos) || todos.length === 0) {
-      setGroupedTodos({
+  // Group and sort todos based on the fetched data
+  const groupedTodos = (() => {
+    if (!todos || !Array.isArray(todos)) {
+      return {
         reminding: [],
         upcoming: [],
         overdued: [],
         completed: [],
-      });
-      return;
+      };
     }
 
     const reminding = [];
@@ -135,7 +124,6 @@ export default function TodoPage() {
       if (todo.completed) {
         completed.push(todo);
       } else {
-        // Determine due and remind dates for sorting
         const dueDate = todo.nextDueDate ? new Date(todo.nextDueDate) : null;
         const remindDate = dueDate ? new Date(dueDate) : null;
         if (remindDate) {
@@ -144,14 +132,12 @@ export default function TodoPage() {
           );
         }
 
-        // Get the start of the current day to compare dates correctly
         const startOfToday = new Date(
           now.getFullYear(),
           now.getMonth(),
           now.getDate(),
         );
 
-        // Classify todos based on dates
         if (
           remindDate &&
           startOfToday.getTime() >= remindDate.getTime() &&
@@ -166,26 +152,17 @@ export default function TodoPage() {
       }
     });
 
-    const sortedGroups = {
+    return {
       overdued: sortTodosByDate(overdued),
       reminding: sortTodosByDate(reminding),
       upcoming: sortTodosByDate(upcoming),
       completed: sortTodosByDate(completed),
     };
+  })();
 
-    console.log("Grouped todos:", sortedGroups);
-    setGroupedTodos(sortedGroups);
-  }, [todos, sortTodosByDate]);
-
-  /**
-   * Renders a group of todos with a label in a single list.
-   * @param {Array<object>} todoItems The array of todos to render.
-   * @param {string} label The label for the group.
-   * @param {React.ReactElement} icon The Material-UI icon for the label.
-   */
   const renderTodoGroup = (todoItems, label, icon) => {
-    if (!todoItems || !Array.isArray(todoItems)) return null;
-    if (todoItems.length === 0) return null;
+    if (!todoItems || !Array.isArray(todoItems) || todoItems.length === 0)
+      return null;
 
     return (
       <Box key={label} sx={{ my: 2 }}>
@@ -212,10 +189,6 @@ export default function TodoPage() {
       </Box>
     );
   };
-
-  useEffect(() => {
-    fetchTodos();
-  }, []);
 
   const allGroupsEmpty = Object.values(groupedTodos).every(
     (group) => group.length === 0,
@@ -268,7 +241,7 @@ export default function TodoPage() {
           </Tooltip>
         </Box>
       </Box>
-      {error && (
+      {swrError && (
         <Alert
           severity="error"
           sx={{
@@ -279,19 +252,18 @@ export default function TodoPage() {
             backgroundColor: red[50],
           }}
         >
-          {error}
+          {swrError.status === 401
+            ? "Session expired or unauthorized. Please log in again."
+            : `Failed to fetch todos: ${swrError.message}`}
         </Alert>
       )}
-      {loading ? (
-        // State 1: Data is currently loading
+      {isLoading ? (
         <Typography sx={{ mt: 4 }} align="center">
           Loading...
         </Typography>
       ) : (
-        // State 2: Data has finished loading
         <>
           {allGroupsEmpty ? (
-            // State 2a: The list is empty after loading
             <Typography
               color="text.secondary"
               align="center"
@@ -300,7 +272,6 @@ export default function TodoPage() {
               No tasks found. Click the button above to add a new todo.
             </Typography>
           ) : (
-            // State 2b: The list has items
             <>
               {renderTodoGroup(
                 groupedTodos.overdued,
