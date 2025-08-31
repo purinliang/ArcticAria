@@ -1,4 +1,5 @@
 import { createPost, getPublicPosts, getPublicPost, getAuthorPosts, updatePost, deletePost } from './posts';
+import { createComment, getCommentsForPost, updateComment, deleteComment } from './comments';
 import pino from 'pino';
 
 const logger = pino({
@@ -42,7 +43,7 @@ export default {
 			if (path === '/posts' && method === 'GET') {
 				return withCORS(await getPublicPosts(request, env, reqLogger));
 			}
-			if (path.startsWith('/posts/') && method === 'GET') {
+			if (path.startsWith('/posts/') && method === 'GET' && !path.endsWith('/comments')) {
 				const id = path.split('/')[2];
 				return withCORS(await getPublicPost(request, env, reqLogger, id));
 			}
@@ -60,6 +61,23 @@ export default {
 			if (method === 'DELETE' && path.startsWith('/posts/')) {
 				const id = path.split('/')[2];
 				return withCORS(await deletePost(request, env, reqLogger, id));
+			}
+
+			// --- Comment API Endpoints ---
+			if (path.startsWith('/posts/') && path.endsWith('/comments') && method === 'GET') {
+				const postId = path.split('/')[2];
+				return withCORS(await getCommentsForPost(request, env, reqLogger, postId));
+			}
+			if (method === 'POST' && path === '/comments') {
+				return withCORS(await createComment(request, env, reqLogger, getAuthenticatedUser));
+			}
+			if (method === 'PUT' && path.startsWith('/comments/')) {
+				const commentId = path.split('/')[2];
+				return withCORS(await updateComment(request, env, reqLogger, commentId, getAuthenticatedUser));
+			}
+			if (method === 'DELETE' && path.startsWith('/comments/')) {
+				const commentId = path.split('/')[2];
+				return withCORS(await deleteComment(request, env, reqLogger, commentId, getAuthenticatedUser));
 			}
 
 			reqLogger.warn({ path }, 'Route not found');
