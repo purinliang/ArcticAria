@@ -56,9 +56,11 @@ export default function LoginPage() {
           "Username field not found in JWT token. Please check your backend.",
         );
       }
-
-      setSuccess("Logged in successfully! Redirecting to todos...");
-      setTimeout(() => navigate("/"), 2000);
+      setSuccess("Logged in successfully! Redirecting to homepage...");
+      setTimeout(() => {
+        navigate("/");
+        window.location.reload();
+      }, 1000);
     } catch (err) {
       console.log(`Login error: ${err}`);
       // Check if the error has a response and data to get a more specific message

@@ -100,7 +100,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
           <Box
             sx={{
               float: "right",
-              mt: -1.8,
+              mt: -1.0,
               mr: -1.8,
               mb: -2.4,
             }}
@@ -116,8 +116,10 @@ export default function TodoCard({ todo, onToggleComplete }) {
             />
           </Box>
           <Typography
-            variant="h7"
+            variant="h6"
             sx={{
+              mt: -0.8,
+              fontSize: "1.1rem",
               fontWeight: "bold",
             }}
           >
@@ -127,7 +129,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
         <Typography
           variant="body2"
           sx={{
-            mt: 1,
+            mt: 0.8,
             mb: 2,
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -174,6 +176,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
           <Typography
             variant="body1"
             sx={{
+              fontSize: "0.8rem",
               fontWeight: "bold",
               mb: -1.6,
             }}
