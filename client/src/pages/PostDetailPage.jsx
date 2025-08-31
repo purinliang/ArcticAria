@@ -175,12 +175,11 @@ export default function PostDetailPage() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 2,
         }}
       >
         <Typography
           variant="h4"
-          sx={{ fontWeight: "bold", color: "primary.main", mb: 1 }}
+          sx={{ fontWeight: "bold", color: "primary.main" }}
         >
           {post.title}
         </Typography>
@@ -205,8 +204,8 @@ export default function PostDetailPage() {
       </Box>
 
       {/* Second line: Author and publication date */}
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="caption" display="block" color="text.secondary">
+      <Box sx={{ mb: 2.5 }}>
+        <Typography variant="caption" display="block" color="text.secondary" sx={{ mb: -0.5 }}>
           Author: {post.username}
         </Typography>
         <Typography variant="caption" display="block" color="text.secondary">
@@ -217,7 +216,10 @@ export default function PostDetailPage() {
       {/* Markdown content box with image styling */}
       <Box
         sx={{
-          p: isMobile ? 1 : 2,
+          pt: isMobile ? 0 : 0.75,
+          pb: isMobile ? 0 : 0.75,
+          pl: isMobile ? 1.5 : 2.5,
+          pr: isMobile ? 1.5 : 2.5,
           border: "1px solid #e0e0e0",
           borderRadius: "8px",
           boxShadow: 1,
@@ -228,7 +230,7 @@ export default function PostDetailPage() {
           component="div"
           sx={{
             whiteSpace: "pre-wrap",
-            lineHeight: "1.6rem",
+            lineHeight: "1.5rem",
             "& img": {
               maxWidth: "100%",
               height: "auto",
