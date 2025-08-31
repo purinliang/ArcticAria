@@ -7,10 +7,6 @@
     "prettier": "3.6.2"
   },
   "scripts": {
-    "format": "prettier --write \"**/*.{js,mjs,cjs,jsx,ts,tsx,json,jsonc,css,scss,less,md,html,yml,yaml,vue,gql,graphql,liquid}\"",
-    "dev:all": "concurrently \"npm run dev:auth\" \"npm run dev:todo\" \"npm run dev:blog\"",
-    "dev:todo": "npx wrangler dev --config server/todo/wrangler.jsonc",
-    "dev:auth": "npx wrangler dev --config server/auth/wrangler.jsonc",
-    "dev:blog": "npx wrangler dev --config server/blog/wrangler.jsonc"
+    "format": "prettier --write \"**/*.{js,mjs,cjs,jsx,ts,tsx,json,jsonc,css,scss,less,md,html,yml,yaml,vue,gql,graphql,liquid}\""
   }
 }
