@@ -148,21 +148,24 @@ const mapPostToCamelCase = (post) => {
 		title: post.title,
 		content: post.content,
 		userId: post.user_id,
+		username: post.username,
 		createdAt: post.created_at,
 		updatedAt: post.updated_at,
 	};
 };
 
 /**
- * Retrieves all public blog posts. No user authentication is required.
+ * Retrieves all public blog posts, including author information.
  */
 async function getPublicPosts(request, env, logger) {
 	try {
+		// 使用 LEFT JOIN 从 users 表中获取 username
 		const { results } = await env.DB.prepare(
 			`
-            SELECT id, title, content, user_id, created_at, updated_at
-            FROM posts
-            ORDER BY created_at DESC
+            SELECT p.id, p.title, p.content, p.user_id, p.created_at, p.updated_at, u.username
+            FROM posts AS p
+            LEFT JOIN users AS u ON p.user_id = u.id
+            ORDER BY p.created_at DESC
         `,
 		).all();
 
@@ -181,15 +184,17 @@ async function getPublicPosts(request, env, logger) {
 }
 
 /**
- * Retrieves a single public blog post by its ID. No user authentication is required.
+ * Retrieves a single public blog post by its ID, including author information.
  */
 async function getPublicPost(request, env, logger, postId) {
 	try {
+		// 使用 LEFT JOIN 从 users 表中获取 username
 		const { results } = await env.DB.prepare(
 			`
-            SELECT *
-            FROM posts
-            WHERE id = ?
+            SELECT p.*, u.username
+            FROM posts AS p
+            LEFT JOIN users AS u ON p.user_id = u.id
+            WHERE p.id = ?
         `,
 		)
 			.bind(postId)
@@ -221,10 +226,11 @@ async function getAuthorPosts(request, env, logger, authorId) {
 	try {
 		const { results } = await env.DB.prepare(
 			`
-            SELECT id, title, created_at, updated_at
-            FROM posts
-            WHERE user_id = ?
-            ORDER BY created_at DESC
+            SELECT p.id, p.title, p.created_at, p.updated_at, u.username
+            FROM posts AS p
+            LEFT JOIN users AS u ON p.user_id = u.id
+            WHERE p.user_id = ?
+            ORDER BY p.created_at DESC
         `,
 		)
 			.bind(authorId)
@@ -349,7 +355,8 @@ async function getAuthenticatedUser(request, env, logger) {
 			return null;
 		}
 		const payload = await res.json();
-		logger.debug({ userId: payload.userId }, 'User authenticated via auth server');
+		// The payload from the auth worker now contains the username.
+		logger.debug({ userId: payload.userId, username: payload.username }, 'User authenticated via auth server');
 		return payload;
 	} catch (err) {
 		logger.error(
