@@ -141,7 +141,7 @@ export default function BlogPage() {
             color="text.secondary"
             sx={{ fontSize: "0.7rem", mt: 1 }}
           >
-            Author: {truncateString(post.userId, 13)}
+            Author: {truncateString(post.username, 13)}
           </Typography>
           <Typography
             variant="caption"
