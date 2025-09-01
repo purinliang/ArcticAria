@@ -13,7 +13,7 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemText,
+  ListItemText
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import RegisterPage from "./pages/RegisterPage";
@@ -25,10 +25,12 @@ import PostEditPage from "./pages/PostEditPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import DiscoverPage from "./pages/DiscoverPage";
 import { AuthProvider, useAuth } from "./AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import HomePage from "./pages/HomePage";
 import ArcticAriaLogo from "./assets/arctic-aria-logo.png";
 import ArcticAriaTitle from "./components/ArcticAriaTitle";
+import { useTranslation } from "react-i18next";
+import SwitchBar from "./components/LangSwitchBar";
 
 function App() {
   const { isLoggedIn, username, logout } = useAuth();
@@ -38,6 +40,13 @@ function App() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { i18n, t } = useTranslation();
+
+  useEffect(() => {
+    const h = (lng) => console.log("i18n language changed ->", lng);
+    i18n.on("languageChanged", h);
+    return () => i18n.off("languageChanged", h);
+  }, [i18n]);
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -67,7 +76,7 @@ function App() {
   // State to manage the special "copied" tooltip and its text
   const [copiedTooltipOpen, setCopiedTooltipOpen] = useState(false);
   const [tooltipText, setTooltipText] = useState(
-    `Click to copy: ${emailAddress}`,
+    `Click to copy: ${emailAddress}`
   );
 
   const handleEmailClick = async () => {
@@ -121,7 +130,7 @@ function App() {
         display: "flex",
         alignItems: "center",
         gap: 2,
-        ml: 4,
+        ml: 4
       }}
     >
       <Button
@@ -129,30 +138,24 @@ function App() {
         color="inherit"
         sx={{
           fontWeight: "bold",
-          textTransform: "none",
+          textTransform: "none"
         }}
       >
-        Todos
+        {t("nav.todos")}
       </Button>
       <Button
         onClick={() => handleNavigation("/discover")}
         color="inherit"
-        sx={{
-          fontWeight: "bold",
-          textTransform: "none",
-        }}
+        sx={{ fontWeight: "bold", textTransform: "none" }}
       >
-        Discover
+        {t("nav.discover")}
       </Button>
       <Button
         onClick={() => handleNavigation("/blog")}
         color="inherit"
-        sx={{
-          fontWeight: "bold",
-          textTransform: "none",
-        }}
+        sx={{ fontWeight: "bold", textTransform: "none" }}
       >
-        Discuss
+        {t("nav.discuss")}
       </Button>
     </Box>
   );
@@ -164,9 +167,11 @@ function App() {
         display: "flex",
         justifyContent: "flex-end",
         alignItems: "center",
-        gap: 1,
+        gap: 1
       }}
     >
+      <SwitchBar />
+
       {isLoggedIn ? (
         <>
           <Typography
@@ -182,10 +187,10 @@ function App() {
             onClick={handleLogout}
             sx={{
               fontSize: "1rem",
-              textTransform: "none",
+              textTransform: "none"
             }}
           >
-            Sign out
+            {t("auth.signOut")}
           </Button>
         </>
       ) : (
@@ -195,10 +200,10 @@ function App() {
           onClick={() => navigate("/login")}
           sx={{
             fontSize: "1rem",
-            textTransform: "none",
+            textTransform: "none"
           }}
         >
-          Sign in
+          {t("auth.signIn")}
         </Button>
       )}
     </Box>
@@ -212,7 +217,7 @@ function App() {
           sx={{
             bgcolor: "white",
             color: "black",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
           }}
         >
           <Toolbar
@@ -220,13 +225,13 @@ function App() {
               maxWidth: "1120px",
               width: "90%",
               mx: "auto",
-              justifyContent: "space-between",
+              justifyContent: "space-between"
             }}
           >
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
+                alignItems: "center"
               }}
             >
               {isMobile && (
@@ -249,7 +254,7 @@ function App() {
                   alignItems: "center",
                   fontWeight: "bold",
                   fontSize: "1.5rem",
-                  textTransform: "none",
+                  textTransform: "none"
                 }}
               >
                 <img
@@ -285,19 +290,19 @@ function App() {
             <List>
               <ListItem button onClick={() => handleNavigation("/todos")}>
                 <ListItemText
-                  primary="Todos"
+                  primary={t("nav.todos")}
                   primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
                 />
               </ListItem>
               <ListItem button onClick={() => handleNavigation("/discover")}>
                 <ListItemText
-                  primary="Discover"
+                  primary={t("nav.discover")}
                   primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
                 />
               </ListItem>
               <ListItem button onClick={() => handleNavigation("/blog")}>
                 <ListItemText
-                  primary="Discuss"
+                  primary={t("nav.discuss")}
                   primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
                 />
               </ListItem>
@@ -312,7 +317,7 @@ function App() {
                     <ListItemText
                       primary="Sign out"
                       primaryTypographyProps={{
-                        sx: { fontWeight: "bold", color: "error.main" },
+                        sx: { fontWeight: "bold", color: "error.main" }
                       }}
                     />
                   </ListItem>
@@ -324,7 +329,7 @@ function App() {
                     <ListItemText
                       primary="Sign in"
                       primaryTypographyProps={{
-                        sx: { fontWeight: "bold", color: "primary.main" },
+                        sx: { fontWeight: "bold", color: "primary.main" }
                       }}
                     />
                   </ListItem>
@@ -362,7 +367,7 @@ function App() {
             p: 2,
             maxWidth: "1120px",
             mx: "auto",
-            textAlign: "center",
+            textAlign: "center"
           }}
         >
           <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -377,7 +382,7 @@ function App() {
               style={{
                 color: "inherit",
                 textDecoration: "none",
-                marginRight: "8px",
+                marginRight: "8px"
               }}
             >
               GitHub
@@ -401,7 +406,7 @@ function App() {
                     color: "inherit",
                     textDecoration: "none",
                     marginLeft: "8px",
-                    cursor: "pointer",
+                    cursor: "pointer"
                   }}
                 >
                   Email

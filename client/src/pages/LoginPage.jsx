@@ -5,13 +5,14 @@ import {
   Box,
   Typography,
   Container,
-  Alert,
+  Alert
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { red } from "@mui/material/colors";
 import { useAuth } from "../AuthContext";
 import { jwtDecode } from "jwt-decode";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_BASE;
 
@@ -20,53 +21,38 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  const { setIsLoggedIn, setUsername } = useAuth(); // Use the auth context
+  const { setIsLoggedIn, setUsername } = useAuth();
+  const { t } = useTranslation();
 
-  /**
-   * Handles form input changes.
-   * @param {Event} e The event object.
-   */
   const handleChange = (e) => {
     setError("");
     setSuccess("");
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  /**
-   * Handles the login process.
-   */
   const handleLogin = async () => {
     setError("");
     setSuccess("");
     try {
-      console.log(`POST ${API_BASE}/login`);
       const res = await axios.post(`${API_BASE}/login`, form);
       const { token } = res.data;
       localStorage.setItem("jwtToken", token);
 
       const decodedToken = jwtDecode(token);
-      console.log("Decoded JWT Payload:", decodedToken); // Log the decoded payload for debugging
 
-      // Check for the 'username' field in the decoded token
       if (decodedToken.username) {
-        setUsername(decodedToken.username); // Update username in context
-        setIsLoggedIn(true); // Update login status in context
-      } else {
-        console.error(
-          "Username field not found in JWT token. Please check your backend.",
-        );
+        setUsername(decodedToken.username);
+        setIsLoggedIn(true);
       }
-      setSuccess("Logged in successfully! Redirecting to homepage...");
+
+      setSuccess(t("page.login.success"));
       setTimeout(() => {
         navigate("/");
         window.location.reload();
       }, 1000);
     } catch (err) {
-      console.log(`Login error: ${err}`);
-      // Check if the error has a response and data to get a more specific message
       const errorMessage = err.response?.data || err.message;
-      // Instead of an alert, set the error state to display the message
-      setError(`Login failed: ${errorMessage}`);
+      setError(t("errors.loginFailed", { message: errorMessage }));
     }
   };
 
@@ -82,7 +68,7 @@ export default function LoginPage() {
           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         <Typography
@@ -91,17 +77,18 @@ export default function LoginPage() {
           component="div"
           sx={{ fontWeight: "bold", color: "primary.main" }}
         >
-          Sign in
+          {t("page.login.title")}
         </Typography>
+
         <Typography
           variant="subtitle1"
           gutterBottom
           sx={{ color: "text.secondary" }}
         >
-          Welcome back! Please log in to your account.
+          {t("page.login.subtitle")}
         </Typography>
 
-        {/* Display success and error alerts */}
+        {/* Success / error messages */}
         {success && (
           <Alert
             severity="success"
@@ -117,7 +104,7 @@ export default function LoginPage() {
               width: "100%",
               mb: 2,
               borderRadius: "8px",
-              backgroundColor: red[50],
+              backgroundColor: red[50]
             }}
           >
             {error}
@@ -127,40 +114,43 @@ export default function LoginPage() {
         <TextField
           fullWidth
           margin="normal"
-          label="Username"
+          label={t("page.login.fields.username")}
           name="username"
           type="text"
           value={form.username}
           onChange={handleChange}
           required
-          // Add autocomplete for better browser support
           autoComplete="username"
         />
         <TextField
           fullWidth
           margin="normal"
-          label="Password"
+          label={t("page.login.fields.password")}
           type="password"
           name="password"
           value={form.password}
           onChange={handleChange}
           required
-          // Use "current-password" for login forms
           autoComplete="current-password"
         />
+
         <Button
           variant="contained"
           color="primary"
           fullWidth
           onClick={handleLogin}
           sx={{ mt: 3, py: 1.5, borderRadius: "8px" }}
+          aria-label={t("page.login.buttons.signIn")}
         >
-          Login
+          {t("page.login.buttons.signIn")}
         </Button>
+
         <Box textAlign="center" sx={{ mt: 2, width: "100%" }}>
           <Typography variant="body2" color="textSecondary">
-            Don't have an account?{" "}
-            <Button onClick={() => navigate("/register")}>Sign up</Button>
+            {t("page.login.cta.noAccount")}{" "}
+            <Button onClick={() => navigate("/register")}>
+              {t("page.login.buttons.signUp")}
+            </Button>
           </Typography>
         </Box>
       </Box>

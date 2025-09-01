@@ -4,7 +4,7 @@ import {
   Button,
   Divider,
   Alert,
-  Box,
+  Box
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import axios from "axios";
@@ -26,179 +26,146 @@ import BookIcon from "@mui/icons-material/Book";
 import HomeIcon from "@mui/icons-material/Home";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import CategoryIcon from "@mui/icons-material/Category";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
-// Define the categories and their corresponding icons for sorting
+// Category keys mapped to icons. Labels will be translated via i18n.
 const CATEGORY_GROUPS = [
-  { label: "Work", icon: <WorkIcon color="primary" />, key: "Work" },
-  { label: "Study", icon: <BookIcon color="info" />, key: "Study" },
-  { label: "Life", icon: <HomeIcon color="action" />, key: "Life" },
-  { label: "Play", icon: <SportsEsportsIcon color="secondary" />, key: "Play" },
-  { label: "Other", icon: <CategoryIcon />, key: "Other" },
+  { key: "Work", icon: <WorkIcon color="primary" /> },
+  { key: "Study", icon: <BookIcon color="info" /> },
+  { key: "Life", icon: <HomeIcon color="action" /> },
+  { key: "Play", icon: <SportsEsportsIcon color="secondary" /> },
+  { key: "Other", icon: <CategoryIcon /> }
 ];
 
-// Helper function to sort todos by due date
-const sortTodosByDate = (todos) => {
-  return [...todos].sort((a, b) => {
-    // Handle cases where nextDueDate is null or undefined
+// Helper: sort by due date
+const sortTodosByDate = (todos) =>
+  [...todos].sort((a, b) => {
     if (!a.nextDueDate && !b.nextDueDate) return 0;
     if (!a.nextDueDate) return 1;
     if (!b.nextDueDate) return -1;
     return new Date(a.nextDueDate) - new Date(b.nextDueDate);
   });
-};
 
-// Helper function to group todos by category
+// Group by category (falls back to "Other")
 const groupTodosByCategory = (todos) => {
   const grouped = {};
-  CATEGORY_GROUPS.forEach((group) => (grouped[group.key] = []));
-
+  CATEGORY_GROUPS.forEach((g) => (grouped[g.key] = []));
   todos.forEach((todo) => {
-    // If the category exists in our defined groups, add it there.
-    // Otherwise, it falls into the 'Other' category.
-    const categoryKey = CATEGORY_GROUPS.find(
-      (group) => group.key === todo.category,
-    )
-      ? todo.category
-      : "Other";
-    grouped[categoryKey].push(todo);
+    const exists = CATEGORY_GROUPS.find((g) => g.key === todo.category);
+    const key = exists ? todo.category : "Other";
+    grouped[key].push(todo);
   });
   return grouped;
 };
 
-// SWR fetcher function with authentication headers
+// SWR fetcher with auth
 const fetcher = async (url) => {
   const token = localStorage.getItem("jwtToken");
   if (!token) {
-    // If no token, throw an error to trigger SWR's error state
     const error = new Error("Not authenticated");
     error.status = 401;
     throw error;
   }
   const res = await axios.get(url, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}` }
   });
   return res.data;
 };
 
 export default function TodoPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [sortByCategory, setSortByCategory] = useState(() => {
     try {
       const storedSort = localStorage.getItem("sortByCategory");
       return storedSort !== null ? JSON.parse(storedSort) : false;
-    } catch (e) {
-      console.error("Failed to load sort preference from localStorage", e);
+    } catch {
       return false;
     }
   });
 
-  // Use useEffect to save the sort state to localStorage whenever it changes
   useEffect(() => {
     try {
       localStorage.setItem("sortByCategory", JSON.stringify(sortByCategory));
-    } catch (e) {
-      console.error("Failed to save sort preference to localStorage", e);
-    }
+    } catch {}
   }, [sortByCategory]);
 
-  // Use useSWR to fetch and manage todos data
   const {
     data: todos,
     error: swrError,
     isLoading,
-    mutate, // The mutate function is crucial for revalidation
+    mutate
   } = useSWR(`${API_BASE}/todo`, fetcher, {
-    dedupingInterval: 1000, // cache for 1 seconds
-    revalidateOnFocus: false, // Prevents re-fetching on window focus
-    revalidateOnReconnect: false, // Prevents re-fetching on network reconnect
+    dedupingInterval: 1000,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   });
 
-  // Handle authentication errors
   useEffect(() => {
     if (swrError && swrError.status === 401) {
       localStorage.removeItem("jwtToken");
     }
   }, [swrError, navigate]);
 
-  /**
-   * Toggles the completion status of a todo.
-   * We'll use mutate() to re-fetch and update the data after a successful change.
-   */
   const handleToggleComplete = async (id, currentStatus) => {
     try {
       const token = localStorage.getItem("jwtToken");
       await axios.put(
         `${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`,
-        {
-          completed: !currentStatus,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { completed: !currentStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Re-fetch data after a successful update to show the latest state
       mutate();
     } catch (err) {
-      console.error("Failed to update todo:", err);
-      // Optionally handle specific errors here
+      // Optionally show a toast here with t('errors.updateTodo')
+      // console.error(err);
     }
   };
 
-  const handleSortChange = (event) => {
-    setSortByCategory(event.target.checked);
-  };
+  const handleSortChange = (event) => setSortByCategory(event.target.checked);
 
-  // Group and sort todos based on the fetched data
+  // Group by time windows
   const groupedTodosByTime = (() => {
     if (!todos || !Array.isArray(todos)) {
-      return {
-        reminding: [],
-        upcoming: [],
-        overdued: [],
-        completed: [],
-      };
+      return { reminding: [], upcoming: [], overdued: [], completed: [] };
     }
-
     const reminding = [];
     const upcoming = [];
     const overdued = [];
     const completed = [];
     const now = new Date();
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
 
     todos.forEach((todo) => {
       if (todo.completed) {
         completed.push(todo);
-      } else {
-        const dueDate = todo.nextDueDate ? new Date(todo.nextDueDate) : null;
-        const remindDate = dueDate ? new Date(dueDate) : null;
-        if (remindDate) {
-          remindDate.setDate(
-            remindDate.getDate() - (todo.reminderDaysBefore || 0),
-          );
-        }
-
-        const startOfToday = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate(),
+        return;
+      }
+      const dueDate = todo.nextDueDate ? new Date(todo.nextDueDate) : null;
+      const remindDate = dueDate ? new Date(dueDate) : null;
+      if (remindDate) {
+        remindDate.setDate(
+          remindDate.getDate() - (todo.reminderDaysBefore || 0)
         );
+      }
 
-        if (
-          remindDate &&
-          startOfToday.getTime() >= remindDate.getTime() &&
-          startOfToday.getTime() <= dueDate.getTime()
-        ) {
-          reminding.push(todo);
-        } else if (dueDate && startOfToday.getTime() > dueDate.getTime()) {
-          overdued.push(todo);
-        } else {
-          upcoming.push(todo);
-        }
+      if (
+        remindDate &&
+        startOfToday.getTime() >= remindDate.getTime() &&
+        startOfToday.getTime() <= (dueDate?.getTime?.() ?? 0)
+      ) {
+        reminding.push(todo);
+      } else if (dueDate && startOfToday.getTime() > dueDate.getTime()) {
+        overdued.push(todo);
+      } else {
+        upcoming.push(todo);
       }
     });
 
@@ -206,25 +173,23 @@ export default function TodoPage() {
       overdued: sortTodosByDate(overdued),
       reminding: sortTodosByDate(reminding),
       upcoming: sortTodosByDate(upcoming),
-      completed: sortTodosByDate(completed),
+      completed: sortTodosByDate(completed)
     };
   })();
 
-  const groupedTodosByCategory = groupTodosByCategory(todos || []);
+  const groupedByCategory = groupTodosByCategory(todos || []);
 
-  const renderTodoGroup = (todoItems, label, icon) => {
-    if (!todoItems || !Array.isArray(todoItems) || todoItems.length === 0)
-      return null;
-
+  const renderTodoGroup = (todoItems, labelKey, icon) => {
+    if (!todoItems?.length) return null;
     return (
-      <Box key={label} sx={{ my: 2 }}>
+      <Box key={labelKey} sx={{ my: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center", mt: 4, mb: 1 }}>
           {icon && (
             <Box component="span" sx={{ mr: 0.5, mt: 0.5, fontSize: "1.2rem" }}>
               {icon}
             </Box>
           )}
-          <Typography sx={{ fontWeight: "bold" }}>{label}</Typography>
+          <Typography sx={{ fontWeight: "bold" }}>{t(labelKey)}</Typography>
         </Box>
         <Divider sx={{ mb: 2 }} />
         <Masonry columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} spacing={2}>
@@ -243,8 +208,8 @@ export default function TodoPage() {
   };
 
   const allGroupsEmpty =
-    Object.values(groupedTodosByTime).every((group) => group.length === 0) &&
-    Object.values(groupedTodosByCategory).every((group) => group.length === 0);
+    Object.values(groupedTodosByTime).every((g) => g.length === 0) &&
+    Object.values(groupedByCategory).every((g) => g.length === 0);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4, p: 2 }}>
@@ -253,15 +218,14 @@ export default function TodoPage() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          flexDirection: { xs: "column", sm: "row" },
+          flexDirection: { xs: "column", sm: "row" }
         }}
       >
         <Box
           sx={{
             textAlign: "left",
             mb: { xs: 2, sm: 0 },
-            // 在小屏幕上让标题和描述靠左
-            alignSelf: { xs: "flex-start", sm: "auto" },
+            alignSelf: { xs: "flex-start", sm: "auto" }
           }}
         >
           <Typography
@@ -269,33 +233,30 @@ export default function TodoPage() {
             component="h1"
             sx={{ fontWeight: "bold", color: "primary.main", mb: 1 }}
           >
-            My Todo List
+            {t("page.todos.title")}
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Manage your tasks and stay on top of your schedule.
+            {t("page.todos.subtitle")}
           </Typography>
         </Box>
+
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: 2,
             justifyContent: "flex-end",
-            width: { xs: "100%", sm: "auto" },
+            width: { xs: "100%", sm: "auto" }
           }}
         >
           <Box
-            sx={{
-              minWidth: "200px",
-              display: "flex",
-              alignItems: "center",
-            }}
+            sx={{ minWidth: "200px", display: "flex", alignItems: "center" }}
           >
             <Tooltip
               title={
                 sortByCategory
-                  ? "Switch to Sort by Time"
-                  : "Switch to Sort by Category"
+                  ? t("page.todos.tooltips.switchToTime")
+                  : t("page.todos.tooltips.switchToCategory")
               }
             >
               <FormControlLabel
@@ -307,22 +268,29 @@ export default function TodoPage() {
                     color="primary"
                   />
                 }
-                label={sortByCategory ? "Sort by Category" : "Sort by Time"}
+                label={
+                  sortByCategory
+                    ? t("page.todos.labels.sortByCategory")
+                    : t("page.todos.labels.sortByTime")
+                }
               />
             </Tooltip>
           </Box>
-          <Tooltip title="Add New Todo">
+
+          <Tooltip title={t("page.todos.tooltips.addNew")}>
             <Button
               variant="contained"
               color="primary"
               onClick={() => navigate("/todos/new")}
               sx={{ minWidth: "auto", p: 1, borderRadius: "50%" }}
+              aria-label={t("page.todos.aria.addNew")}
             >
               <PlaylistAddIcon sx={{ fontSize: 24 }} />
             </Button>
           </Tooltip>
         </Box>
       </Box>
+
       {swrError && (
         <Alert
           severity="error"
@@ -331,17 +299,18 @@ export default function TodoPage() {
             mt: 2,
             mb: 2,
             borderRadius: "8px",
-            backgroundColor: red[50],
+            backgroundColor: red[50]
           }}
         >
           {swrError.status === 401
-            ? "Session expired or unauthorized. Please log in again."
-            : `Failed to fetch todos: ${swrError.message}`}
+            ? t("errors.sessionExpired")
+            : t("errors.fetchTodos", { message: swrError.message })}
         </Alert>
       )}
+
       {isLoading ? (
         <Typography sx={{ mt: 4 }} align="center">
-          Loading...
+          {t("common.loading")}
         </Typography>
       ) : (
         <>
@@ -351,41 +320,41 @@ export default function TodoPage() {
               align="center"
               sx={{ mt: 8, mb: 4 }}
             >
-              No tasks found. Click the button above to add a new todo.
+              {t("page.todos.empty")}
             </Typography>
           ) : (
             <>
               {sortByCategory ? (
-                // Render groups by category
+                // By category
                 CATEGORY_GROUPS.map((group) =>
                   renderTodoGroup(
-                    groupedTodosByCategory[group.key],
-                    group.label,
-                    group.icon,
-                  ),
+                    groupedByCategory[group.key],
+                    `categories.${group.key}`,
+                    group.icon
+                  )
                 )
               ) : (
-                // Render groups by time (default)
+                // By time windows
                 <>
                   {renderTodoGroup(
                     groupedTodosByTime.overdued,
-                    "Overdue",
-                    <WarningIcon color="error" />,
+                    "todoGroups.overdue",
+                    <WarningIcon color="error" />
                   )}
                   {renderTodoGroup(
                     groupedTodosByTime.reminding,
-                    "Reminding",
-                    <NotificationsActiveIcon color="info" />,
+                    "todoGroups.reminding",
+                    <NotificationsActiveIcon color="info" />
                   )}
                   {renderTodoGroup(
                     groupedTodosByTime.upcoming,
-                    "Upcoming",
-                    <CalendarTodayIcon sx={{ color: "info" }} />,
+                    "todoGroups.upcoming",
+                    <CalendarTodayIcon sx={{ color: "info" }} />
                   )}
                   {renderTodoGroup(
                     groupedTodosByTime.completed,
-                    "Completed",
-                    <CheckCircleOutlineIcon color="success" />,
+                    "todoGroups.completed",
+                    <CheckCircleOutlineIcon color="success" />
                   )}
                 </>
               )}

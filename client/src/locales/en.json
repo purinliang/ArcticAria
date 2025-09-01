@@ -1,0 +1,286 @@
+{
+  "appTitle": "Arctic Aria",
+
+  "common": {
+    "none": "None",
+    "dateFormat": "DD/MM/YYYY",
+    "loading": "Loading..."
+  },
+  "errors": {
+    "sessionExpired": "Session expired or unauthorized. Please log in again.",
+    "fetchTodos": "Failed to fetch todos: {{message}}",
+    "loginFailed": "Login failed: {{message}}",
+    "passwordMismatch": "Passwords do not match.",
+    "registerFailed": "Register error: {{message}}"
+  },
+
+  "nav": {
+    "todos": "Todos",
+    "discover": "Discover",
+    "discuss": "Discuss"
+  },
+
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out"
+  },
+
+  "footer": {
+    "rights": "All rights reserved.",
+    "contact": "Contact me:",
+    "email": "Email"
+  },
+
+  "dialog": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "deleteTitle": "Delete Item",
+    "deleteContent": "Are you sure you want to delete this item? This action cannot be undone."
+  },
+
+  "todo": {
+    "markComplete": "Mark as complete",
+    "categoryLabel": "Category",
+    "recurrenceLabel": "Recurrence Rule",
+    "nextDueDateLabel": "Next Due Date",
+    "dueToday": "Due today",
+    "daysLeft_one": "{{count}} day left",
+    "daysLeft_other": "{{count}} days left",
+    "overdue_one": "Overdue by {{count}} day",
+    "overdue_other": "Overdue by {{count}} days"
+  },
+  "categories": {
+    "Work": "Work",
+    "Study": "Study",
+    "Life": "Life",
+    "Play": "Play",
+    "Other": "Other"
+  },
+  "todoGroups": {
+    "overdue": "Overdue",
+    "reminding": "Reminding",
+    "upcoming": "Upcoming",
+    "completed": "Completed"
+  },
+
+  "page": {
+    "home": {
+      "title": "Welcome to ArcticAria",
+      "subtitle": "Your personal assistant for managing daily life.",
+      "intro": "ArcticAria is designed to be your small life assistant, helping you plan your daily progress with <strong>Todos</strong> for work, study, and essential tasks. In your free time, it will offer <strong>Discover</strong> for food, entertainment, and shopping to help you decide.",
+      "features": {
+        "title": "Key Features",
+        "todos": {
+          "title": "Todos",
+          "desc": "Easily create, track, and manage all your tasks. Ensure every task is completed on time.",
+          "cta": "Go to Todos"
+        },
+        "discover": {
+          "title": "Discover",
+          "desc": "Coming Soon! We plan to offer personalized recommendations for food, places to visit, and things to do to help you make decisions effortlessly.",
+          "cta": "Go to Discover"
+        },
+        "discuss": {
+          "title": "Discuss",
+          "desc": "A public discussion area for everyone. If you have ideas for new daily life tools, feel free to leave a message here!",
+          "cta": "Go to Discuss"
+        }
+      }
+    },
+    "todos": {
+      "title": "My Todo List",
+      "subtitle": "Manage your tasks and stay on top of your schedule.",
+      "labels": {
+        "sortByCategory": "Sort by Category",
+        "sortByTime": "Sort by Time"
+      },
+      "tooltips": {
+        "switchToTime": "Switch to Sort by Time",
+        "switchToCategory": "Switch to Sort by Category",
+        "addNew": "Add New Todo"
+      },
+      "aria": {
+        "addNew": "Add new todo"
+      },
+      "empty": "No tasks found. Click the button above to add a new todo."
+    },
+    "discover": {
+      "title": "Discover",
+      "subtitle": "This feature is coming soon!",
+      "description": "We are currently working hard to bring you personalized recommendations for your daily life. In the meantime, feel free to explore our other features.",
+      "buttons": {
+        "todos": "Go to Todos",
+        "discussion": "Join the Discussion"
+      }
+    },
+    "blogpage": {
+      "title": "Discuss",
+      "subtitle": "Share your thoughts, ask questions, or start a new discussion.",
+      "buttons": {
+        "newPost": "Create new post"
+      },
+      "tooltips": {
+        "newPost": "Create new post"
+      },
+      "status": {
+        "loading": "Loading posts...",
+        "error": "Failed to load posts. Please try again later.",
+        "empty": "There are no discussions yet. Be the first to share your thoughts!"
+      },
+      "meta": {
+        "author": "Author: {{name}}",
+        "created": "Created",
+        "updated": "Updated"
+      },
+      "time": {
+        "justNow": "just now",
+        "minutes_one": "{{count}} minute ago",
+        "minutes_other": "{{count}} minutes ago",
+        "hours_one": "{{count}} hour ago",
+        "hours_other": "{{count}} hours ago",
+        "days_one": "{{count}} day ago",
+        "days_other": "{{count}} days ago",
+        "longDateFormat": "MMM d, yyyy"
+      }
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Welcome back! Please log in to your account.",
+      "success": "Logged in successfully! Redirecting to homepage...",
+      "fields": {
+        "username": "Username",
+        "password": "Password"
+      },
+      "buttons": {
+        "signIn": "Login",
+        "signUp": "Sign up"
+      },
+      "cta": {
+        "noAccount": "Don't have an account?"
+      }
+    },
+    "register": {
+      "title": "Sign up",
+      "subtitle": "Create an account to get started.",
+      "success": "Registered successfully! Redirecting to login page...",
+      "fields": {
+        "username": "Username",
+        "password": "Password",
+        "confirm": "Confirm Password"
+      },
+      "buttons": {
+        "signUp": "Register",
+        "signIn": "Sign in"
+      },
+      "cta": {
+        "haveAccount": "Already have an account?"
+      }
+    },
+    "postDetail": {
+      "errors": {
+        "loadPost": "Failed to load post. It may not exist.",
+        "loadComments": "Failed to load comments.",
+        "deletePost": "Failed to delete post.",
+        "addComment": "Failed to add comment. Please try again.",
+        "updateComment": "Failed to update comment. Please try again.",
+        "deleteComment": "Failed to delete comment. Please try again."
+      },
+      "buttons": {
+        "backToList": "Go Back to Blog List"
+      },
+      "tooltips": {
+        "editPost": "Edit Post",
+        "deletePost": "Delete Post",
+        "editComment": "Edit Comment",
+        "deleteComment": "Delete Comment"
+      },
+      "comments": {
+        "title": "Comments",
+        "empty": "No comments yet. Be the first to comment!",
+        "addTitle": "Add a Comment",
+        "placeholder": "Write your comment here...",
+        "submit": "Submit Comment",
+        "loginToComment": "You must be logged in to add a comment."
+      },
+      "dialog": {
+        "postDelete": {
+          "title": "Confirm Deletion",
+          "content": "Are you sure you want to delete the post titled \"{{title}}\"? This action cannot be undone."
+        },
+        "commentEdit": {
+          "title": "Edit Comment",
+          "save": "Save"
+        },
+        "commentDelete": {
+          "title": "Confirm Deletion",
+          "content": "Are you sure you want to delete this comment? This action cannot be undone."
+        }
+      },
+      "validation": {
+        "emptyComment": "Comment cannot be empty.",
+        "mustLogin": "You must be logged in to comment.",
+        "emptyCommentContent": "Comment content cannot be empty."
+      }
+    },
+    "postEdit": {
+      "titles": {
+        "edit": "Edit Blog Post",
+        "create": "Create New Blog Post"
+      },
+      "fields": {
+        "title": "Post Title",
+        "content": "Content (Markdown supported)"
+      },
+      "buttons": {
+        "update": "Update Post",
+        "publish": "Publish Post",
+        "cancel": "Cancel",
+        "goLogin": "Go to Login"
+      },
+      "messages": {
+        "updated": "Post updated successfully!",
+        "created": "Post created successfully!"
+      },
+      "errors": {
+        "fetchPost": "Failed to fetch post. Please check the post ID.",
+        "submit": "Failed to {{action}} post: {{message}}"
+      },
+      "actions": {
+        "update": "update",
+        "create": "create"
+      },
+      "auth": {
+        "required": "You must be logged in to access this page."
+      }
+    }
+  },
+  "todoDetail": {
+    "addTitle": "Add New Todo",
+    "editTitle": "Edit Todo",
+    "fields": {
+      "title": "Title",
+      "dueDate": "Due Date",
+      "content": "Content",
+      "contentHelper": "Provide a detailed description of the task, including any specific requirements or notes.",
+      "recurrence": "Recurrence Rule",
+      "category": "Category",
+      "reminderDays": "Remind Days Before",
+      "markCompleted": "Mark as Completed"
+    },
+    "recurrence": {
+      "oneTime": "One-time",
+      "every7d": "Every 7 days",
+      "every14d": "Every 14 days",
+      "monthly": "Monthly"
+    },
+    "buttons": {
+      "create": "Create Todo",
+      "save": "Save Changes",
+      "delete": "Delete"
+    },
+    "dialog": {
+      "title": "Confirm Deletion",
+      "content": "This action is permanent. Are you sure you want to delete this todo?"
+    }
+  }
+}

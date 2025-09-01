@@ -5,7 +5,7 @@ import {
   Card,
   CardContent,
   Button,
-  Tooltip,
+  Tooltip
 } from "@mui/material";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import axios from "axios";
@@ -15,18 +15,15 @@ import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
 import { Masonry } from "@mui/lab";
 import useSWR from "swr";
+import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = import.meta.env.VITE_BLOG_API_BASE;
 
-/**
- * Formats a date string into a relative, human-readable format.
- * @param {string} dateString The date string (e.g., from post.createdAt).
- * @returns {string} The relative formatted date string.
- */
-const getRelativeTime = (dateString) => {
-  // Ensure the date string is treated as UTC if it doesn't have a 'Z'
+// Relative time using i18n pluralization + long date fallback
+const getRelativeTime = (dateString, t) => {
   const date = new Date(
-    dateString.endsWith("Z") ? dateString : dateString + "Z",
+    dateString.endsWith("Z") ? dateString : dateString + "Z"
   );
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -34,40 +31,16 @@ const getRelativeTime = (dateString) => {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
-  if (seconds < 60) {
-    return "just now";
-  } else if (minutes < 60) {
-    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-  } else if (hours < 24) {
-    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-  } else if (days < 30) {
-    return `${days} day${days > 1 ? "s" : ""} ago`;
-  } else {
-    // For older posts, show a simple date format.
-    // The original date formatting logic uses 'Z' which is correct.
-    const olderDate = new Date(dateString + "Z");
-    return olderDate.toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }
+  if (seconds < 60) return t("page.blogpage.time.justNow");
+  if (minutes < 60) return t("page.blogpage.time.minutes", { count: minutes });
+  if (hours < 24) return t("page.blogpage.time.hours", { count: hours });
+  if (days < 30) return t("page.blogpage.time.days", { count: days });
+
+  // Older posts: format with a locale-controlled format string
+  return dayjs(date).format(t("page.blogpage.time.longDateFormat"));
 };
 
-/**
- * A helper function to truncate a string and add ellipsis.
- * @param {string} str The string to truncate.
- * @param {number} maxLength The maximum allowed length.
- * @returns {string} The truncated string with an ellipsis, or the original string.
- */
-const truncateString = (str, maxLength) => {
-  if (str && str.length > maxLength) {
-    return str.substring(0, maxLength) + "...";
-  }
-  return str;
-};
-
-// Define a fetcher function for useSWR
+// SWR fetcher
 const fetcher = async (url) => {
   const res = await axios.get(url);
   return res.data;
@@ -76,12 +49,12 @@ const fetcher = async (url) => {
 export default function BlogPage() {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const { t } = useTranslation();
 
-  // Use useSWR to fetch and cache data
   const { data: posts, error } = useSWR(`${API_BASE}/posts`, fetcher, {
-    dedupingInterval: 1000, // cache for 1 seconds
+    dedupingInterval: 1000,
     revalidateOnFocus: false,
-    revalidateOnReconnect: false,
+    revalidateOnReconnect: false
   });
 
   const loading = !posts && !error;
@@ -94,10 +67,12 @@ export default function BlogPage() {
       updatedAt.getTime() - createdAt.getTime() < fiveMinutesInMs;
 
     const displayTimestamp = isRecentUpdate
-      ? getRelativeTime(post.createdAt)
-      : getRelativeTime(post.updatedAt);
+      ? getRelativeTime(post.createdAt, t)
+      : getRelativeTime(post.updatedAt, t);
 
-    const displayLabel = isRecentUpdate ? "Created" : "Updated";
+    const displayLabel = isRecentUpdate
+      ? t("page.blogpage.meta.created")
+      : t("page.blogpage.meta.updated");
 
     return (
       <Card
@@ -108,8 +83,8 @@ export default function BlogPage() {
             boxShadow: 6,
             transform: "translateY(-2px)",
             transition: "transform 0.2s",
-            cursor: "pointer",
-          },
+            cursor: "pointer"
+          }
         }}
         onClick={() => navigate(`/blog/${post.id}`)}
       >
@@ -120,6 +95,7 @@ export default function BlogPage() {
           >
             {post.title}
           </Typography>
+
           <Typography
             component="div"
             sx={{
@@ -129,19 +105,20 @@ export default function BlogPage() {
                 maxWidth: "100%",
                 height: "auto",
                 display: "block",
-                mx: "auto",
-              },
+                mx: "auto"
+              }
             }}
           >
             <ReactMarkdown remarkPlugins={[gfm]}>{post.content}</ReactMarkdown>
           </Typography>
+
           <Typography
             variant="caption"
             display="block"
             color="text.secondary"
             sx={{ fontSize: "0.7rem", mt: 1 }}
           >
-            Author: {truncateString(post.username, 20)}
+            {t("page.blogpage.meta.author", { name: post.username })}
           </Typography>
           <Typography
             variant="caption"
@@ -164,47 +141,55 @@ export default function BlogPage() {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
-          mt: 4,
+          mt: 4
         }}
       >
         <Typography
           variant="h4"
           sx={{ fontWeight: "bold", color: "primary.main" }}
         >
-          Discuss
+          {t("page.blogpage.title")}
         </Typography>
+
         {isLoggedIn && (
-          <Tooltip title="Create new post">
+          <Tooltip title={t("page.blogpage.tooltips.newPost")}>
             <Button
               variant="contained"
               color="primary"
               onClick={() => navigate("/blog/new")}
               sx={{ minWidth: "auto", p: 1, borderRadius: "50%" }}
+              aria-label={t("page.blogpage.buttons.newPost")}
             >
               <PostAddIcon sx={{ fontSize: 24 }} />
             </Button>
           </Tooltip>
         )}
       </Box>
+
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Share your thoughts, ask questions, or start a new discussion.
+        {t("page.blogpage.subtitle")}
       </Typography>
 
-      {loading && <Typography align="center">Loading posts...</Typography>}
-      {error && (
-        <Typography color="error" align="center">
-          Failed to load posts. Please try again later.
+      {loading && (
+        <Typography align="center">
+          {t("page.blogpage.status.loading")}
         </Typography>
       )}
-      <Box sx={{ display: "flex", justifyContent: "center", p: "0", m: "0" }}>
+
+      {error && (
+        <Typography color="error" align="center">
+          {t("page.blogpage.status.error")}
+        </Typography>
+      )}
+
+      <Box sx={{ display: "flex", justifyContent: "center", p: 0, m: 0 }}>
         {!loading && !error && (
           <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={2}>
             {posts && posts.length > 0 ? (
               posts.map(renderPost)
             ) : (
               <Typography color="text.secondary" align="center">
-                There are no discussions yet. Be the first to share your
-                thoughts!
+                {t("page.blogpage.status.empty")}
               </Typography>
             )}
           </Masonry>

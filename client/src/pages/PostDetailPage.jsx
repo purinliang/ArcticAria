@@ -15,7 +15,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  TextField,
+  TextField
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -25,18 +25,15 @@ import { useAuth } from "../AuthContext";
 import { jwtDecode } from "jwt-decode";
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
+import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = import.meta.env.VITE_BLOG_API_BASE;
 
-/**
- * Formats a date string into a relative, human-readable format.
- * @param {string} dateString The date string (e.g., from post.createdAt).
- * @returns {string} The relative formatted date string.
- */
-const getRelativeTime = (dateString) => {
-  // Ensure the date string is treated as UTC if it doesn't have a 'Z'
+// Relative time using your blogpage time keys for consistency
+const getRelativeTime = (dateString, t) => {
   const date = new Date(
-    dateString.endsWith("Z") ? dateString : dateString + "Z",
+    dateString.endsWith("Z") ? dateString : dateString + "Z"
   );
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -44,29 +41,18 @@ const getRelativeTime = (dateString) => {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
-  if (seconds < 60) {
-    return "just now";
-  } else if (minutes < 60) {
-    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-  } else if (hours < 24) {
-    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-  } else if (days < 30) {
-    return `${days} day${days > 1 ? "s" : ""} ago`;
-  } else {
-    // For older posts, show a simple date format.
-    const olderDate = new Date(dateString + "Z");
-    return olderDate.toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }
+  if (seconds < 60) return t("page.blogpage.time.justNow");
+  if (minutes < 60) return t("page.blogpage.time.minutes", { count: minutes });
+  if (hours < 24) return t("page.blogpage.time.hours", { count: hours });
+  if (days < 30) return t("page.blogpage.time.days", { count: days });
+  return dayjs(date).format(t("page.blogpage.time.longDateFormat"));
 };
 
 export default function PostDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const { t } = useTranslation();
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -74,7 +60,7 @@ export default function PostDetailPage() {
   const [isAuthor, setIsAuthor] = useState(false);
   const [openPostDeleteDialog, setOpenPostDeleteDialog] = useState(false);
 
-  // States for Comments
+  // Comments
   const [comments, setComments] = useState([]);
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [commentError, setCommentError] = useState(null);
@@ -99,24 +85,19 @@ export default function PostDetailPage() {
 
         if (token) {
           const decodedToken = jwtDecode(token);
-          if (decodedToken.userId === res.data.userId) {
-            setIsAuthor(true);
-          } else {
-            setIsAuthor(false);
-          }
+          setIsAuthor(decodedToken.userId === res.data.userId);
         } else {
           setIsAuthor(false);
         }
       } catch (err) {
-        console.error("Failed to fetch post:", err);
-        setError("Failed to load post. It may not exist.");
+        setError(t("page.postDetail.errors.loadPost"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchPost();
-  }, [id, token]);
+  }, [id, token, t]);
 
   // Fetch Comments
   useEffect(() => {
@@ -126,57 +107,49 @@ export default function PostDetailPage() {
       try {
         const res = await axios.get(`${API_BASE}/posts/${id}/comments`);
         setComments(res.data);
+        setCommentError(null);
       } catch (err) {
-        console.error("Failed to fetch comments:", err);
-        setCommentError("Failed to load comments.");
+        setCommentError(t("page.postDetail.errors.loadComments"));
       } finally {
         setCommentsLoading(false);
       }
     };
     fetchComments();
-  }, [id, token]);
+  }, [id, token, t]);
 
   const handleDeletePost = async () => {
     setOpenPostDeleteDialog(false);
     try {
       await axios.delete(`${API_BASE}/posts/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       });
       navigate("/blog");
     } catch (err) {
-      console.error("Failed to delete post:", err);
-      setError("Failed to delete post.");
+      setError(t("page.postDetail.errors.deletePost"));
     }
   };
 
   const handleAddComment = async () => {
     if (!newCommentContent.trim()) {
-      alert("Comment cannot be empty.");
+      alert(t("page.postDetail.validation.emptyComment"));
       return;
     }
     if (!isLoggedIn || !token) {
-      alert("You must be logged in to comment.");
+      alert(t("page.postDetail.validation.mustLogin"));
       return;
     }
 
     try {
       await axios.post(
         `${API_BASE}/comments`,
-        {
-          postId: id,
-          content: newCommentContent,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { postId: id, content: newCommentContent },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setNewCommentContent("");
-      // Re-fetch comments to show the new one
       const res = await axios.get(`${API_BASE}/posts/${id}/comments`);
       setComments(res.data);
     } catch (err) {
-      console.error("Failed to add comment:", err);
-      setCommentError("Failed to add comment. Please try again.");
+      setCommentError(t("page.postDetail.errors.addComment"));
     }
   };
 
@@ -187,7 +160,7 @@ export default function PostDetailPage() {
 
   const handleSaveComment = async () => {
     if (!commentToEdit || !commentToEdit.content.trim()) {
-      alert("Comment content cannot be empty.");
+      alert(t("page.postDetail.validation.emptyCommentContent"));
       return;
     }
 
@@ -195,16 +168,14 @@ export default function PostDetailPage() {
       await axios.put(
         `${API_BASE}/comments/${commentToEdit.id}`,
         { content: commentToEdit.content },
-        { headers: { Authorization: `Bearer ${token}` } },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setOpenCommentEditDialog(false);
       setCommentToEdit(null);
-      // Re-fetch comments to update the list
       const res = await axios.get(`${API_BASE}/posts/${id}/comments`);
       setComments(res.data);
     } catch (err) {
-      console.error("Failed to update comment:", err);
-      setCommentError("Failed to update comment. Please try again.");
+      setCommentError(t("page.postDetail.errors.updateComment"));
     }
   };
 
@@ -217,16 +188,14 @@ export default function PostDetailPage() {
     if (!commentToDelete) return;
     try {
       await axios.delete(`${API_BASE}/comments/${commentToDelete.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       });
       setOpenCommentDeleteDialog(false);
       setCommentToDelete(null);
-      // Re-fetch comments to update the list
       const res = await axios.get(`${API_BASE}/posts/${id}/comments`);
       setComments(res.data);
     } catch (err) {
-      console.error("Failed to delete comment:", err);
-      setCommentError("Failed to delete comment. Please try again.");
+      setCommentError(t("page.postDetail.errors.deleteComment"));
     }
   };
 
@@ -238,7 +207,7 @@ export default function PostDetailPage() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "80vh",
+          height: "80vh"
         }}
       >
         <CircularProgress />
@@ -255,15 +224,13 @@ export default function PostDetailPage() {
           variant="contained"
           onClick={() => navigate("/blog")}
         >
-          Go Back to Blog List
+          {t("page.postDetail.buttons.backToList")}
         </Button>
       </Container>
     );
   }
 
-  if (!post) {
-    return null;
-  }
+  if (!post) return null;
 
   const createdAt = new Date(post.createdAt);
   const updatedAt = new Date(post.updatedAt);
@@ -272,10 +239,12 @@ export default function PostDetailPage() {
     updatedAt.getTime() - createdAt.getTime() < fiveMinutesInMs;
 
   const displayTimestamp = isRecentUpdate
-    ? getRelativeTime(post.createdAt)
-    : getRelativeTime(post.updatedAt);
+    ? getRelativeTime(post.createdAt, t)
+    : getRelativeTime(post.updatedAt, t);
 
-  const displayLabel = isRecentUpdate ? "Created" : "Updated";
+  const displayLabel = isRecentUpdate
+    ? t("page.blogpage.meta.created")
+    : t("page.blogpage.meta.updated");
 
   const myUserId = token ? jwtDecode(token).userId : null;
 
@@ -286,7 +255,7 @@ export default function PostDetailPage() {
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         <Typography
@@ -298,7 +267,7 @@ export default function PostDetailPage() {
 
         {isLoggedIn && isAuthor && (
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Tooltip title="Edit Post">
+            <Tooltip title={t("page.postDetail.tooltips.editPost")}>
               <IconButton
                 onClick={() => navigate(`/blog/edit/${post.id}`)}
                 color="primary"
@@ -306,7 +275,7 @@ export default function PostDetailPage() {
                 <EditIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Delete Post">
+            <Tooltip title={t("page.postDetail.tooltips.deletePost")}>
               <IconButton
                 onClick={() => setOpenPostDeleteDialog(true)}
                 color="error"
@@ -326,14 +295,14 @@ export default function PostDetailPage() {
           color="text.secondary"
           sx={{ mb: -0.5 }}
         >
-          Author: {post.username}
+          {t("page.blogpage.meta.author", { name: post.username })}
         </Typography>
         <Typography variant="caption" display="block" color="text.secondary">
           {displayLabel}: {displayTimestamp}
         </Typography>
       </Box>
 
-      {/* Markdown content box with image styling */}
+      {/* Markdown content */}
       <Box
         sx={{
           pt: isMobile ? 0 : 0.75,
@@ -343,7 +312,7 @@ export default function PostDetailPage() {
           border: "1px solid #e0e0e0",
           borderRadius: "8px",
           boxShadow: 1,
-          backgroundColor: "white",
+          backgroundColor: "white"
         }}
       >
         <Typography
@@ -355,8 +324,8 @@ export default function PostDetailPage() {
               maxWidth: "100%",
               height: "auto",
               display: "block",
-              mx: "auto",
-            },
+              mx: "auto"
+            }
           }}
         >
           <ReactMarkdown remarkPlugins={[gfm]}>{post.content}</ReactMarkdown>
@@ -366,8 +335,9 @@ export default function PostDetailPage() {
       {/* --- Comments Section --- */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-          Comments
+          {t("page.postDetail.comments.title")}
         </Typography>
+
         {commentError && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {commentError}
@@ -391,7 +361,7 @@ export default function PostDetailPage() {
                     borderRadius: "8px",
                     border: "1px solid #e0e0e0",
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: "column"
                   }}
                 >
                   <Typography variant="body1">{comment.content}</Typography>
@@ -400,15 +370,18 @@ export default function PostDetailPage() {
                       mt: 1,
                       display: "flex",
                       justifyContent: "space-between",
-                      alignItems: "center",
+                      alignItems: "center"
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">
-                      {comment.username} • {getRelativeTime(comment.createdAt)}
+                      {comment.username} •{" "}
+                      {getRelativeTime(comment.createdAt, t)}
                     </Typography>
                     {isLoggedIn && myUserId === comment.userId && (
                       <Box sx={{ display: "flex", gap: 1 }}>
-                        <Tooltip title="Edit Comment">
+                        <Tooltip
+                          title={t("page.postDetail.tooltips.editComment")}
+                        >
                           <IconButton
                             size="small"
                             onClick={() => handleEditComment(comment)}
@@ -416,7 +389,9 @@ export default function PostDetailPage() {
                             <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Delete Comment">
+                        <Tooltip
+                          title={t("page.postDetail.tooltips.deleteComment")}
+                        >
                           <IconButton
                             size="small"
                             onClick={() => handleDeleteComment(comment)}
@@ -435,7 +410,7 @@ export default function PostDetailPage() {
                 color="text.secondary"
                 sx={{ fontStyle: "italic" }}
               >
-                No comments yet. Be the first to comment!
+                {t("page.postDetail.comments.empty")}
               </Typography>
             )}
           </Box>
@@ -444,7 +419,7 @@ export default function PostDetailPage() {
         {/* Comment Form */}
         <Box sx={{ mt: 3, pt: 3, borderTop: "1px solid #e0e0e0" }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Add a Comment
+            {t("page.postDetail.comments.addTitle")}
           </Typography>
           {isLoggedIn ? (
             <Box>
@@ -453,7 +428,7 @@ export default function PostDetailPage() {
                 fullWidth
                 minRows={3}
                 variant="outlined"
-                placeholder="Write your comment here..."
+                placeholder={t("page.postDetail.comments.placeholder")}
                 value={newCommentContent}
                 onChange={(e) => setNewCommentContent(e.target.value)}
                 sx={{ mb: 2 }}
@@ -463,12 +438,12 @@ export default function PostDetailPage() {
                 onClick={handleAddComment}
                 sx={{ borderRadius: 8 }}
               >
-                Submit Comment
+                {t("page.postDetail.comments.submit")}
               </Button>
             </Box>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              You must be logged in to add a comment.
+              {t("page.postDetail.comments.loginToComment")}
             </Typography>
           )}
         </Box>
@@ -479,11 +454,14 @@ export default function PostDetailPage() {
         open={openPostDeleteDialog}
         onClose={() => setOpenPostDeleteDialog(false)}
       >
-        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogTitle>
+          {t("page.postDetail.dialog.postDelete.title")}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the post titled "{post.title}"? This
-            action cannot be undone.
+            {t("page.postDetail.dialog.postDelete.content", {
+              title: post.title
+            })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -491,10 +469,10 @@ export default function PostDetailPage() {
             onClick={() => setOpenPostDeleteDialog(false)}
             color="primary"
           >
-            Cancel
+            {t("dialog.cancel")}
           </Button>
           <Button onClick={handleDeletePost} color="error" autoFocus>
-            Delete
+            {t("dialog.confirm")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -505,7 +483,9 @@ export default function PostDetailPage() {
         onClose={() => setOpenCommentEditDialog(false)}
         fullWidth
       >
-        <DialogTitle>Edit Comment</DialogTitle>
+        <DialogTitle>
+          {t("page.postDetail.dialog.commentEdit.title")}
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -524,14 +504,14 @@ export default function PostDetailPage() {
             onClick={() => setOpenCommentEditDialog(false)}
             color="primary"
           >
-            Cancel
+            {t("dialog.cancel")}
           </Button>
           <Button
             onClick={handleSaveComment}
             color="primary"
             variant="contained"
           >
-            Save
+            {t("page.postDetail.dialog.commentEdit.save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -541,11 +521,12 @@ export default function PostDetailPage() {
         open={openCommentDeleteDialog}
         onClose={() => setOpenCommentDeleteDialog(false)}
       >
-        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogTitle>
+          {t("page.postDetail.dialog.commentDelete.title")}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this comment? This action cannot be
-            undone.
+            {t("page.postDetail.dialog.commentDelete.content")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -553,10 +534,10 @@ export default function PostDetailPage() {
             onClick={() => setOpenCommentDeleteDialog(false)}
             color="primary"
           >
-            Cancel
+            {t("dialog.cancel")}
           </Button>
           <Button onClick={handleConfirmDeleteComment} color="error" autoFocus>
-            Delete
+            {t("dialog.confirm")}
           </Button>
         </DialogActions>
       </Dialog>

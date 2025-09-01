@@ -1,8 +1,10 @@
-import { Box, Typography, Button, Container, Grid, Paper } from "@mui/material";
+import { Box, Typography, Button, Container, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const DiscoverPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <Container maxWidth="md" sx={{ mt: 10, mb: 10, textAlign: "center" }}>
@@ -11,7 +13,7 @@ const DiscoverPage = () => {
           p: 4,
           bgcolor: "background.paper",
           borderRadius: 2,
-          boxShadow: 3,
+          boxShadow: 3
         }}
       >
         <Typography
@@ -20,30 +22,31 @@ const DiscoverPage = () => {
           gutterBottom
           sx={{ fontWeight: "bold" }}
         >
-          Discover
+          {t("page.discover.title")}
         </Typography>
+
         <Typography
           variant="h6"
           component="p"
           color="text.secondary"
           sx={{ mb: 4 }}
         >
-          This feature is coming soon!
+          {t("page.discover.subtitle")}
         </Typography>
+
         <Typography variant="body1" sx={{ mb: 4 }}>
-          We are currently working hard to bring you personalized
-          recommendations for your daily life. In the meantime, feel free to
-          explore our other features.
+          {t("page.discover.description")}
         </Typography>
+
         <Grid container spacing={2} justifyContent="center">
           <Grid item>
             <Button variant="contained" onClick={() => navigate("/todos")}>
-              Go to Todos
+              {t("page.discover.buttons.todos")}
             </Button>
           </Grid>
           <Grid item>
             <Button variant="outlined" onClick={() => navigate("/blog")}>
-              Join the Discussion
+              {t("page.discover.buttons.discussion")}
             </Button>
           </Grid>
         </Grid>

@@ -4,13 +4,14 @@ import {
   Button,
   Container,
   Paper,
-  Divider,
+  Divider
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Trans, useTranslation } from "react-i18next";
 
-// A simple and clean homepage component
 const HomePage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <Container maxWidth="md" sx={{ mt: 8, mb: 8, textAlign: "center" }}>
@@ -22,22 +23,25 @@ const HomePage = () => {
           gutterBottom
           sx={{ fontWeight: "bold" }}
         >
-          Welcome to ArcticAria
+          {t("page.home.title")}
         </Typography>
+
         <Typography
           variant="h5"
           component="p"
           color="text.secondary"
           sx={{ mb: 4 }}
         >
-          Your personal assistant for managing daily life.
+          {t("page.home.subtitle")}
         </Typography>
+
         <Typography variant="body1" sx={{ maxWidth: "720px", mx: "auto" }}>
-          ArcticAria is designed to be your small life assistant, helping you
-          plan your daily progress with <strong>Todos</strong> for work, study,
-          and essential tasks. In your free time, it will offer{" "}
-          <strong>Discover</strong> for food, entertainment, and shopping to
-          help you decide.
+          <Trans
+            i18nKey="page.home.intro"
+            components={{
+              strong: <Box component="span" sx={{ fontWeight: 700 }} />
+            }}
+          />
         </Typography>
       </Box>
 
@@ -51,33 +55,25 @@ const HomePage = () => {
           gutterBottom
           sx={{ fontWeight: "bold" }}
         >
-          Key Features
+          {t("page.home.features.title")}
         </Typography>
-        {/* Using Flexbox for a robust and responsive layout */}
+
         <Box
           sx={{
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
             gap: 4,
             mt: 2,
-            alignItems: "stretch",
+            alignItems: "stretch"
           }}
         >
           {/* Todo Feature */}
-          <Paper
-            elevation={3}
-            sx={{
-              p: 4,
-              flex: 1, // Makes this item take up equal space
-              height: "100%",
-            }}
-          >
+          <Paper elevation={3} sx={{ p: 4, flex: 1, height: "100%" }}>
             <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-              Todos
+              {t("page.home.features.todos.title")}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Easily create, track, and manage all your tasks. Ensure every task
-              is completed on time.
+              {t("page.home.features.todos.desc")}
             </Typography>
             <Button
               variant="outlined"
@@ -85,29 +81,21 @@ const HomePage = () => {
               sx={{ mt: 2, px: 1, py: 0.5 }}
               onClick={() => navigate("/todos")}
             >
-              Go to Todos
+              {t("page.home.features.todos.cta")}
             </Button>
           </Paper>
+
           {/* Discover Feature */}
-          <Paper
-            elevation={3}
-            sx={{
-              p: 4,
-              flex: 1, // Makes this item take up equal space
-              height: "100%",
-            }}
-          >
+          <Paper elevation={3} sx={{ p: 4, flex: 1, height: "100%" }}>
             <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-              Discover
+              {t("page.home.features.discover.title")}
             </Typography>
             <Typography
               variant="body2"
               color="text.secondary"
               fontStyle="italic"
             >
-              Coming Soon! We plan to offer personalized recommendations for
-              food, places to visit, and things to do to help you make decisions
-              effortlessly.
+              {t("page.home.features.discover.desc")}
             </Typography>
             <Button
               variant="outlined"
@@ -115,24 +103,17 @@ const HomePage = () => {
               sx={{ mt: 2, px: 1, py: 0.5 }}
               onClick={() => navigate("/discover")}
             >
-              Go to Discover
+              {t("page.home.features.discover.cta")}
             </Button>
           </Paper>
+
           {/* Discuss Feature */}
-          <Paper
-            elevation={3}
-            sx={{
-              p: 4,
-              flex: 1, // Makes this item take up equal space
-              height: "100%",
-            }}
-          >
+          <Paper elevation={3} sx={{ p: 4, flex: 1, height: "100%" }}>
             <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-              Discuss
+              {t("page.home.features.discuss.title")}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              A public discussion area for everyone. If you have ideas for new
-              daily life tools, feel free to leave a message here!
+              {t("page.home.features.discuss.desc")}
             </Typography>
             <Button
               variant="outlined"
@@ -140,7 +121,7 @@ const HomePage = () => {
               sx={{ mt: 2, px: 1, py: 0.5 }}
               onClick={() => navigate("/blog")}
             >
-              Go to Discuss
+              {t("page.home.features.discuss.cta")}
             </Button>
           </Paper>
         </Box>

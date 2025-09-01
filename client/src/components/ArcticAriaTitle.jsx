@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
+
 const ArcticAriaTitle = (props) => {
   const { fill, stroke, width, height, ...restProps } = props;
-
+  const { t } = useTranslation();
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -9,6 +11,7 @@ const ArcticAriaTitle = (props) => {
       height={height}
       {...restProps}
     >
+      <title>{t("appTitle")}</title> // translated <title></title>
       <g
         id="svgGroup"
         fillRule="evenodd"
@@ -17,7 +20,7 @@ const ArcticAriaTitle = (props) => {
           stroke: stroke || "currentColor",
           strokeWidth: "1.2mm",
           fill: fill || "currentColor",
-          strokeLinecap: "round",
+          strokeLinecap: "round"
         }}
       >
         <path

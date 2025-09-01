@@ -13,17 +13,17 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
+  DialogTitle
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
 import axios from "axios";
 import { red } from "@mui/material/colors";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
-// Define the four hardcoded categories as requested.
 const CATEGORIES = ["Work", "Study", "Life", "Play", "Other"];
 
 export default function TodoDetailPage() {
@@ -32,6 +32,7 @@ export default function TodoDetailPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const token = localStorage.getItem("jwtToken");
+  const { t } = useTranslation();
 
   const [form, setForm] = useState({
     title: "",
@@ -39,51 +40,42 @@ export default function TodoDetailPage() {
     nextDueDate: dayjs().format("YYYY-MM-DD"),
     recurrenceRule: "one-time",
     reminderDaysBefore: 0,
-    // Initialize category to an empty string.
     category: "Other",
-    completed: false,
+    completed: false
   });
   const [error, setError] = useState("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  /**
-   * Handles changes to the form fields.
-   * @param {Event} e The event object.
-   */
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  /**
-   * Fetches a single todo by its ID.
-   */
   const fetchTodo = async () => {
     setError("");
     if (!token) {
-      setError("You are not logged in. Redirecting to login page...");
+      setError(t("errors.notLoggedIn"));
       setTimeout(() => navigate("/login"), 3000);
       return;
     }
     try {
       const res = await axios.get(`${API_BASE}/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       });
       setForm(res.data);
     } catch (err) {
       console.error("Failed to load todo:", err);
       if (err.response && err.response.status === 401) {
         localStorage.removeItem("jwtToken");
-        setError("Session expired or unauthorized. Please log in again.");
+        setError(t("errors.sessionExpired"));
         setTimeout(() => navigate("/login"), 3000);
       } else {
-        setError(`Failed to load todo: ${err.response?.data || err.message}`);
+        setError(
+          t("errors.loadTodo", { message: err.response?.data || err.message })
+        );
       }
     }
   };
 
-  /**
-   * Saves the todo (creates or updates).
-   */
   const handleSave = async () => {
     setError("");
     try {
@@ -92,15 +84,15 @@ export default function TodoDetailPage() {
         await axios.put(`${API_BASE}/todo/${id}`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+            "Content-Type": "application/json"
+          }
         });
       } else {
         await axios.post(`${API_BASE}/todo`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+            "Content-Type": "application/json"
+          }
         });
       }
       navigate("/todos");
@@ -108,74 +100,55 @@ export default function TodoDetailPage() {
       console.error("Save failed:", err);
       if (err.response && err.response.status === 401) {
         localStorage.removeItem("jwtToken");
-        setError("Session expired or unauthorized. Please log in again.");
+        setError(t("errors.sessionExpired"));
         setTimeout(() => navigate("/login"), 3000);
       } else {
-        setError(`Save failed: ${err.response?.data || err.message}`);
+        setError(
+          t("errors.saveTodo", { message: err.response?.data || err.message })
+        );
       }
     }
   };
 
-  /**
-   * Toggles the completion status of a todo.
-   */
   const toggleCompleted = async () => {
     setError("");
     try {
       await axios.put(
         `${API_BASE}/todo/${id}`,
-        {
-          completed: !form.completed,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { completed: !form.completed },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setForm((prev) => ({ ...prev, completed: !prev.completed }));
     } catch (err) {
       console.error("Failed to update status:", err);
       if (err.response && err.response.status === 401) {
         localStorage.removeItem("jwtToken");
-        setError("Session expired or unauthorized. Please log in again.");
+        setError(t("errors.sessionExpired"));
         setTimeout(() => navigate("/login"), 3000);
       } else {
-        setError("Failed to update status");
+        setError(t("errors.updateStatus"));
       }
     }
   };
 
-  /**
-   * Opens the confirmation dialog for deletion.
-   */
-  const handleOpenDeleteDialog = () => {
-    setIsDeleteDialogOpen(true);
-  };
+  const handleOpenDeleteDialog = () => setIsDeleteDialogOpen(true);
+  const handleCloseDeleteDialog = () => setIsDeleteDialogOpen(false);
 
-  /**
-   * Closes the confirmation dialog.
-   */
-  const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
-  };
-
-  /**
-   * Executes the actual deletion after user confirmation.
-   */
   const handleConfirmDelete = async () => {
     setError("");
     try {
       await axios.delete(`${API_BASE}/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       });
       navigate("/todos");
     } catch (err) {
       console.error("Failed to delete todo:", err);
       if (err.response && err.response.status === 401) {
         localStorage.removeItem("jwtToken");
-        setError("Session expired or unauthorized. Please log in again.");
+        setError(t("errors.sessionExpired"));
         setTimeout(() => navigate("/login"), 3000);
       } else {
-        setError("Failed to delete todo.");
+        setError(t("errors.deleteTodo"));
       }
     } finally {
       handleCloseDeleteDialog();
@@ -187,7 +160,7 @@ export default function TodoDetailPage() {
       if (state?.todo) {
         setForm(state.todo);
       } else {
-        fetchTodo(); // fallback
+        fetchTodo();
       }
     }
   }, [id, state]);
@@ -198,7 +171,7 @@ export default function TodoDetailPage() {
         variant="h4"
         sx={{ fontWeight: "bold", color: "primary.main", mb: 3 }}
       >
-        {isEdit ? "Edit Todo" : "Add New Todo"}
+        {isEdit ? t("todoDetail.editTitle") : t("todoDetail.addTitle")}
       </Typography>
 
       {error && (
@@ -209,7 +182,7 @@ export default function TodoDetailPage() {
             mt: 2,
             mb: 2,
             borderRadius: "8px",
-            backgroundColor: red[50],
+            backgroundColor: red[50]
           }}
         >
           {error}
@@ -219,18 +192,17 @@ export default function TodoDetailPage() {
       <Grid container spacing={3} mt={1} direction="column">
         <Grid item xs={12}>
           <TextField
-            label="Title"
+            label={t("todoDetail.fields.title")}
             name="title"
             fullWidth
             value={form.title}
             onChange={handleChange}
             variant="outlined"
-            sx={{ borderRadius: "8px" }}
           />
         </Grid>
         <Grid item xs={12}>
           <TextField
-            label="Due Date"
+            label={t("todoDetail.fields.dueDate")}
             name="nextDueDate"
             type="date"
             fullWidth
@@ -238,12 +210,11 @@ export default function TodoDetailPage() {
             onChange={handleChange}
             variant="outlined"
             InputLabelProps={{ shrink: true }}
-            sx={{ borderRadius: "8px" }}
           />
         </Grid>
         <Grid item xs={12}>
           <TextField
-            label="Content"
+            label={t("todoDetail.fields.content")}
             name="content"
             fullWidth
             multiline
@@ -251,56 +222,57 @@ export default function TodoDetailPage() {
             value={form.content}
             onChange={handleChange}
             variant="outlined"
-            sx={{ borderRadius: "8px" }}
-            helperText="Provide a detailed description of the task, including any specific requirements or notes."
+            helperText={t("todoDetail.fields.contentHelper")}
           />
         </Grid>
         <Grid item xs={12}>
           <TextField
-            label="Recurrence Rule"
+            label={t("todoDetail.fields.recurrence")}
             name="recurrenceRule"
             select
             fullWidth
             value={form.recurrenceRule}
             onChange={handleChange}
             variant="outlined"
-            sx={{ borderRadius: "8px" }}
           >
-            <MenuItem value="one-time">One-time</MenuItem>
-            <MenuItem value="7d">Every 7 days</MenuItem>
-            <MenuItem value="14d">Every 14 days</MenuItem>
-            <MenuItem value="monthly">Monthly</MenuItem>
+            <MenuItem value="one-time">
+              {t("todoDetail.recurrence.oneTime")}
+            </MenuItem>
+            <MenuItem value="7d">{t("todoDetail.recurrence.every7d")}</MenuItem>
+            <MenuItem value="14d">
+              {t("todoDetail.recurrence.every14d")}
+            </MenuItem>
+            <MenuItem value="monthly">
+              {t("todoDetail.recurrence.monthly")}
+            </MenuItem>
           </TextField>
         </Grid>
-        {/* New Category field added here */}
         <Grid item xs={12}>
           <TextField
-            label="Category"
+            label={t("todoDetail.fields.category")}
             name="category"
             select
             fullWidth
             value={form.category}
             onChange={handleChange}
             variant="outlined"
-            sx={{ borderRadius: "8px" }}
           >
             {CATEGORIES.map((category) => (
               <MenuItem key={category} value={category}>
-                {category}
+                {t(`categories.${category}`)}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
         <Grid item xs={12}>
           <TextField
-            label="Remind Days Before"
+            label={t("todoDetail.fields.reminderDays")}
             name="reminderDaysBefore"
             type="number"
             fullWidth
             value={form.reminderDaysBefore}
             onChange={handleChange}
             variant="outlined"
-            sx={{ borderRadius: "8px" }}
           />
         </Grid>
         {isEdit && (
@@ -313,7 +285,7 @@ export default function TodoDetailPage() {
                   color="primary"
                 />
               }
-              label="Mark as Completed"
+              label={t("todoDetail.fields.markCompleted")}
             />
           </Grid>
         )}
@@ -322,14 +294,11 @@ export default function TodoDetailPage() {
             variant="contained"
             color="primary"
             fullWidth
-            sx={{
-              py: 1.5,
-              borderRadius: "8px",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-            }}
             onClick={handleSave}
           >
-            {isEdit ? "Save Changes" : "Create Todo"}
+            {isEdit
+              ? t("todoDetail.buttons.save")
+              : t("todoDetail.buttons.create")}
           </Button>
         </Grid>
         {isEdit && (
@@ -338,33 +307,27 @@ export default function TodoDetailPage() {
               variant="outlined"
               color="error"
               fullWidth
-              sx={{ py: 1.5, borderRadius: "8px" }}
               onClick={handleOpenDeleteDialog}
             >
-              Delete
+              {t("todoDetail.buttons.delete")}
             </Button>
           </Grid>
         )}
       </Grid>
 
-      <Dialog
-        open={isDeleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+      <Dialog open={isDeleteDialogOpen} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>{t("todoDetail.dialog.title")}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            This action is permanent. Are you sure you want to delete this todo?
+          <DialogContentText>
+            {t("todoDetail.dialog.content")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDeleteDialog} color="primary" autoFocus>
-            Cancel
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            {t("dialog.cancel")}
           </Button>
           <Button onClick={handleConfirmDelete} color="error">
-            Delete
+            {t("dialog.confirm")}
           </Button>
         </DialogActions>
       </Dialog>
