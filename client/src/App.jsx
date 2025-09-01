@@ -315,7 +315,7 @@ function App() {
                   {/* Sign out button with error color */}
                   <ListItem button onClick={handleLogout}>
                     <ListItemText
-                      primary="Sign out"
+                      primary={t("auth.signOut")}
                       primaryTypographyProps={{
                         sx: { fontWeight: "bold", color: "error.main" },
                       }}
