@@ -317,13 +317,13 @@ export default function TodoDetailPage() {
                   disabled={isEdit && !isFormEnabled}
                 />
               }
-              label="Is this a recurring task?"
+              label="Set a repeat rule"
             />
           </Box>
           {isRecurring && (
             <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
               <TextField
-                label="Recurrence Rule"
+                label="Repeat"
                 name="recurrenceRule"
                 select
                 fullWidth
@@ -331,8 +331,12 @@ export default function TodoDetailPage() {
                 onChange={handleChange}
                 variant="outlined"
                 size="small"
-                disabled={isEdit && !isFormEnabled}
-              />
+                disabled={isEdit && !isFormEnabled}>
+                <MenuItem value="one-time">One-time</MenuItem>
+                <MenuItem value="7d">Every week</MenuItem>
+                <MenuItem value="14d">Every two weeks</MenuItem>
+                <MenuItem value="monthly">Every month</MenuItem>
+              </TextField>
             </Box>
           )}
           {!isRecurring && (
@@ -358,13 +362,13 @@ export default function TodoDetailPage() {
                   disabled={isEdit && !isFormEnabled}
                 />
               }
-              label="Do you need a reminder?"
+              label="Set a reminder"
             />
           </Box>
           {hasReminder && (
             <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
               <TextField
-                label="Remind Days Before"
+                label={`Remind me ${form.reminderDaysBefore} day(s) before`}
                 name="reminderDaysBefore"
                 type="number"
                 fullWidth
