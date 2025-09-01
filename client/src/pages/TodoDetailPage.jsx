@@ -3,7 +3,6 @@ import {
   Typography,
   TextField,
   Button,
-  Grid,
   MenuItem,
   Checkbox,
   FormControlLabel,
@@ -25,9 +24,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
-
-// Define the four hardcoded categories as requested.
 const CATEGORIES = ["Work", "Study", "Life", "Play", "Other"];
+
 export default function TodoDetailPage() {
   const { id } = useParams();
   const isEdit = !!id;
@@ -44,20 +42,37 @@ export default function TodoDetailPage() {
     category: "Other",
     completed: false,
   });
+
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [hasReminder, setHasReminder] = useState(false);
+
   const [error, setError] = useState("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  /**
-   * Handles changes to the form fields.
-   * @param {Event} e The event object.
-   */
   const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value, checked, type } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  /**
-   * Fetches a single todo by its ID.
-   */
+  const handleRecurringChange = (event) => {
+    const isChecked = event.target.checked;
+    setIsRecurring(isChecked);
+    if (!isChecked) {
+      setForm((prev) => ({ ...prev, recurrenceRule: "one-time" }));
+    }
+  };
+
+  const handleReminderChange = (event) => {
+    const isChecked = event.target.checked;
+    setHasReminder(isChecked);
+    if (!isChecked) {
+      setForm((prev) => ({ ...prev, reminderDaysBefore: 0 }));
+    }
+  };
+
   const fetchTodo = async () => {
     setError("");
     if (!token) {
@@ -69,7 +84,12 @@ export default function TodoDetailPage() {
       const res = await axios.get(`${API_BASE}/todo/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setForm(res.data);
+      const isRec = res.data.recurrenceRule !== "one-time";
+      setIsRecurring(isRec);
+      const hasRem = res.data.reminderDaysBefore > 0;
+      setHasReminder(hasRem);
+
+      setForm({ ...res.data, nextDueDate: dayjs(res.data.nextDueDate) });
     } catch (err) {
       console.error("Failed to load todo:", err);
       if (err.response && err.response.status === 401) {
@@ -82,9 +102,6 @@ export default function TodoDetailPage() {
     }
   };
 
-  /**
-   * Saves the todo (creates or updates).
-   */
   const handleSave = async () => {
     setError("");
     try {
@@ -117,51 +134,14 @@ export default function TodoDetailPage() {
     }
   };
 
-  /**
-   * Toggles the completion status of a todo.
-   */
-  const toggleCompleted = async () => {
-    setError("");
-    try {
-      await axios.put(
-        `${API_BASE}/todo/${id}`,
-        {
-          completed: !form.completed,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      setForm((prev) => ({ ...prev, completed: !prev.completed }));
-    } catch (err) {
-      console.error("Failed to update status:", err);
-      if (err.response && err.response.status === 401) {
-        localStorage.removeItem("jwtToken");
-        setError("Session expired or unauthorized. Please log in again.");
-        setTimeout(() => navigate("/login"), 3000);
-      } else {
-        setError("Failed to update status");
-      }
-    }
-  };
-
-  /**
-   * Opens the confirmation dialog for deletion.
-   */
   const handleOpenDeleteDialog = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  /**
-   * Closes the confirmation dialog.
-   */
   const handleCloseDeleteDialog = () => {
     setIsDeleteDialogOpen(false);
   };
 
-  /**
-   * Executes the actual deletion after user confirmation.
-   */
   const handleConfirmDelete = async () => {
     setError("");
     try {
@@ -186,7 +166,10 @@ export default function TodoDetailPage() {
   useEffect(() => {
     if (isEdit) {
       if (state?.todo) {
-        // When setting the form from state, make sure nextDueDate is a Day.js object
+        const isRec = state.todo.recurrenceRule !== "one-time";
+        setIsRecurring(isRec);
+        const hasRem = state.todo.reminderDaysBefore > 0;
+        setHasReminder(hasRem);
         setForm({ ...state.todo, nextDueDate: dayjs(state.todo.nextDueDate) });
       } else {
         fetchTodo(); // fallback
@@ -218,148 +201,204 @@ export default function TodoDetailPage() {
         </Alert>
       )}
 
-      <Grid container spacing={3} mt={1} direction="column">
-        <Grid item xs={12}>
-          <TextField
-            label="Title"
-            name="title"
-            fullWidth
-            value={form.title}
-            onChange={handleChange}
-            variant="outlined"
-            sx={{ borderRadius: "8px" }}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Content"
-            name="content"
-            fullWidth
-            multiline
-            rows={8}
-            value={form.content}
-            onChange={handleChange}
-            variant="outlined"
-            sx={{ borderRadius: "8px" }}
-            helperText="Provide a detailed description of the task, including any specific requirements or notes."
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Category"
-            name="category"
-            select
-            fullWidth
-            value={form.category}
-            onChange={handleChange}
-            variant="outlined"
-            sx={{ borderRadius: "8px" }}
-          >
-            {CATEGORIES.map((category) => (
-              <MenuItem key={category} value={category}>
-                {category}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
+      <Box
+        component="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSave();
+        }}
+        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+      >
+        <TextField
+          label="Title"
+          name="title"
+          fullWidth
+          value={form.title}
+          onChange={handleChange}
+          variant="outlined"
+        />
 
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label="Due Date"
-            // Pass the Day.js object directly to the value prop
-            value={form.nextDueDate}
-            onChange={(newValue) => {
-              setForm((prev) => ({
-                ...prev,
-                // Update the state with the new Day.js object
-                nextDueDate: newValue,
-              }));
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                fullWidth
-                variant="outlined"
-                sx={{ borderRadius: "8px" }}
+        <TextField
+          label="Content"
+          name="content"
+          fullWidth
+          multiline
+          rows={8}
+          value={form.content}
+          onChange={handleChange}
+          variant="outlined"
+          helperText="Provide a detailed description of the task."
+        />
+
+        <TextField
+          label="Category"
+          name="category"
+          select
+          fullWidth
+          value={form.category}
+          onChange={handleChange}
+          variant="outlined"
+        >
+          {CATEGORIES.map((category) => (
+            <MenuItem key={category} value={category}>
+              {category}
+            </MenuItem>
+          ))}
+        </TextField>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Due Date"
+                value={form.nextDueDate}
+                onChange={(newValue) => {
+                  setForm((prev) => ({ ...prev, nextDueDate: newValue }));
+                }}
+                slotProps={{ textField: { fullWidth: true } }}
               />
-            )}
-          />
-        </LocalizationProvider>
-        <Grid item xs={12}>
-          <TextField
-            label="Recurrence Rule"
-            name="recurrenceRule"
-            select
-            fullWidth
-            value={form.recurrenceRule}
-            onChange={handleChange}
-            variant="outlined"
-            sx={{ borderRadius: "8px" }}
-          >
-            <MenuItem value="one-time">One-time</MenuItem>
-            <MenuItem value="7d">Every 7 days</MenuItem>
-            <MenuItem value="14d">Every 14 days</MenuItem>
-            <MenuItem value="monthly">Monthly</MenuItem>
-          </TextField>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Remind Days Before"
-            name="reminderDaysBefore"
-            type="number"
-            fullWidth
-            value={form.reminderDaysBefore}
-            onChange={handleChange}
-            variant="outlined"
-            sx={{ borderRadius: "8px" }}
-          />
-        </Grid>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 1, mb: 1 }}>
-          Selected Date: {dayjs(form.nextDueDate).format("YYYY/MM/DD (dddd)")}
-        </Typography>
-        {isEdit && (
-          <Grid item xs={12}>
+            </LocalizationProvider>
+          </Box>
+          <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+            <Typography variant="body1" color="text.secondary">
+              Selected date: {dayjs(form.nextDueDate).format("YYYY/MM/DD (dddd)")}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={!!form.completed}
-                  onChange={toggleCompleted}
+                  checked={isRecurring}
+                  onChange={handleRecurringChange}
                   color="primary"
                 />
               }
-              label="Mark as Completed"
+              label="Is this a recurring task?"
             />
-          </Grid>
+          </Box>
+          {isRecurring && (
+            <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+              <TextField
+                label="Recurrence Rule"
+                name="recurrenceRule"
+                select
+                fullWidth
+                value={form.recurrenceRule}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+              >
+                <MenuItem value="one-time">One-time</MenuItem>
+                <MenuItem value="7d">Every 7 days</MenuItem>
+                <MenuItem value="14d">Every 14 days</MenuItem>
+                <MenuItem value="monthly">Monthly</MenuItem>
+              </TextField>
+            </Box>
+          )}
+          {!isRecurring && (
+            <Box sx={{ flex: { xs: 'auto', sm: 1 } }}></Box>
+          )}
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={hasReminder}
+                  onChange={handleReminderChange}
+                  color="primary"
+                />
+              }
+              label="Do you need a reminder?"
+            />
+          </Box>
+          {hasReminder && (
+            <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+              <TextField
+                label="Remind Days Before"
+                name="reminderDaysBefore"
+                type="number"
+                fullWidth
+                value={form.reminderDaysBefore}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+              />
+            </Box>
+          )}
+          {!hasReminder && (
+            <Box sx={{ flex: { xs: 'auto', sm: 1 } }}></Box>
+          )}
+        </Box>
+
+        {isEdit && (
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={!!form.completed}
+                onChange={handleChange}
+                color="primary"
+                name="completed"
+              />
+            }
+            label="Mark as Completed"
+          />
         )}
-        <Grid item xs={12} sm={isEdit ? 6 : 12}>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: 2,
+          }}
+        >
           <Button
             variant="contained"
             color="primary"
             fullWidth
-            sx={{
-              py: 1.5,
-              borderRadius: "8px",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-            }}
+            sx={{ py: 1.5, borderRadius: "8px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", flex: { xs: 'auto', sm: 1 } }}
             onClick={handleSave}
           >
             {isEdit ? "Save Changes" : "Create Todo"}
           </Button>
-        </Grid>
-        {isEdit && (
-          <Grid item xs={12} sm={6}>
+          {isEdit && (
             <Button
               variant="outlined"
               color="error"
               fullWidth
-              sx={{ py: 1.5, borderRadius: "8px" }}
+              sx={{ py: 1.5, borderRadius: "8px", flex: { xs: 'auto', sm: 1 } }}
               onClick={handleOpenDeleteDialog}
             >
               Delete
             </Button>
-          </Grid>
-        )}
-      </Grid>
+          )}
+        </Box>
+      </Box>
 
       <Dialog
         open={isDeleteDialogOpen}
