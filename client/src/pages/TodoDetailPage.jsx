@@ -19,9 +19,9 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
 import axios from "axios";
 import { red } from "@mui/material/colors";
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 const CATEGORIES = ["Work", "Study", "Life", "Play", "Other"];
@@ -52,8 +52,8 @@ export default function TodoDetailPage() {
   const [isFormEnabled, setIsFormEnabled] = useState(!isEdit);
 
   const getDueDateMessage = (dueDateStr) => {
-    const due = dayjs(dueDateStr).startOf('day');
-    const now = dayjs().startOf('day');
+    const due = dayjs(dueDateStr).startOf("day");
+    const now = dayjs().startOf("day");
     const diffDays = due.diff(now, "day");
     const dayOfWeek = dayjs(dueDateStr).format("dddd");
 
@@ -228,7 +228,7 @@ export default function TodoDetailPage() {
           e.preventDefault();
           handleSave();
         }}
-        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
         <TextField
           label="Title"
@@ -273,13 +273,13 @@ export default function TodoDetailPage() {
 
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "center",
             gap: 2,
           }}
         >
-          <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+          <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="Due Date"
@@ -292,7 +292,7 @@ export default function TodoDetailPage() {
               />
             </LocalizationProvider>
           </Box>
-          <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+          <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
             <Typography variant="body1" color="text.secondary">
               {getDueDateMessage(form.nextDueDate)}
             </Typography>
@@ -301,13 +301,13 @@ export default function TodoDetailPage() {
 
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "center",
             gap: 2,
           }}
         >
-          <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+          <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -321,7 +321,7 @@ export default function TodoDetailPage() {
             />
           </Box>
           {isRecurring && (
-            <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+            <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
               <TextField
                 label="Repeat"
                 name="recurrenceRule"
@@ -331,7 +331,8 @@ export default function TodoDetailPage() {
                 onChange={handleChange}
                 variant="outlined"
                 size="small"
-                disabled={isEdit && !isFormEnabled}>
+                disabled={isEdit && !isFormEnabled}
+              >
                 <MenuItem value="one-time">One-time</MenuItem>
                 <MenuItem value="7d">Every week</MenuItem>
                 <MenuItem value="14d">Every two weeks</MenuItem>
@@ -339,20 +340,18 @@ export default function TodoDetailPage() {
               </TextField>
             </Box>
           )}
-          {!isRecurring && (
-            <Box sx={{ flex: { xs: 'auto', sm: 1 } }}></Box>
-          )}
+          {!isRecurring && <Box sx={{ flex: { xs: "auto", sm: 1 } }}></Box>}
         </Box>
 
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "center",
             gap: 2,
           }}
         >
-          <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+          <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -366,7 +365,7 @@ export default function TodoDetailPage() {
             />
           </Box>
           {hasReminder && (
-            <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
+            <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
               <TextField
                 label={`Remind me ${form.reminderDaysBefore} day(s) before`}
                 name="reminderDaysBefore"
@@ -380,9 +379,7 @@ export default function TodoDetailPage() {
               />
             </Box>
           )}
-          {!hasReminder && (
-            <Box sx={{ flex: { xs: 'auto', sm: 1 } }}></Box>
-          )}
+          {!hasReminder && <Box sx={{ flex: { xs: "auto", sm: 1 } }}></Box>}
         </Box>
 
         {isEdit && (
@@ -402,8 +399,8 @@ export default function TodoDetailPage() {
 
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             gap: 2,
           }}
         >
@@ -413,7 +410,12 @@ export default function TodoDetailPage() {
                 variant="contained"
                 color="primary"
                 fullWidth
-                sx={{ py: 1.5, borderRadius: "8px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", flex: { xs: 'auto', sm: 1 } }}
+                sx={{
+                  py: 1.5,
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                  flex: { xs: "auto", sm: 1 },
+                }}
                 onClick={handleEditClick}
               >
                 Edit
@@ -422,7 +424,11 @@ export default function TodoDetailPage() {
                 variant="outlined"
                 color="error"
                 fullWidth
-                sx={{ py: 1.5, borderRadius: "8px", flex: { xs: 'auto', sm: 1 } }}
+                sx={{
+                  py: 1.5,
+                  borderRadius: "8px",
+                  flex: { xs: "auto", sm: 1 },
+                }}
                 onClick={handleOpenDeleteDialog}
               >
                 Delete
@@ -434,7 +440,12 @@ export default function TodoDetailPage() {
                 variant="contained"
                 color="primary"
                 fullWidth
-                sx={{ py: 1.5, borderRadius: "8px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", flex: { xs: 'auto', sm: 1 } }}
+                sx={{
+                  py: 1.5,
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                  flex: { xs: "auto", sm: 1 },
+                }}
                 onClick={handleSave}
               >
                 {isEdit ? "Save Changes" : "Create Todo"}
@@ -444,7 +455,11 @@ export default function TodoDetailPage() {
                   variant="outlined"
                   color="error"
                   fullWidth
-                  sx={{ py: 1.5, borderRadius: "8px", flex: { xs: 'auto', sm: 1 } }}
+                  sx={{
+                    py: 1.5,
+                    borderRadius: "8px",
+                    flex: { xs: "auto", sm: 1 },
+                  }}
                   onClick={handleOpenDeleteDialog}
                 >
                   Delete
