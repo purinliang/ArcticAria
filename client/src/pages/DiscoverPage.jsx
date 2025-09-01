@@ -13,7 +13,7 @@ const DiscoverPage = () => {
           p: 4,
           bgcolor: "background.paper",
           borderRadius: 2,
-          boxShadow: 3
+          boxShadow: 3,
         }}
       >
         <Typography

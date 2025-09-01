@@ -13,7 +13,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -41,7 +41,7 @@ export default function TodoDetailPage() {
     recurrenceRule: "one-time",
     reminderDaysBefore: 0,
     category: "Other",
-    completed: false
+    completed: false,
   });
   const [error, setError] = useState("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -59,7 +59,7 @@ export default function TodoDetailPage() {
     }
     try {
       const res = await axios.get(`${API_BASE}/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setForm(res.data);
     } catch (err) {
@@ -70,7 +70,7 @@ export default function TodoDetailPage() {
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(
-          t("errors.loadTodo", { message: err.response?.data || err.message })
+          t("errors.loadTodo", { message: err.response?.data || err.message }),
         );
       }
     }
@@ -84,15 +84,15 @@ export default function TodoDetailPage() {
         await axios.put(`${API_BASE}/todo/${id}`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         });
       } else {
         await axios.post(`${API_BASE}/todo`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         });
       }
       navigate("/todos");
@@ -104,7 +104,7 @@ export default function TodoDetailPage() {
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(
-          t("errors.saveTodo", { message: err.response?.data || err.message })
+          t("errors.saveTodo", { message: err.response?.data || err.message }),
         );
       }
     }
@@ -116,7 +116,7 @@ export default function TodoDetailPage() {
       await axios.put(
         `${API_BASE}/todo/${id}`,
         { completed: !form.completed },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       setForm((prev) => ({ ...prev, completed: !prev.completed }));
     } catch (err) {
@@ -138,7 +138,7 @@ export default function TodoDetailPage() {
     setError("");
     try {
       await axios.delete(`${API_BASE}/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/todos");
     } catch (err) {
@@ -182,7 +182,7 @@ export default function TodoDetailPage() {
             mt: 2,
             mb: 2,
             borderRadius: "8px",
-            backgroundColor: red[50]
+            backgroundColor: red[50],
           }}
         >
           {error}

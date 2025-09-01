@@ -8,7 +8,7 @@ export default function LangSwitchBar() {
   const { i18n } = useTranslation();
 
   const selected = (i18n.resolvedLanguage || i18n.language || "en").startsWith(
-    "zh"
+    "zh",
   )
     ? "CN"
     : "AU";
@@ -25,12 +25,12 @@ export default function LangSwitchBar() {
         // Remove border/outline/focus ring from the select button — no external CSS needed
         "& .aa-no-outline": {
           border: "none !important",
-          boxShadow: "none !important"
+          boxShadow: "none !important",
         },
         "& .aa-no-outline:focus": {
           outline: "none !important",
-          boxShadow: "none !important"
-        }
+          boxShadow: "none !important",
+        },
       }}
     >
       <ReactFlagsSelect

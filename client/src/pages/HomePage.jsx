@@ -4,7 +4,7 @@ import {
   Button,
   Container,
   Paper,
-  Divider
+  Divider,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
@@ -39,7 +39,7 @@ const HomePage = () => {
           <Trans
             i18nKey="page.home.intro"
             components={{
-              strong: <Box component="span" sx={{ fontWeight: 700 }} />
+              strong: <Box component="span" sx={{ fontWeight: 700 }} />,
             }}
           />
         </Typography>
@@ -64,7 +64,7 @@ const HomePage = () => {
             flexDirection: { xs: "column", md: "row" },
             gap: 4,
             mt: 2,
-            alignItems: "stretch"
+            alignItems: "stretch",
           }}
         >
           {/* Todo Feature */}

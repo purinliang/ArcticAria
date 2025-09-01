@@ -5,7 +5,7 @@ import {
   Box,
   Typography,
   Container,
-  Alert
+  Alert,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -68,7 +68,7 @@ export default function LoginPage() {
           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <Typography
@@ -104,7 +104,7 @@ export default function LoginPage() {
               width: "100%",
               mb: 2,
               borderRadius: "8px",
-              backgroundColor: red[50]
+              backgroundColor: red[50],
             }}
           >
             {error}

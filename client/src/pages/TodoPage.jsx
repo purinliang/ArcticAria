@@ -4,7 +4,7 @@ import {
   Button,
   Divider,
   Alert,
-  Box
+  Box,
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import axios from "axios";
@@ -36,7 +36,7 @@ const CATEGORY_GROUPS = [
   { key: "Study", icon: <BookIcon color="info" /> },
   { key: "Life", icon: <HomeIcon color="action" /> },
   { key: "Play", icon: <SportsEsportsIcon color="secondary" /> },
-  { key: "Other", icon: <CategoryIcon /> }
+  { key: "Other", icon: <CategoryIcon /> },
 ];
 
 // Helper: sort by due date
@@ -69,7 +69,7 @@ const fetcher = async (url) => {
     throw error;
   }
   const res = await axios.get(url, {
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
 };
@@ -97,11 +97,11 @@ export default function TodoPage() {
     data: todos,
     error: swrError,
     isLoading,
-    mutate
+    mutate,
   } = useSWR(`${API_BASE}/todo`, fetcher, {
     dedupingInterval: 1000,
     revalidateOnFocus: false,
-    revalidateOnReconnect: false
+    revalidateOnReconnect: false,
   });
 
   useEffect(() => {
@@ -116,7 +116,7 @@ export default function TodoPage() {
       await axios.put(
         `${import.meta.env.VITE_TODO_API_BASE}/todo/${id}`,
         { completed: !currentStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       mutate();
     } catch (err) {
@@ -140,7 +140,7 @@ export default function TodoPage() {
     const startOfToday = new Date(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate()
+      now.getDate(),
     );
 
     todos.forEach((todo) => {
@@ -152,7 +152,7 @@ export default function TodoPage() {
       const remindDate = dueDate ? new Date(dueDate) : null;
       if (remindDate) {
         remindDate.setDate(
-          remindDate.getDate() - (todo.reminderDaysBefore || 0)
+          remindDate.getDate() - (todo.reminderDaysBefore || 0),
         );
       }
 
@@ -173,7 +173,7 @@ export default function TodoPage() {
       overdued: sortTodosByDate(overdued),
       reminding: sortTodosByDate(reminding),
       upcoming: sortTodosByDate(upcoming),
-      completed: sortTodosByDate(completed)
+      completed: sortTodosByDate(completed),
     };
   })();
 
@@ -218,14 +218,14 @@ export default function TodoPage() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          flexDirection: { xs: "column", sm: "row" }
+          flexDirection: { xs: "column", sm: "row" },
         }}
       >
         <Box
           sx={{
             textAlign: "left",
             mb: { xs: 2, sm: 0 },
-            alignSelf: { xs: "flex-start", sm: "auto" }
+            alignSelf: { xs: "flex-start", sm: "auto" },
           }}
         >
           <Typography
@@ -246,7 +246,7 @@ export default function TodoPage() {
             alignItems: "center",
             gap: 2,
             justifyContent: "flex-end",
-            width: { xs: "100%", sm: "auto" }
+            width: { xs: "100%", sm: "auto" },
           }}
         >
           <Box
@@ -299,7 +299,7 @@ export default function TodoPage() {
             mt: 2,
             mb: 2,
             borderRadius: "8px",
-            backgroundColor: red[50]
+            backgroundColor: red[50],
           }}
         >
           {swrError.status === 401
@@ -330,8 +330,8 @@ export default function TodoPage() {
                   renderTodoGroup(
                     groupedByCategory[group.key],
                     `categories.${group.key}`,
-                    group.icon
-                  )
+                    group.icon,
+                  ),
                 )
               ) : (
                 // By time windows
@@ -339,22 +339,22 @@ export default function TodoPage() {
                   {renderTodoGroup(
                     groupedTodosByTime.overdued,
                     "todoGroups.overdue",
-                    <WarningIcon color="error" />
+                    <WarningIcon color="error" />,
                   )}
                   {renderTodoGroup(
                     groupedTodosByTime.reminding,
                     "todoGroups.reminding",
-                    <NotificationsActiveIcon color="info" />
+                    <NotificationsActiveIcon color="info" />,
                   )}
                   {renderTodoGroup(
                     groupedTodosByTime.upcoming,
                     "todoGroups.upcoming",
-                    <CalendarTodayIcon sx={{ color: "info" }} />
+                    <CalendarTodayIcon sx={{ color: "info" }} />,
                   )}
                   {renderTodoGroup(
                     groupedTodosByTime.completed,
                     "todoGroups.completed",
-                    <CheckCircleOutlineIcon color="success" />
+                    <CheckCircleOutlineIcon color="success" />,
                   )}
                 </>
               )}

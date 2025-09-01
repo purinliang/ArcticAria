@@ -5,7 +5,7 @@ import {
   Typography,
   Checkbox,
   Box,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { lightBlue, deepOrange, green, blue } from "@mui/material/colors";
@@ -57,7 +57,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
     const startOfToday = new Date(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate()
+      now.getDate(),
     );
 
     if (
@@ -103,7 +103,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
       every7d: "every7d",
       "14d": "every14d",
       every14d: "every14d",
-      monthly: "monthly"
+      monthly: "monthly",
     };
     const k = map[norm];
     if (k && i18n.exists(`todoDetail.recurrence.${k}`)) {
@@ -128,16 +128,16 @@ export default function TodoCard({ todo, onToggleComplete }) {
         transition: "transform 0.2s",
         "&:hover": {
           transform: "translateY(-4px)",
-          boxShadow: "0 6px 12px rgba(0,0,0,0.15)"
+          boxShadow: "0 6px 12px rgba(0,0,0,0.15)",
         },
-        bgcolor: getCardColor(todo)
+        bgcolor: getCardColor(todo),
       }}
       onClick={() => navigate(`/todos/${todo.id}`, { state: { todo } })}
     >
       <CardContent>
         <Box
           sx={{
-            "&::after": { content: '""', display: "table", clear: "both" }
+            "&::after": { content: '""', display: "table", clear: "both" },
           }}
         >
           <Box sx={{ float: "right", mt: -1.0, mr: -1.8, mb: -2.4 }}>
@@ -170,7 +170,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
             textOverflow: "ellipsis",
             display: "-webkit-box",
             WebkitLineClamp: 4,
-            WebkitBoxOrient: "vertical"
+            WebkitBoxOrient: "vertical",
           }}
         >
           {todo.content}
