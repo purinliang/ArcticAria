@@ -4,7 +4,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 /**
@@ -25,7 +25,7 @@ export default function ConfirmationDialog({
   title,
   contentText,
   cancelText = "dialog.cancel", //  use translation keys
-  confirmText = "dialog.confirm" //  use translation keys
+  confirmText = "dialog.confirm", //  use translation keys
 }) {
   const { t } = useTranslation();
   return (

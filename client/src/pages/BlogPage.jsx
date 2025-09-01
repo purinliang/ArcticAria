@@ -5,7 +5,7 @@ import {
   Card,
   CardContent,
   Button,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import axios from "axios";
@@ -23,7 +23,7 @@ const API_BASE = import.meta.env.VITE_BLOG_API_BASE;
 // Relative time using i18n pluralization + long date fallback
 const getRelativeTime = (dateString, t) => {
   const date = new Date(
-    dateString.endsWith("Z") ? dateString : dateString + "Z"
+    dateString.endsWith("Z") ? dateString : dateString + "Z",
   );
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -54,7 +54,7 @@ export default function BlogPage() {
   const { data: posts, error } = useSWR(`${API_BASE}/posts`, fetcher, {
     dedupingInterval: 1000,
     revalidateOnFocus: false,
-    revalidateOnReconnect: false
+    revalidateOnReconnect: false,
   });
 
   const loading = !posts && !error;
@@ -83,8 +83,8 @@ export default function BlogPage() {
             boxShadow: 6,
             transform: "translateY(-2px)",
             transition: "transform 0.2s",
-            cursor: "pointer"
-          }
+            cursor: "pointer",
+          },
         }}
         onClick={() => navigate(`/blog/${post.id}`)}
       >
@@ -105,8 +105,8 @@ export default function BlogPage() {
                 maxWidth: "100%",
                 height: "auto",
                 display: "block",
-                mx: "auto"
-              }
+                mx: "auto",
+              },
             }}
           >
             <ReactMarkdown remarkPlugins={[gfm]}>{post.content}</ReactMarkdown>
@@ -141,7 +141,7 @@ export default function BlogPage() {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
-          mt: 4
+          mt: 4,
         }}
       >
         <Typography

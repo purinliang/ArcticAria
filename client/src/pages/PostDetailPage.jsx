@@ -15,7 +15,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  TextField
+  TextField,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -33,7 +33,7 @@ const API_BASE = import.meta.env.VITE_BLOG_API_BASE;
 // Relative time using your blogpage time keys for consistency
 const getRelativeTime = (dateString, t) => {
   const date = new Date(
-    dateString.endsWith("Z") ? dateString : dateString + "Z"
+    dateString.endsWith("Z") ? dateString : dateString + "Z",
   );
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -121,7 +121,7 @@ export default function PostDetailPage() {
     setOpenPostDeleteDialog(false);
     try {
       await axios.delete(`${API_BASE}/posts/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/blog");
     } catch (err) {
@@ -143,7 +143,7 @@ export default function PostDetailPage() {
       await axios.post(
         `${API_BASE}/comments`,
         { postId: id, content: newCommentContent },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       setNewCommentContent("");
       const res = await axios.get(`${API_BASE}/posts/${id}/comments`);
@@ -168,7 +168,7 @@ export default function PostDetailPage() {
       await axios.put(
         `${API_BASE}/comments/${commentToEdit.id}`,
         { content: commentToEdit.content },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       setOpenCommentEditDialog(false);
       setCommentToEdit(null);
@@ -188,7 +188,7 @@ export default function PostDetailPage() {
     if (!commentToDelete) return;
     try {
       await axios.delete(`${API_BASE}/comments/${commentToDelete.id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setOpenCommentDeleteDialog(false);
       setCommentToDelete(null);
@@ -207,7 +207,7 @@ export default function PostDetailPage() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "80vh"
+          height: "80vh",
         }}
       >
         <CircularProgress />
@@ -255,7 +255,7 @@ export default function PostDetailPage() {
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <Typography
@@ -312,7 +312,7 @@ export default function PostDetailPage() {
           border: "1px solid #e0e0e0",
           borderRadius: "8px",
           boxShadow: 1,
-          backgroundColor: "white"
+          backgroundColor: "white",
         }}
       >
         <Typography
@@ -324,8 +324,8 @@ export default function PostDetailPage() {
               maxWidth: "100%",
               height: "auto",
               display: "block",
-              mx: "auto"
-            }
+              mx: "auto",
+            },
           }}
         >
           <ReactMarkdown remarkPlugins={[gfm]}>{post.content}</ReactMarkdown>
@@ -361,7 +361,7 @@ export default function PostDetailPage() {
                     borderRadius: "8px",
                     border: "1px solid #e0e0e0",
                     display: "flex",
-                    flexDirection: "column"
+                    flexDirection: "column",
                   }}
                 >
                   <Typography variant="body1">{comment.content}</Typography>
@@ -370,7 +370,7 @@ export default function PostDetailPage() {
                       mt: 1,
                       display: "flex",
                       justifyContent: "space-between",
-                      alignItems: "center"
+                      alignItems: "center",
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">
@@ -460,7 +460,7 @@ export default function PostDetailPage() {
         <DialogContent>
           <DialogContentText>
             {t("page.postDetail.dialog.postDelete.content", {
-              title: post.title
+              title: post.title,
             })}
           </DialogContentText>
         </DialogContent>

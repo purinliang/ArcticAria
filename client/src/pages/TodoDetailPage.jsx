@@ -3,7 +3,6 @@ import {
   Typography,
   TextField,
   Button,
-  Grid,
   MenuItem,
   Checkbox,
   FormControlLabel,
@@ -13,7 +12,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -21,9 +20,11 @@ import dayjs from "dayjs";
 import axios from "axios";
 import { red } from "@mui/material/colors";
 import { useTranslation } from "react-i18next";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
-
 const CATEGORIES = ["Work", "Study", "Life", "Play", "Other"];
 
 export default function TodoDetailPage() {
@@ -37,17 +38,58 @@ export default function TodoDetailPage() {
   const [form, setForm] = useState({
     title: "",
     content: "",
-    nextDueDate: dayjs().format("YYYY-MM-DD"),
+    nextDueDate: dayjs(),
     recurrenceRule: "one-time",
     reminderDaysBefore: 0,
     category: "Other",
-    completed: false
+    completed: false,
   });
+
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [hasReminder, setHasReminder] = useState(false);
+
   const [error, setError] = useState("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  const [isFormEnabled, setIsFormEnabled] = useState(!isEdit);
+
+  const getDueDateMessage = (dueDateStr) => {
+    const due = dayjs(dueDateStr).startOf("day");
+    const now = dayjs().startOf("day");
+    const diffDays = due.diff(now, "day");
+    const dayOfWeek = dayjs(dueDateStr).format("dddd");
+
+    if (diffDays === 0) {
+      return `Due Today (${dayOfWeek})`;
+    } else if (diffDays > 0) {
+      return `${diffDays} day${diffDays === 1 ? "" : "s"} left (${dayOfWeek})`;
+    } else {
+      return `Overdue by ${-diffDays} day${-diffDays === 1 ? "" : "s"} (${dayOfWeek})`;
+    }
+  };
+
   const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value, checked, type } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleRecurringChange = (event) => {
+    const isChecked = event.target.checked;
+    setIsRecurring(isChecked);
+    if (!isChecked) {
+      setForm((prev) => ({ ...prev, recurrenceRule: "one-time" }));
+    }
+  };
+
+  const handleReminderChange = (event) => {
+    const isChecked = event.target.checked;
+    setHasReminder(isChecked);
+    if (!isChecked) {
+      setForm((prev) => ({ ...prev, reminderDaysBefore: 0 }));
+    }
   };
 
   const fetchTodo = async () => {
@@ -59,9 +101,14 @@ export default function TodoDetailPage() {
     }
     try {
       const res = await axios.get(`${API_BASE}/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      setForm(res.data);
+      const isRec = res.data.recurrenceRule !== "one-time";
+      setIsRecurring(isRec);
+      const hasRem = res.data.reminderDaysBefore > 0;
+      setHasReminder(hasRem);
+
+      setForm({ ...res.data, nextDueDate: dayjs(res.data.nextDueDate) });
     } catch (err) {
       console.error("Failed to load todo:", err);
       if (err.response && err.response.status === 401) {
@@ -70,7 +117,7 @@ export default function TodoDetailPage() {
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(
-          t("errors.loadTodo", { message: err.response?.data || err.message })
+          t("errors.loadTodo", { message: err.response?.data || err.message }),
         );
       }
     }
@@ -84,15 +131,15 @@ export default function TodoDetailPage() {
         await axios.put(`${API_BASE}/todo/${id}`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         });
       } else {
         await axios.post(`${API_BASE}/todo`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         });
       }
       navigate("/todos");
@@ -104,41 +151,25 @@ export default function TodoDetailPage() {
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(
-          t("errors.saveTodo", { message: err.response?.data || err.message })
+          t("errors.saveTodo", { message: err.response?.data || err.message }),
         );
       }
     }
   };
 
-  const toggleCompleted = async () => {
-    setError("");
-    try {
-      await axios.put(
-        `${API_BASE}/todo/${id}`,
-        { completed: !form.completed },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setForm((prev) => ({ ...prev, completed: !prev.completed }));
-    } catch (err) {
-      console.error("Failed to update status:", err);
-      if (err.response && err.response.status === 401) {
-        localStorage.removeItem("jwtToken");
-        setError(t("errors.sessionExpired"));
-        setTimeout(() => navigate("/login"), 3000);
-      } else {
-        setError(t("errors.updateStatus"));
-      }
-    }
+  const handleOpenDeleteDialog = () => {
+    setIsDeleteDialogOpen(true);
   };
 
-  const handleOpenDeleteDialog = () => setIsDeleteDialogOpen(true);
-  const handleCloseDeleteDialog = () => setIsDeleteDialogOpen(false);
+  const handleCloseDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
+  };
 
   const handleConfirmDelete = async () => {
     setError("");
     try {
       await axios.delete(`${API_BASE}/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/todos");
     } catch (err) {
@@ -155,12 +186,20 @@ export default function TodoDetailPage() {
     }
   };
 
+  const handleEditClick = () => {
+    setIsFormEnabled(true);
+  };
+
   useEffect(() => {
     if (isEdit) {
       if (state?.todo) {
-        setForm(state.todo);
+        const isRec = state.todo.recurrenceRule !== "one-time";
+        setIsRecurring(isRec);
+        const hasRem = state.todo.reminderDaysBefore > 0;
+        setHasReminder(hasRem);
+        setForm({ ...state.todo, nextDueDate: dayjs(state.todo.nextDueDate) });
       } else {
-        fetchTodo();
+        fetchTodo(); // fallback
       }
     }
   }, [id, state]);
@@ -182,138 +221,262 @@ export default function TodoDetailPage() {
             mt: 2,
             mb: 2,
             borderRadius: "8px",
-            backgroundColor: red[50]
+            backgroundColor: red[50],
           }}
         >
           {error}
         </Alert>
       )}
 
-      <Grid container spacing={3} mt={1} direction="column">
-        <Grid item xs={12}>
-          <TextField
-            label={t("todoDetail.fields.title")}
-            name="title"
-            fullWidth
-            value={form.title}
-            onChange={handleChange}
-            variant="outlined"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label={t("todoDetail.fields.dueDate")}
-            name="nextDueDate"
-            type="date"
-            fullWidth
-            value={form.nextDueDate}
-            onChange={handleChange}
-            variant="outlined"
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label={t("todoDetail.fields.content")}
-            name="content"
-            fullWidth
-            multiline
-            rows={8}
-            value={form.content}
-            onChange={handleChange}
-            variant="outlined"
-            helperText={t("todoDetail.fields.contentHelper")}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label={t("todoDetail.fields.recurrence")}
-            name="recurrenceRule"
-            select
-            fullWidth
-            value={form.recurrenceRule}
-            onChange={handleChange}
-            variant="outlined"
-          >
-            <MenuItem value="one-time">
-              {t("todoDetail.recurrence.oneTime")}
+      <Box
+        component="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSave();
+        }}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      >
+        <TextField
+          label={t("todoDetail.fields.title")}
+          name="title"
+          fullWidth
+          value={form.title}
+          onChange={handleChange}
+          variant="outlined"
+          disabled={isEdit && !isFormEnabled}
+        />
+
+        <TextField
+          label={t("todoDetail.fields.content")}
+          name="content"
+          fullWidth
+          multiline
+          value={form.content}
+          onChange={handleChange}
+          variant="outlined"
+          helperText="Provide a detailed description of the task."
+          disabled={isEdit && !isFormEnabled}
+          minRows={10}
+          maxRows={30}
+        />
+
+        <TextField
+          label={t("todoDetail.fields.category")}
+          name="category"
+          select
+          fullWidth
+          value={form.category}
+          onChange={handleChange}
+          variant="outlined"
+          disabled={isEdit && !isFormEnabled}
+        >
+          {CATEGORIES.map((category) => (
+            <MenuItem key={category} value={category}>
+              {category}
             </MenuItem>
-            <MenuItem value="7d">{t("todoDetail.recurrence.every7d")}</MenuItem>
-            <MenuItem value="14d">
-              {t("todoDetail.recurrence.every14d")}
-            </MenuItem>
-            <MenuItem value="monthly">
-              {t("todoDetail.recurrence.monthly")}
-            </MenuItem>
-          </TextField>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label={t("todoDetail.fields.category")}
-            name="category"
-            select
-            fullWidth
-            value={form.category}
-            onChange={handleChange}
-            variant="outlined"
-          >
-            {CATEGORIES.map((category) => (
-              <MenuItem key={category} value={category}>
-                {t(`categories.${category}`)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label={t("todoDetail.fields.reminderDays")}
-            name="reminderDaysBefore"
-            type="number"
-            fullWidth
-            value={form.reminderDaysBefore}
-            onChange={handleChange}
-            variant="outlined"
-          />
-        </Grid>
-        {isEdit && (
-          <Grid item xs={12}>
+          ))}
+        </TextField>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label={t("todoDetail.fields.dueDate")}
+                value={form.nextDueDate}
+                onChange={(newValue) => {
+                  setForm((prev) => ({ ...prev, nextDueDate: newValue }));
+                }}
+                slotProps={{ textField: { fullWidth: true } }}
+                disabled={isEdit && !isFormEnabled}
+              />
+            </LocalizationProvider>
+          </Box>
+          <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
+            <Typography variant="body1" color="text.secondary">
+              {getDueDateMessage(form.nextDueDate)}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={!!form.completed}
-                  onChange={toggleCompleted}
+                  checked={isRecurring}
+                  onChange={handleRecurringChange}
                   color="primary"
+                  disabled={isEdit && !isFormEnabled}
                 />
               }
-              label={t("todoDetail.fields.markCompleted")}
+              label="Set a repeat rule"
             />
-          </Grid>
-        )}
-        <Grid item xs={12} sm={isEdit ? 6 : 12}>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleSave}
-          >
-            {isEdit
-              ? t("todoDetail.buttons.save")
-              : t("todoDetail.buttons.create")}
-          </Button>
-        </Grid>
+          </Box>
+          {isRecurring && (
+            <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
+              <TextField
+                label="Repeat"
+                name="recurrenceRule"
+                select
+                fullWidth
+                value={form.recurrenceRule}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                disabled={isEdit && !isFormEnabled}
+              >
+                <MenuItem value="one-time">One-time</MenuItem>
+                <MenuItem value="7d">Every week</MenuItem>
+                <MenuItem value="14d">Every two weeks</MenuItem>
+                <MenuItem value="monthly">Every month</MenuItem>
+              </TextField>
+            </Box>
+          )}
+          {!isRecurring && <Box sx={{ flex: { xs: "auto", sm: 1 } }}></Box>}
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={hasReminder}
+                  onChange={handleReminderChange}
+                  color="primary"
+                  disabled={isEdit && !isFormEnabled}
+                />
+              }
+              label="Set a reminder"
+            />
+          </Box>
+          {hasReminder && (
+            <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
+              <TextField
+                label={`Remind me ${form.reminderDaysBefore} day(s) before`}
+                name="reminderDaysBefore"
+                type="number"
+                fullWidth
+                value={form.reminderDaysBefore}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                disabled={isEdit && !isFormEnabled}
+              />
+            </Box>
+          )}
+          {!hasReminder && <Box sx={{ flex: { xs: "auto", sm: 1 } }}></Box>}
+        </Box>
+
         {isEdit && (
-          <Grid item xs={12} sm={6}>
-            <Button
-              variant="outlined"
-              color="error"
-              fullWidth
-              onClick={handleOpenDeleteDialog}
-            >
-              {t("todoDetail.buttons.delete")}
-            </Button>
-          </Grid>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={!!form.completed}
+                onChange={handleChange}
+                color="primary"
+                name="completed"
+                disabled={isEdit && !isFormEnabled}
+              />
+            }
+            label={t("todoDetail.fields.markCompleted")}
+          />
         )}
-      </Grid>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2,
+          }}
+        >
+          {isEdit && !isFormEnabled ? (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{
+                  py: 1.5,
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                  flex: { xs: "auto", sm: 1 },
+                }}
+                onClick={handleEditClick}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                fullWidth
+                sx={{
+                  py: 1.5,
+                  borderRadius: "8px",
+                  flex: { xs: "auto", sm: 1 },
+                }}
+                onClick={handleOpenDeleteDialog}
+              >
+                {t("todoDetail.buttons.delete")}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{
+                  py: 1.5,
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                  flex: { xs: "auto", sm: 1 },
+                }}
+                onClick={handleSave}
+              >
+                {isEdit
+                  ? t("todoDetail.buttons.save")
+                  : t("todoDetail.buttons.create")}
+              </Button>
+              {isEdit && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  fullWidth
+                  sx={{
+                    py: 1.5,
+                    borderRadius: "8px",
+                    flex: { xs: "auto", sm: 1 },
+                  }}
+                  onClick={handleOpenDeleteDialog}
+                >
+                  {t("todoDetail.buttons.delete")}
+                </Button>
+              )}
+            </>
+          )}
+        </Box>
+      </Box>
 
       <Dialog open={isDeleteDialogOpen} onClose={handleCloseDeleteDialog}>
         <DialogTitle>{t("todoDetail.dialog.title")}</DialogTitle>
@@ -323,7 +486,7 @@ export default function TodoDetailPage() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDeleteDialog} color="primary">
+          <Button onClick={handleCloseDeleteDialog} color="primary" autoFocus>
             {t("dialog.cancel")}
           </Button>
           <Button onClick={handleConfirmDelete} color="error">

@@ -13,7 +13,7 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemText
+  ListItemText,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import RegisterPage from "./pages/RegisterPage";
@@ -76,7 +76,7 @@ function App() {
   // State to manage the special "copied" tooltip and its text
   const [copiedTooltipOpen, setCopiedTooltipOpen] = useState(false);
   const [tooltipText, setTooltipText] = useState(
-    `Click to copy: ${emailAddress}`
+    `Click to copy: ${emailAddress}`,
   );
 
   const handleEmailClick = async () => {
@@ -130,7 +130,7 @@ function App() {
         display: "flex",
         alignItems: "center",
         gap: 2,
-        ml: 4
+        ml: 4,
       }}
     >
       <Button
@@ -138,7 +138,7 @@ function App() {
         color="inherit"
         sx={{
           fontWeight: "bold",
-          textTransform: "none"
+          textTransform: "none",
         }}
       >
         {t("nav.todos")}
@@ -167,7 +167,7 @@ function App() {
         display: "flex",
         justifyContent: "flex-end",
         alignItems: "center",
-        gap: 1
+        gap: 1,
       }}
     >
       <SwitchBar />
@@ -187,7 +187,7 @@ function App() {
             onClick={handleLogout}
             sx={{
               fontSize: "1rem",
-              textTransform: "none"
+              textTransform: "none",
             }}
           >
             {t("auth.signOut")}
@@ -200,7 +200,7 @@ function App() {
           onClick={() => navigate("/login")}
           sx={{
             fontSize: "1rem",
-            textTransform: "none"
+            textTransform: "none",
           }}
         >
           {t("auth.signIn")}
@@ -217,7 +217,7 @@ function App() {
           sx={{
             bgcolor: "white",
             color: "black",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
           }}
         >
           <Toolbar
@@ -225,13 +225,13 @@ function App() {
               maxWidth: "1120px",
               width: "90%",
               mx: "auto",
-              justifyContent: "space-between"
+              justifyContent: "space-between",
             }}
           >
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center"
+                alignItems: "center",
               }}
             >
               {isMobile && (
@@ -254,7 +254,7 @@ function App() {
                   alignItems: "center",
                   fontWeight: "bold",
                   fontSize: "1.5rem",
-                  textTransform: "none"
+                  textTransform: "none",
                 }}
               >
                 <img
@@ -317,7 +317,7 @@ function App() {
                     <ListItemText
                       primary="Sign out"
                       primaryTypographyProps={{
-                        sx: { fontWeight: "bold", color: "error.main" }
+                        sx: { fontWeight: "bold", color: "error.main" },
                       }}
                     />
                   </ListItem>
@@ -329,7 +329,7 @@ function App() {
                     <ListItemText
                       primary="Sign in"
                       primaryTypographyProps={{
-                        sx: { fontWeight: "bold", color: "primary.main" }
+                        sx: { fontWeight: "bold", color: "primary.main" },
                       }}
                     />
                   </ListItem>
@@ -367,7 +367,7 @@ function App() {
             p: 2,
             maxWidth: "1120px",
             mx: "auto",
-            textAlign: "center"
+            textAlign: "center",
           }}
         >
           <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -382,7 +382,7 @@ function App() {
               style={{
                 color: "inherit",
                 textDecoration: "none",
-                marginRight: "8px"
+                marginRight: "8px",
               }}
             >
               GitHub
@@ -406,7 +406,7 @@ function App() {
                     color: "inherit",
                     textDecoration: "none",
                     marginLeft: "8px",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   Email

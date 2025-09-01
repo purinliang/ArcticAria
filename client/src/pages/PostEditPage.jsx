@@ -7,7 +7,7 @@ import {
   Button,
   Paper,
   Alert,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -41,7 +41,7 @@ export default function PostEditPage() {
         setLoading(true);
         try {
           const res = await axios.get(`${API_BASE}/posts/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           });
           setPost(res.data);
           setError(null);
@@ -72,13 +72,13 @@ export default function PostEditPage() {
     try {
       if (isEditMode) {
         await axios.put(`${API_BASE}/posts/${id}`, post, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         setMessage(t("page.postEdit.messages.updated"));
         setTimeout(() => navigate(`/blog/${id}`), 1000);
       } else {
         await axios.post(`${API_BASE}/posts`, post, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         setMessage(t("page.postEdit.messages.created"));
         setTimeout(() => navigate("/blog"), 2000);
@@ -89,8 +89,8 @@ export default function PostEditPage() {
           action: isEditMode
             ? t("page.postEdit.actions.update")
             : t("page.postEdit.actions.create"),
-          message: err.response?.data?.message || err.message
-        })
+          message: err.response?.data?.message || err.message,
+        }),
       );
     } finally {
       setLoading(false);
@@ -105,7 +105,7 @@ export default function PostEditPage() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "80vh"
+          height: "80vh",
         }}
       >
         <CircularProgress />

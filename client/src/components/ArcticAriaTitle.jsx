@@ -20,7 +20,7 @@ const ArcticAriaTitle = (props) => {
           stroke: stroke || "currentColor",
           strokeWidth: "1.2mm",
           fill: fill || "currentColor",
-          strokeLinecap: "round"
+          strokeLinecap: "round",
         }}
       >
         <path

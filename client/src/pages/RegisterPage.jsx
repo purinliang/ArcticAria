@@ -5,7 +5,7 @@ import {
   Box,
   Typography,
   Container,
-  Alert
+  Alert,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -39,15 +39,15 @@ export default function RegisterPage() {
     try {
       await axios.post(`${API_BASE}/register`, {
         username: form.username,
-        password: form.password
+        password: form.password,
       });
       setSuccess(t("page.register.success"));
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       setError(
         t("errors.registerFailed", {
-          message: err.response?.data || err.message
-        })
+          message: err.response?.data || err.message,
+        }),
       );
     }
   };
@@ -64,7 +64,7 @@ export default function RegisterPage() {
           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <Typography
@@ -100,7 +100,7 @@ export default function RegisterPage() {
               width: "100%",
               mb: 2,
               borderRadius: "8px",
-              backgroundColor: red[50]
+              backgroundColor: red[50],
             }}
           >
             {error}
