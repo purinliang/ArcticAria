@@ -117,7 +117,7 @@ export default function TodoDetailPage() {
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(
-          t("errors.loadTodo", { message: err.response?.data || err.message })
+          t("errors.loadTodo", { message: err.response?.data || err.message }),
         );
       }
     }
@@ -151,7 +151,7 @@ export default function TodoDetailPage() {
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(
-          t("errors.saveTodo", { message: err.response?.data || err.message })
+          t("errors.saveTodo", { message: err.response?.data || err.message }),
         );
       }
     }
@@ -478,12 +478,9 @@ export default function TodoDetailPage() {
         </Box>
       </Box>
 
-      <Dialog
-        open={isDeleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-      >
-
-        <DialogTitle>{t("todoDetail.dialog.title")}</DialogTitle><DialogContent>
+      <Dialog open={isDeleteDialogOpen} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>{t("todoDetail.dialog.title")}</DialogTitle>
+        <DialogContent>
           <DialogContentText>
             {t("todoDetail.dialog.content")}
           </DialogContentText>
