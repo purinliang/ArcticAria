@@ -36,7 +36,7 @@ const CATEGORY_GROUPS = [
   { key: "Study", icon: <BookIcon color="info" /> },
   { key: "Life", icon: <HomeIcon color="action" /> },
   { key: "Play", icon: <SportsEsportsIcon color="secondary" /> },
-  { key: "Other", icon: <CategoryIcon /> }
+  { key: "Other", icon: <CategoryIcon /> },
 ];
 
 // Helper function to sort todos by due date
@@ -262,7 +262,6 @@ export default function TodoPage() {
           sx={{
             textAlign: "left",
             mb: { xs: 2, sm: 0 },
-            // 在小屏幕上让标题和描述靠左
             alignSelf: { xs: "flex-start", sm: "auto" },
           }}
         >
@@ -308,11 +307,13 @@ export default function TodoPage() {
                     name="sortBySwitch"
                     color="primary"
                   />
-                } label={
+                }
+                label={
                   sortByCategory
                     ? t("page.todos.labels.sortByCategory")
                     : t("page.todos.labels.sortByTime")
-                } />
+                }
+              />
             </Tooltip>
           </Box>
           <Tooltip title={t("page.todos.tooltips.addNew")}>
