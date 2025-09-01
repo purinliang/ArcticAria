@@ -49,6 +49,23 @@ export default function TodoDetailPage() {
   const [error, setError] = useState("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  const [isFormEnabled, setIsFormEnabled] = useState(!isEdit);
+
+  const getDueDateMessage = (dueDateStr) => {
+    const due = dayjs(dueDateStr).startOf('day');
+    const now = dayjs().startOf('day');
+    const diffDays = due.diff(now, "day");
+    const dayOfWeek = dayjs(dueDateStr).format("dddd");
+
+    if (diffDays === 0) {
+      return `Due Today (${dayOfWeek})`;
+    } else if (diffDays > 0) {
+      return `${diffDays} day${diffDays === 1 ? "" : "s"} left (${dayOfWeek})`;
+    } else {
+      return `Overdue by ${-diffDays} day${-diffDays === 1 ? "" : "s"} (${dayOfWeek})`;
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
     setForm((prev) => ({
@@ -163,6 +180,10 @@ export default function TodoDetailPage() {
     }
   };
 
+  const handleEditClick = () => {
+    setIsFormEnabled(true);
+  };
+
   useEffect(() => {
     if (isEdit) {
       if (state?.todo) {
@@ -216,6 +237,7 @@ export default function TodoDetailPage() {
           value={form.title}
           onChange={handleChange}
           variant="outlined"
+          disabled={isEdit && !isFormEnabled}
         />
 
         <TextField
@@ -223,11 +245,13 @@ export default function TodoDetailPage() {
           name="content"
           fullWidth
           multiline
-          rows={8}
           value={form.content}
           onChange={handleChange}
           variant="outlined"
           helperText="Provide a detailed description of the task."
+          disabled={isEdit && !isFormEnabled}
+          minRows={10}
+          maxRows={30}
         />
 
         <TextField
@@ -238,6 +262,7 @@ export default function TodoDetailPage() {
           value={form.category}
           onChange={handleChange}
           variant="outlined"
+          disabled={isEdit && !isFormEnabled}
         >
           {CATEGORIES.map((category) => (
             <MenuItem key={category} value={category}>
@@ -263,12 +288,13 @@ export default function TodoDetailPage() {
                   setForm((prev) => ({ ...prev, nextDueDate: newValue }));
                 }}
                 slotProps={{ textField: { fullWidth: true } }}
+                disabled={isEdit && !isFormEnabled}
               />
             </LocalizationProvider>
           </Box>
           <Box sx={{ flex: { xs: 'auto', sm: 1 } }}>
             <Typography variant="body1" color="text.secondary">
-              Selected date: {dayjs(form.nextDueDate).format("YYYY/MM/DD (dddd)")}
+              {getDueDateMessage(form.nextDueDate)}
             </Typography>
           </Box>
         </Box>
@@ -288,6 +314,7 @@ export default function TodoDetailPage() {
                   checked={isRecurring}
                   onChange={handleRecurringChange}
                   color="primary"
+                  disabled={isEdit && !isFormEnabled}
                 />
               }
               label="Is this a recurring task?"
@@ -304,12 +331,8 @@ export default function TodoDetailPage() {
                 onChange={handleChange}
                 variant="outlined"
                 size="small"
-              >
-                <MenuItem value="one-time">One-time</MenuItem>
-                <MenuItem value="7d">Every 7 days</MenuItem>
-                <MenuItem value="14d">Every 14 days</MenuItem>
-                <MenuItem value="monthly">Monthly</MenuItem>
-              </TextField>
+                disabled={isEdit && !isFormEnabled}
+              />
             </Box>
           )}
           {!isRecurring && (
@@ -332,6 +355,7 @@ export default function TodoDetailPage() {
                   checked={hasReminder}
                   onChange={handleReminderChange}
                   color="primary"
+                  disabled={isEdit && !isFormEnabled}
                 />
               }
               label="Do you need a reminder?"
@@ -348,6 +372,7 @@ export default function TodoDetailPage() {
                 onChange={handleChange}
                 variant="outlined"
                 size="small"
+                disabled={isEdit && !isFormEnabled}
               />
             </Box>
           )}
@@ -364,6 +389,7 @@ export default function TodoDetailPage() {
                 onChange={handleChange}
                 color="primary"
                 name="completed"
+                disabled={isEdit && !isFormEnabled}
               />
             }
             label="Mark as Completed"
@@ -377,25 +403,50 @@ export default function TodoDetailPage() {
             gap: 2,
           }}
         >
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ py: 1.5, borderRadius: "8px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", flex: { xs: 'auto', sm: 1 } }}
-            onClick={handleSave}
-          >
-            {isEdit ? "Save Changes" : "Create Todo"}
-          </Button>
-          {isEdit && (
-            <Button
-              variant="outlined"
-              color="error"
-              fullWidth
-              sx={{ py: 1.5, borderRadius: "8px", flex: { xs: 'auto', sm: 1 } }}
-              onClick={handleOpenDeleteDialog}
-            >
-              Delete
-            </Button>
+          {isEdit && !isFormEnabled ? (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ py: 1.5, borderRadius: "8px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", flex: { xs: 'auto', sm: 1 } }}
+                onClick={handleEditClick}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                fullWidth
+                sx={{ py: 1.5, borderRadius: "8px", flex: { xs: 'auto', sm: 1 } }}
+                onClick={handleOpenDeleteDialog}
+              >
+                Delete
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ py: 1.5, borderRadius: "8px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", flex: { xs: 'auto', sm: 1 } }}
+                onClick={handleSave}
+              >
+                {isEdit ? "Save Changes" : "Create Todo"}
+              </Button>
+              {isEdit && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  fullWidth
+                  sx={{ py: 1.5, borderRadius: "8px", flex: { xs: 'auto', sm: 1 } }}
+                  onClick={handleOpenDeleteDialog}
+                >
+                  Delete
+                </Button>
+              )}
+            </>
           )}
         </Box>
       </Box>
