@@ -2,6 +2,7 @@
 import React from "react";
 import { IconButton, Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import LanguageIcon from "@mui/icons-material/Language";
 
 export default function LangSwitchBar() {
   const { i18n } = useTranslation();
@@ -26,10 +27,14 @@ export default function LangSwitchBar() {
         "&:focus": { outline: "none" },
       }}
     >
-      <Box sx={{ fontSize: "20px" }}>{isZh ? "🇨🇳" : "🇦🇺"}</Box>
+      {/* Globe icon */}
+      <LanguageIcon fontSize="small" />
+
+      {/* Text */}
       <Typography variant="body2">
-        {isZh ? "中文" : "EN"}
+        {isZh ? "中文" : "English"}
       </Typography>
+      
     </IconButton>
   );
 }
