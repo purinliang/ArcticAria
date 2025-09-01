@@ -12,7 +12,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
+  DialogTitle
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -23,9 +23,9 @@ import { useTranslation } from "react-i18next";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-
+import i18n from "../i18n";
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
-const CATEGORIES = ["Work", "Study", "Life", "Play", "Other"];
+const CATEGORIES = ["work", "study", "life", "play", "other"];
 
 export default function TodoDetailPage() {
   const { id } = useParams();
@@ -42,7 +42,7 @@ export default function TodoDetailPage() {
     recurrenceRule: "one-time",
     reminderDaysBefore: 0,
     category: "Other",
-    completed: false,
+    completed: false
   });
 
   const [isRecurring, setIsRecurring] = useState(false);
@@ -60,11 +60,11 @@ export default function TodoDetailPage() {
     const dayOfWeek = dayjs(dueDateStr).format("dddd");
 
     if (diffDays === 0) {
-      return `Due Today (${dayOfWeek})`;
+      return t("todo.dueToday", { weekday: dayOfWeek });
     } else if (diffDays > 0) {
-      return `${diffDays} day${diffDays === 1 ? "" : "s"} left (${dayOfWeek})`;
+      return t("todo.daysLeft", { count: diffDays, weekday: dayOfWeek });
     } else {
-      return `Overdue by ${-diffDays} day${-diffDays === 1 ? "" : "s"} (${dayOfWeek})`;
+      return t("todo.overdue", { count: -diffDays, weekday: dayOfWeek });
     }
   };
 
@@ -72,7 +72,7 @@ export default function TodoDetailPage() {
     const { name, value, checked, type } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : value
     }));
   };
 
@@ -101,7 +101,7 @@ export default function TodoDetailPage() {
     }
     try {
       const res = await axios.get(`${API_BASE}/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       });
       const isRec = res.data.recurrenceRule !== "one-time";
       setIsRecurring(isRec);
@@ -117,7 +117,7 @@ export default function TodoDetailPage() {
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(
-          t("errors.loadTodo", { message: err.response?.data || err.message }),
+          t("errors.loadTodo", { message: err.response?.data || err.message })
         );
       }
     }
@@ -131,15 +131,15 @@ export default function TodoDetailPage() {
         await axios.put(`${API_BASE}/todo/${id}`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+            "Content-Type": "application/json"
+          }
         });
       } else {
         await axios.post(`${API_BASE}/todo`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+            "Content-Type": "application/json"
+          }
         });
       }
       navigate("/todos");
@@ -151,7 +151,7 @@ export default function TodoDetailPage() {
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(
-          t("errors.saveTodo", { message: err.response?.data || err.message }),
+          t("errors.saveTodo", { message: err.response?.data || err.message })
         );
       }
     }
@@ -169,7 +169,7 @@ export default function TodoDetailPage() {
     setError("");
     try {
       await axios.delete(`${API_BASE}/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       });
       navigate("/todos");
     } catch (err) {
@@ -221,7 +221,7 @@ export default function TodoDetailPage() {
             mt: 2,
             mb: 2,
             borderRadius: "8px",
-            backgroundColor: red[50],
+            backgroundColor: red[50]
           }}
         >
           {error}
@@ -254,7 +254,7 @@ export default function TodoDetailPage() {
           value={form.content}
           onChange={handleChange}
           variant="outlined"
-          helperText="Provide a detailed description of the task."
+          helperText={t("todoDetail.fields.contentHelper")}
           disabled={isEdit && !isFormEnabled}
           minRows={10}
           maxRows={30}
@@ -272,7 +272,7 @@ export default function TodoDetailPage() {
         >
           {CATEGORIES.map((category) => (
             <MenuItem key={category} value={category}>
-              {category}
+              {t(`categories.${category}`)}
             </MenuItem>
           ))}
         </TextField>
@@ -282,11 +282,14 @@ export default function TodoDetailPage() {
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
             alignItems: "center",
-            gap: 2,
+            gap: 2
           }}
         >
           <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider
+              dateAdapter={AdapterDayjs}
+              adapterLocale={i18n.language === "zh" ? "zh-cn" : "en"}
+            >
               <DatePicker
                 label={t("todoDetail.fields.dueDate")}
                 value={form.nextDueDate}
@@ -310,7 +313,7 @@ export default function TodoDetailPage() {
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
             alignItems: "center",
-            gap: 2,
+            gap: 2
           }}
         >
           <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
@@ -323,13 +326,13 @@ export default function TodoDetailPage() {
                   disabled={isEdit && !isFormEnabled}
                 />
               }
-              label="Set a repeat rule"
+              label={t("todoDetail.repeat.toggle")}
             />
           </Box>
           {isRecurring && (
             <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
               <TextField
-                label="Repeat"
+                label={t("todoDetail.repeat.label")}
                 name="recurrenceRule"
                 select
                 fullWidth
@@ -339,10 +342,18 @@ export default function TodoDetailPage() {
                 size="small"
                 disabled={isEdit && !isFormEnabled}
               >
-                <MenuItem value="one-time">One-time</MenuItem>
-                <MenuItem value="7d">Every week</MenuItem>
-                <MenuItem value="14d">Every two weeks</MenuItem>
-                <MenuItem value="monthly">Every month</MenuItem>
+                <MenuItem value="one-time">
+                  {t("todoDetail.recurrence.oneTime")}
+                </MenuItem>
+                <MenuItem value="7d">
+                  {t("todoDetail.recurrence.every7d")}
+                </MenuItem>
+                <MenuItem value="14d">
+                  {t("todoDetail.recurrence.every14d")}
+                </MenuItem>
+                <MenuItem value="monthly">
+                  {t("todoDetail.recurrence.monthly")}
+                </MenuItem>
               </TextField>
             </Box>
           )}
@@ -354,7 +365,7 @@ export default function TodoDetailPage() {
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
             alignItems: "center",
-            gap: 2,
+            gap: 2
           }}
         >
           <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
@@ -367,13 +378,15 @@ export default function TodoDetailPage() {
                   disabled={isEdit && !isFormEnabled}
                 />
               }
-              label="Set a reminder"
+              label={t("todoDetail.reminder.toggle")}
             />
           </Box>
           {hasReminder && (
             <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
               <TextField
-                label={`Remind me ${form.reminderDaysBefore} day(s) before`}
+                label={t("todoDetail.reminder.label", {
+                  count: form.reminderDaysBefore || 0
+                })}
                 name="reminderDaysBefore"
                 type="number"
                 fullWidth
@@ -407,7 +420,7 @@ export default function TodoDetailPage() {
           sx={{
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
-            gap: 2,
+            gap: 2
           }}
         >
           {isEdit && !isFormEnabled ? (
@@ -420,7 +433,7 @@ export default function TodoDetailPage() {
                   py: 1.5,
                   borderRadius: "8px",
                   boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                  flex: { xs: "auto", sm: 1 },
+                  flex: { xs: "auto", sm: 1 }
                 }}
                 onClick={handleEditClick}
               >
@@ -433,7 +446,7 @@ export default function TodoDetailPage() {
                 sx={{
                   py: 1.5,
                   borderRadius: "8px",
-                  flex: { xs: "auto", sm: 1 },
+                  flex: { xs: "auto", sm: 1 }
                 }}
                 onClick={handleOpenDeleteDialog}
               >
@@ -450,7 +463,7 @@ export default function TodoDetailPage() {
                   py: 1.5,
                   borderRadius: "8px",
                   boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                  flex: { xs: "auto", sm: 1 },
+                  flex: { xs: "auto", sm: 1 }
                 }}
                 onClick={handleSave}
               >
@@ -466,7 +479,7 @@ export default function TodoDetailPage() {
                   sx={{
                     py: 1.5,
                     borderRadius: "8px",
-                    flex: { xs: "auto", sm: 1 },
+                    flex: { xs: "auto", sm: 1 }
                   }}
                   onClick={handleOpenDeleteDialog}
                 >
