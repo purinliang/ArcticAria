@@ -20,12 +20,14 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
 import axios from "axios";
 import { red } from "@mui/material/colors";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
 // Define the four hardcoded categories as requested.
 const CATEGORIES = ["Work", "Study", "Life", "Play", "Other"];
-
 export default function TodoDetailPage() {
   const { id } = useParams();
   const isEdit = !!id;
@@ -36,10 +38,9 @@ export default function TodoDetailPage() {
   const [form, setForm] = useState({
     title: "",
     content: "",
-    nextDueDate: dayjs().format("YYYY-MM-DD"),
+    nextDueDate: dayjs(),
     recurrenceRule: "one-time",
     reminderDaysBefore: 0,
-    // Initialize category to an empty string.
     category: "Other",
     completed: false,
   });
@@ -185,7 +186,8 @@ export default function TodoDetailPage() {
   useEffect(() => {
     if (isEdit) {
       if (state?.todo) {
-        setForm(state.todo);
+        // When setting the form from state, make sure nextDueDate is a Day.js object
+        setForm({ ...state.todo, nextDueDate: dayjs(state.todo.nextDueDate) });
       } else {
         fetchTodo(); // fallback
       }
@@ -230,19 +232,6 @@ export default function TodoDetailPage() {
         </Grid>
         <Grid item xs={12}>
           <TextField
-            label="Due Date"
-            name="nextDueDate"
-            type="date"
-            fullWidth
-            value={form.nextDueDate}
-            onChange={handleChange}
-            variant="outlined"
-            InputLabelProps={{ shrink: true }}
-            sx={{ borderRadius: "8px" }}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
             label="Content"
             name="content"
             fullWidth
@@ -255,24 +244,6 @@ export default function TodoDetailPage() {
             helperText="Provide a detailed description of the task, including any specific requirements or notes."
           />
         </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Recurrence Rule"
-            name="recurrenceRule"
-            select
-            fullWidth
-            value={form.recurrenceRule}
-            onChange={handleChange}
-            variant="outlined"
-            sx={{ borderRadius: "8px" }}
-          >
-            <MenuItem value="one-time">One-time</MenuItem>
-            <MenuItem value="7d">Every 7 days</MenuItem>
-            <MenuItem value="14d">Every 14 days</MenuItem>
-            <MenuItem value="monthly">Monthly</MenuItem>
-          </TextField>
-        </Grid>
-        {/* New Category field added here */}
         <Grid item xs={12}>
           <TextField
             label="Category"
@@ -291,6 +262,46 @@ export default function TodoDetailPage() {
             ))}
           </TextField>
         </Grid>
+
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="Due Date"
+            // Pass the Day.js object directly to the value prop
+            value={form.nextDueDate}
+            onChange={(newValue) => {
+              setForm((prev) => ({
+                ...prev,
+                // Update the state with the new Day.js object
+                nextDueDate: newValue,
+              }));
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                fullWidth
+                variant="outlined"
+                sx={{ borderRadius: "8px" }}
+              />
+            )}
+          />
+        </LocalizationProvider>
+        <Grid item xs={12}>
+          <TextField
+            label="Recurrence Rule"
+            name="recurrenceRule"
+            select
+            fullWidth
+            value={form.recurrenceRule}
+            onChange={handleChange}
+            variant="outlined"
+            sx={{ borderRadius: "8px" }}
+          >
+            <MenuItem value="one-time">One-time</MenuItem>
+            <MenuItem value="7d">Every 7 days</MenuItem>
+            <MenuItem value="14d">Every 14 days</MenuItem>
+            <MenuItem value="monthly">Monthly</MenuItem>
+          </TextField>
+        </Grid>
         <Grid item xs={12}>
           <TextField
             label="Remind Days Before"
@@ -303,6 +314,9 @@ export default function TodoDetailPage() {
             sx={{ borderRadius: "8px" }}
           />
         </Grid>
+        <Typography variant="body1" color="text.secondary" sx={{ mt: 1, mb: 1 }}>
+          Selected Date: {dayjs(form.nextDueDate).format("YYYY/MM/DD (dddd)")}
+        </Typography>
         {isEdit && (
           <Grid item xs={12}>
             <FormControlLabel

@@ -169,7 +169,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
             </Tooltip>
             <Box>
               <Typography variant="body2">
-                {dayjs(todo.nextDueDate).format("DD/MM/YYYY")}
+                {dayjs(todo.nextDueDate).format("YYYY/MM/DD (ddd)")}
               </Typography>
             </Box>
           </Box>
