@@ -7,13 +7,12 @@ import {
   Button,
   Paper,
   Alert,
-  IconButton,
   CircularProgress,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../AuthContext";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = import.meta.env.VITE_BLOG_API_BASE;
 
@@ -21,6 +20,7 @@ export default function PostEditPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { isLoggedIn } = useAuth();
+  const { t } = useTranslation();
 
   const [post, setPost] = useState({ title: "", content: "" });
   const [loading, setLoading] = useState(false);
@@ -35,7 +35,6 @@ export default function PostEditPage() {
       navigate("/login");
       return;
     }
-    console.log(id);
 
     if (isEditMode) {
       const fetchPost = async () => {
@@ -47,20 +46,17 @@ export default function PostEditPage() {
           setPost(res.data);
           setError(null);
         } catch (err) {
-          console.error("Failed to fetch post for editing:", err);
-          setError("Failed to fetch post. Please check the post ID.");
+          setError(t("page.postEdit.errors.fetchPost"));
         } finally {
           setLoading(false);
         }
       };
       fetchPost();
     }
-  }, [id, isLoggedIn, navigate, token, isEditMode]);
+  }, [id, isLoggedIn, navigate, token, isEditMode, t]);
 
   useEffect(() => {
-    if (!isEditMode) {
-      setPost({ title: "", content: "" });
-    }
+    if (!isEditMode) setPost({ title: "", content: "" });
   }, [isEditMode]);
 
   const handleChange = (e) => {
@@ -78,24 +74,23 @@ export default function PostEditPage() {
         await axios.put(`${API_BASE}/posts/${id}`, post, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setMessage("Post updated successfully!");
-        setTimeout(() => {
-          navigate(`/blog/${id}`);
-        }, 1000);
+        setMessage(t("page.postEdit.messages.updated"));
+        setTimeout(() => navigate(`/blog/${id}`), 1000);
       } else {
         await axios.post(`${API_BASE}/posts`, post, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setMessage("Post created successfully!");
-
-        setTimeout(() => {
-          navigate("/blog");
-        }, 2000);
+        setMessage(t("page.postEdit.messages.created"));
+        setTimeout(() => navigate("/blog"), 2000);
       }
     } catch (err) {
-      console.error("Failed to submit post:", err);
       setError(
-        `Failed to ${isEditMode ? "update" : "create"} post: ${err.response?.data?.message || err.message}`,
+        t("page.postEdit.errors.submit", {
+          action: isEditMode
+            ? t("page.postEdit.actions.update")
+            : t("page.postEdit.actions.create"),
+          message: err.response?.data?.message || err.message,
+        }),
       );
     } finally {
       setLoading(false);
@@ -118,19 +113,16 @@ export default function PostEditPage() {
     );
   }
 
-  // Check for not logged in and not in loading state
   if (!isLoggedIn && !loading) {
     return (
       <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Alert severity="warning">
-          You must be logged in to access this page.
-        </Alert>
+        <Alert severity="warning">{t("page.postEdit.auth.required")}</Alert>
         <Button
           sx={{ mt: 2 }}
           variant="contained"
           onClick={() => navigate("/login")}
         >
-          Go to Login
+          {t("page.postEdit.buttons.goLogin")}
         </Button>
       </Container>
     );
@@ -139,14 +131,13 @@ export default function PostEditPage() {
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        {/* <IconButton onClick={() => navigate('/blog')} sx={{ mr: 1 }}>
-                    <ArrowBackIcon />
-                </IconButton> */}
         <Typography
           variant="h4"
           sx={{ fontWeight: "bold", color: "primary.main" }}
         >
-          {isEditMode ? "Edit Blog Post" : "Create New Blog Post"}
+          {isEditMode
+            ? t("page.postEdit.titles.edit")
+            : t("page.postEdit.titles.create")}
         </Typography>
       </Box>
 
@@ -164,7 +155,7 @@ export default function PostEditPage() {
 
         <form onSubmit={handleSubmit}>
           <TextField
-            label="Post Title"
+            label={t("page.postEdit.fields.title")}
             name="title"
             fullWidth
             value={post.title}
@@ -173,7 +164,7 @@ export default function PostEditPage() {
             required
           />
           <TextField
-            label="Content (Markdown supported)"
+            label={t("page.postEdit.fields.content")}
             name="content"
             fullWidth
             multiline
@@ -193,9 +184,9 @@ export default function PostEditPage() {
               {loading ? (
                 <CircularProgress size={24} />
               ) : isEditMode ? (
-                "Update Post"
+                t("page.postEdit.buttons.update")
               ) : (
-                "Publish Post"
+                t("page.postEdit.buttons.publish")
               )}
             </Button>
             <Button
@@ -204,7 +195,7 @@ export default function PostEditPage() {
               disabled={loading}
               sx={{ textTransform: "none" }}
             >
-              Cancel
+              {t("page.postEdit.buttons.cancel")}
             </Button>
           </Box>
         </form>

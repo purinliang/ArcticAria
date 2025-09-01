@@ -25,10 +25,12 @@ import PostEditPage from "./pages/PostEditPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import DiscoverPage from "./pages/DiscoverPage";
 import { AuthProvider, useAuth } from "./AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import HomePage from "./pages/HomePage";
 import ArcticAriaLogo from "./assets/arctic-aria-logo.png";
 import ArcticAriaTitle from "./components/ArcticAriaTitle";
+import { useTranslation } from "react-i18next";
+import SwitchBar from "./components/LangSwitchBar";
 
 function App() {
   const { isLoggedIn, username, logout } = useAuth();
@@ -38,6 +40,13 @@ function App() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { i18n, t } = useTranslation();
+
+  useEffect(() => {
+    const h = (lng) => console.log("i18n language changed ->", lng);
+    i18n.on("languageChanged", h);
+    return () => i18n.off("languageChanged", h);
+  }, [i18n]);
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -132,27 +141,21 @@ function App() {
           textTransform: "none",
         }}
       >
-        Todos
+        {t("nav.todos")}
       </Button>
       <Button
         onClick={() => handleNavigation("/discover")}
         color="inherit"
-        sx={{
-          fontWeight: "bold",
-          textTransform: "none",
-        }}
+        sx={{ fontWeight: "bold", textTransform: "none" }}
       >
-        Discover
+        {t("nav.discover")}
       </Button>
       <Button
         onClick={() => handleNavigation("/blog")}
         color="inherit"
-        sx={{
-          fontWeight: "bold",
-          textTransform: "none",
-        }}
+        sx={{ fontWeight: "bold", textTransform: "none" }}
       >
-        Discuss
+        {t("nav.discuss")}
       </Button>
     </Box>
   );
@@ -167,6 +170,8 @@ function App() {
         gap: 1,
       }}
     >
+      <SwitchBar />
+
       {isLoggedIn ? (
         <>
           <Typography
@@ -185,7 +190,7 @@ function App() {
               textTransform: "none",
             }}
           >
-            Sign out
+            {t("auth.signOut")}
           </Button>
         </>
       ) : (
@@ -198,7 +203,7 @@ function App() {
             textTransform: "none",
           }}
         >
-          Sign in
+          {t("auth.signIn")}
         </Button>
       )}
     </Box>
@@ -285,19 +290,19 @@ function App() {
             <List>
               <ListItem button onClick={() => handleNavigation("/todos")}>
                 <ListItemText
-                  primary="Todos"
+                  primary={t("nav.todos")}
                   primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
                 />
               </ListItem>
               <ListItem button onClick={() => handleNavigation("/discover")}>
                 <ListItemText
-                  primary="Discover"
+                  primary={t("nav.discover")}
                   primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
                 />
               </ListItem>
               <ListItem button onClick={() => handleNavigation("/blog")}>
                 <ListItemText
-                  primary="Discuss"
+                  primary={t("nav.discuss")}
                   primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
                 />
               </ListItem>
@@ -310,7 +315,7 @@ function App() {
                   {/* Sign out button with error color */}
                   <ListItem button onClick={handleLogout}>
                     <ListItemText
-                      primary="Sign out"
+                      primary={t("auth.signOut")}
                       primaryTypographyProps={{
                         sx: { fontWeight: "bold", color: "error.main" },
                       }}

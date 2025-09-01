@@ -26,16 +26,17 @@ import BookIcon from "@mui/icons-material/Book";
 import HomeIcon from "@mui/icons-material/Home";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import CategoryIcon from "@mui/icons-material/Category";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
 // Define the categories and their corresponding icons for sorting
 const CATEGORY_GROUPS = [
-  { label: "Work", icon: <WorkIcon color="primary" />, key: "Work" },
-  { label: "Study", icon: <BookIcon color="info" />, key: "Study" },
-  { label: "Life", icon: <HomeIcon color="action" />, key: "Life" },
-  { label: "Play", icon: <SportsEsportsIcon color="secondary" />, key: "Play" },
-  { label: "Other", icon: <CategoryIcon />, key: "Other" },
+  { key: "Work", icon: <WorkIcon color="primary" /> },
+  { key: "Study", icon: <BookIcon color="info" /> },
+  { key: "Life", icon: <HomeIcon color="action" /> },
+  { key: "Play", icon: <SportsEsportsIcon color="secondary" /> },
+  { key: "Other", icon: <CategoryIcon /> },
 ];
 
 // Helper function to sort todos by due date
@@ -84,6 +85,7 @@ const fetcher = async (url) => {
 
 export default function TodoPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [sortByCategory, setSortByCategory] = useState(() => {
     try {
@@ -212,19 +214,19 @@ export default function TodoPage() {
 
   const groupedTodosByCategory = groupTodosByCategory(todos || []);
 
-  const renderTodoGroup = (todoItems, label, icon) => {
+  const renderTodoGroup = (todoItems, labelKey, icon) => {
     if (!todoItems || !Array.isArray(todoItems) || todoItems.length === 0)
       return null;
 
     return (
-      <Box key={label} sx={{ my: 2 }}>
+      <Box key={labelKey} sx={{ my: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center", mt: 4, mb: 1 }}>
           {icon && (
             <Box component="span" sx={{ mr: 0.5, mt: 0.5, fontSize: "1.2rem" }}>
               {icon}
             </Box>
           )}
-          <Typography sx={{ fontWeight: "bold" }}>{label}</Typography>
+          <Typography sx={{ fontWeight: "bold" }}>{t(labelKey)}</Typography>
         </Box>
         <Divider sx={{ mb: 2 }} />
         <Masonry columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} spacing={2}>
@@ -260,7 +262,6 @@ export default function TodoPage() {
           sx={{
             textAlign: "left",
             mb: { xs: 2, sm: 0 },
-            // 在小屏幕上让标题和描述靠左
             alignSelf: { xs: "flex-start", sm: "auto" },
           }}
         >
@@ -269,10 +270,10 @@ export default function TodoPage() {
             component="h1"
             sx={{ fontWeight: "bold", color: "primary.main", mb: 1 }}
           >
-            My Todo List
+            {t("page.todos.title")}
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Manage your tasks and stay on top of your schedule.
+            {t("page.todos.subtitle")}
           </Typography>
         </Box>
         <Box
@@ -294,8 +295,8 @@ export default function TodoPage() {
             <Tooltip
               title={
                 sortByCategory
-                  ? "Switch to Sort by Time"
-                  : "Switch to Sort by Category"
+                  ? t("page.todos.tooltips.switchToTime")
+                  : t("page.todos.tooltips.switchToCategory")
               }
             >
               <FormControlLabel
@@ -307,11 +308,15 @@ export default function TodoPage() {
                     color="primary"
                   />
                 }
-                label={sortByCategory ? "Sort by Category" : "Sort by Time"}
+                label={
+                  sortByCategory
+                    ? t("page.todos.labels.sortByCategory")
+                    : t("page.todos.labels.sortByTime")
+                }
               />
             </Tooltip>
           </Box>
-          <Tooltip title="Add New Todo">
+          <Tooltip title={t("page.todos.tooltips.addNew")}>
             <Button
               variant="contained"
               color="primary"
@@ -335,13 +340,13 @@ export default function TodoPage() {
           }}
         >
           {swrError.status === 401
-            ? "Session expired or unauthorized. Please log in again."
-            : `Failed to fetch todos: ${swrError.message}`}
+            ? t("errors.sessionExpired")
+            : t("errors.fetchTodos", { message: swrError.message })}
         </Alert>
       )}
       {isLoading ? (
         <Typography sx={{ mt: 4 }} align="center">
-          Loading...
+          {t("common.loading")}
         </Typography>
       ) : (
         <>
@@ -351,40 +356,41 @@ export default function TodoPage() {
               align="center"
               sx={{ mt: 8, mb: 4 }}
             >
-              No tasks found. Click the button above to add a new todo.
+              {t("page.todos.empty")}
             </Typography>
           ) : (
             <>
               {sortByCategory ? (
                 // Render groups by category
                 CATEGORY_GROUPS.map((group) =>
-                  renderTodoGroup(
-                    groupedTodosByCategory[group.key],
-                    group.label,
-                    group.icon,
-                  ),
-                )
+  renderTodoGroup(
+    groupedTodosByCategory[group.key],
+    `categories.${group.key}`,
+    group.icon,
+  )
+)
+
               ) : (
                 // Render groups by time (default)
                 <>
                   {renderTodoGroup(
                     groupedTodosByTime.overdued,
-                    "Overdue",
+                    "todoGroups.overdue",
                     <WarningIcon color="error" />,
                   )}
                   {renderTodoGroup(
                     groupedTodosByTime.reminding,
-                    "Reminding",
+                    "todoGroups.reminding",
                     <NotificationsActiveIcon color="info" />,
                   )}
                   {renderTodoGroup(
                     groupedTodosByTime.upcoming,
-                    "Upcoming",
+                    "todoGroups.upcoming",
                     <CalendarTodayIcon sx={{ color: "info" }} />,
                   )}
                   {renderTodoGroup(
                     groupedTodosByTime.completed,
-                    "Completed",
+                    "todoGroups.completed",
                     <CheckCircleOutlineIcon color="success" />,
                   )}
                 </>

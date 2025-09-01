@@ -1,0 +1,286 @@
+{
+  "appTitle": "北极之歌",
+
+  "common": {
+    "none": "无",
+    "dateFormat": "YYYY年MM月DD日",
+    "loading": "加载中…"
+  },
+  "errors": {
+    "sessionExpired": "会话已过期或未授权，请重新登录。",
+    "fetchTodos": "获取待办失败：{{message}}",
+    "loginFailed": "登录失败：{{message}}",
+    "passwordMismatch": "两次输入的密码不一致。",
+    "registerFailed": "注册失败：{{message}}"
+  },
+  "categories": {
+    "Work": "工作",
+    "Study": "学习",
+    "Life": "生活",
+    "Play": "娱乐",
+    "Other": "其他"
+  },
+  "todoGroups": {
+    "overdue": "已逾期",
+    "reminding": "提醒中",
+    "upcoming": "即将到期",
+    "completed": "已完成"
+  },
+
+  "nav": {
+    "todos": "待办",
+    "discover": "发现",
+    "discuss": "讨论"
+  },
+
+  "auth": {
+    "signIn": "登录",
+    "signOut": "退出"
+  },
+
+  "footer": {
+    "rights": "保留所有权利。",
+    "contact": "联系我：",
+    "email": "邮箱"
+  },
+
+  "dialog": {
+    "cancel": "取消",
+    "confirm": "确认",
+    "deleteTitle": "删除项目",
+    "deleteContent": "您确定要删除此项目吗？此操作无法撤销。"
+  },
+
+  "todo": {
+    "markComplete": "标记为已完成",
+    "categoryLabel": "分类",
+    "recurrenceLabel": "重复规则",
+    "nextDueDateLabel": "下次到期日",
+    "dueToday": "今天到期",
+    "daysLeft_one": "剩余 {{count}} 天",
+    "daysLeft_other": "剩余 {{count}} 天",
+    "overdue_one": "已逾期 {{count}} 天",
+    "overdue_other": "已逾期 {{count}} 天"
+  },
+
+  "page": {
+    "home": {
+      "title": "欢迎使用 ArcticAria",
+      "subtitle": "你的日常生活管理助手。",
+      "intro": "ArcticAria 致力于成为你的生活小助手，帮助你用 <strong>待办</strong> 规划工作、学习和必要事项；空闲时提供 <strong>发现</strong> 的美食、娱乐与购物参考，助你轻松决策。",
+      "features": {
+        "title": "核心功能",
+        "todos": {
+          "title": "待办",
+          "desc": "轻松创建、跟踪并管理所有任务，确保每一项都按时完成。",
+          "cta": "前往待办"
+        },
+        "discover": {
+          "title": "发现",
+          "desc": "即将上线！我们计划提供个性化的餐饮、出行与活动推荐，帮助你更轻松地做决定。",
+          "cta": "前往发现"
+        },
+        "discuss": {
+          "title": "讨论",
+          "desc": "面向所有人的公开讨论区。如果你对新的生活工具有想法，欢迎在此留言！",
+          "cta": "前往讨论"
+        }
+      }
+    },
+    "todos": {
+      "title": "我的待办清单",
+      "subtitle": "管理你的任务，合理安排时间。",
+      "labels": {
+        "sortByCategory": "按分类排序",
+        "sortByTime": "按时间排序"
+      },
+      "tooltips": {
+        "switchToTime": "切换为按时间排序",
+        "switchToCategory": "切换为按分类排序",
+        "addNew": "新增待办"
+      },
+      "aria": {
+        "addNew": "新增待办"
+      },
+      "empty": "暂无任务。点击上方按钮添加新的待办事项。"
+    },
+    "discover": {
+      "title": "发现",
+      "subtitle": "此功能即将上线！",
+      "description": "我们正在努力为您带来个性化的生活推荐。在此期间，您可以先体验我们的其他功能。",
+      "buttons": {
+        "todos": "前往待办",
+        "discussion": "加入讨论"
+      }
+    },
+    "blogpage": {
+      "title": "讨论",
+      "subtitle": "分享你的想法、提出问题，或开启一场新的讨论。",
+      "buttons": {
+        "newPost": "新建帖子"
+      },
+      "tooltips": {
+        "newPost": "新建帖子"
+      },
+      "status": {
+        "loading": "帖子加载中…",
+        "error": "获取帖子失败，请稍后重试。",
+        "empty": "还没有任何讨论，成为第一个分享想法的人吧！"
+      },
+      "meta": {
+        "author": "作者：{{name}}",
+        "created": "创建于",
+        "updated": "更新于"
+      },
+      "time": {
+        "justNow": "刚刚",
+        "minutes_one": "{{count}} 分钟前",
+        "minutes_other": "{{count}} 分钟前",
+        "hours_one": "{{count}} 小时前",
+        "hours_other": "{{count}} 小时前",
+        "days_one": "{{count}} 天前",
+        "days_other": "{{count}} 天前",
+        "longDateFormat": "YYYY年M月D日"
+      }
+    },
+    "login": {
+      "title": "登录",
+      "subtitle": "欢迎回来！请登录您的账户。",
+      "success": "登录成功！正在跳转到首页…",
+      "fields": {
+        "username": "用户名",
+        "password": "密码"
+      },
+      "buttons": {
+        "signIn": "登录",
+        "signUp": "注册"
+      },
+      "cta": {
+        "noAccount": "还没有账号？"
+      }
+    },
+    "register": {
+      "title": "注册",
+      "subtitle": "创建一个账户即可开始使用。",
+      "success": "注册成功！正在跳转到登录页面…",
+      "fields": {
+        "username": "用户名",
+        "password": "密码",
+        "confirm": "确认密码"
+      },
+      "buttons": {
+        "signUp": "注册",
+        "signIn": "登录"
+      },
+      "cta": {
+        "haveAccount": "已经有账号了？"
+      }
+    },
+    "postDetail": {
+      "errors": {
+        "loadPost": "加载帖子失败，帖子可能不存在。",
+        "loadComments": "加载评论失败。",
+        "deletePost": "删除帖子失败。",
+        "addComment": "发表评论失败，请稍后再试。",
+        "updateComment": "更新评论失败，请稍后再试。",
+        "deleteComment": "删除评论失败，请稍后再试。"
+      },
+      "buttons": {
+        "backToList": "返回讨论列表"
+      },
+      "tooltips": {
+        "editPost": "编辑帖子",
+        "deletePost": "删除帖子",
+        "editComment": "编辑评论",
+        "deleteComment": "删除评论"
+      },
+      "comments": {
+        "title": "评论",
+        "empty": "还没有评论，快来抢沙发！",
+        "addTitle": "添加评论",
+        "placeholder": "在此输入你的评论…",
+        "submit": "提交评论",
+        "loginToComment": "你需要登录后才能发表评论。"
+      },
+      "dialog": {
+        "postDelete": {
+          "title": "确认删除",
+          "content": "确定要删除标题为“{{title}}”的帖子吗？此操作不可撤销。"
+        },
+        "commentEdit": {
+          "title": "编辑评论",
+          "save": "保存"
+        },
+        "commentDelete": {
+          "title": "确认删除",
+          "content": "确定要删除这条评论吗？此操作不可撤销。"
+        }
+      },
+      "validation": {
+        "emptyComment": "评论不能为空。",
+        "mustLogin": "你需要登录后才能发表评论。",
+        "emptyCommentContent": "评论内容不能为空。"
+      }
+    },
+    "postEdit": {
+      "titles": {
+        "edit": "编辑帖子",
+        "create": "创建新帖子"
+      },
+      "fields": {
+        "title": "帖子标题",
+        "content": "内容（支持 Markdown）"
+      },
+      "buttons": {
+        "update": "更新帖子",
+        "publish": "发布帖子",
+        "cancel": "取消",
+        "goLogin": "前往登录"
+      },
+      "messages": {
+        "updated": "帖子更新成功！",
+        "created": "帖子创建成功！"
+      },
+      "errors": {
+        "fetchPost": "获取帖子失败，请检查帖子 ID。",
+        "submit": "提交{{action}}操作失败：{{message}}"
+      },
+      "actions": {
+        "update": "更新",
+        "create": "创建"
+      },
+      "auth": {
+        "required": "你需要登录后才能访问此页面。"
+      }
+    }
+  },
+  "todoDetail": {
+    "addTitle": "新增待办",
+    "editTitle": "编辑待办",
+    "fields": {
+      "title": "标题",
+      "dueDate": "到期日期",
+      "content": "内容",
+      "contentHelper": "请提供任务的详细描述，包括具体要求或备注。",
+      "recurrence": "重复规则",
+      "category": "分类",
+      "reminderDays": "提前提醒天数",
+      "markCompleted": "标记为已完成"
+    },
+    "recurrence": {
+      "oneTime": "一次性",
+      "every7d": "每7天",
+      "every14d": "每14天",
+      "monthly": "每月"
+    },
+    "buttons": {
+      "create": "创建待办",
+      "save": "保存修改",
+      "delete": "删除"
+    },
+    "dialog": {
+      "title": "确认删除",
+      "content": "此操作不可撤销。确定要删除此待办事项吗？"
+    }
+  }
+}

@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { red } from "@mui/material/colors";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_BASE;
 
@@ -18,41 +19,36 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
-  /**
-   * Handles form input changes.
-   * @param {Event} e The event object.
-   */
   const handleChange = (e) => {
     setError("");
     setSuccess("");
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  /**
-   * Handles the registration process.
-   */
   const handleRegister = async () => {
     setError("");
     setSuccess("");
 
     if (form.password !== form.confirm) {
-      setError("Passwords do not match.");
+      setError(t("errors.passwordMismatch"));
       return;
     }
 
     try {
-      console.log(`POST ${API_BASE}/register`);
       await axios.post(`${API_BASE}/register`, {
         username: form.username,
         password: form.password,
       });
-      setSuccess("Registered successfully! Redirecting to login page...");
-      // Automatically navigate to login page after a delay
+      setSuccess(t("page.register.success"));
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      console.error("Register error:", err);
-      setError(`Register error: ${err.response?.data || err.message}`);
+      setError(
+        t("errors.registerFailed", {
+          message: err.response?.data || err.message,
+        }),
+      );
     }
   };
 
@@ -77,17 +73,18 @@ export default function RegisterPage() {
           component="div"
           sx={{ fontWeight: "bold", color: "primary.main" }}
         >
-          Sign up
+          {t("page.register.title")}
         </Typography>
+
         <Typography
           variant="subtitle1"
           gutterBottom
           sx={{ color: "text.secondary" }}
         >
-          Create an account to get started.
+          {t("page.register.subtitle")}
         </Typography>
 
-        {/* Display success and error alerts */}
+        {/* success & error */}
         {success && (
           <Alert
             severity="success"
@@ -113,52 +110,54 @@ export default function RegisterPage() {
         <TextField
           fullWidth
           margin="normal"
-          label="Username"
+          label={t("page.register.fields.username")}
           name="username"
           type="text"
           value={form.username}
           onChange={handleChange}
           required
-          // Add autocomplete for better browser support
           autoComplete="username"
         />
         <TextField
           fullWidth
           margin="normal"
-          label="Password"
+          label={t("page.register.fields.password")}
           type="password"
           name="password"
           value={form.password}
           onChange={handleChange}
           required
-          // Add autocomplete for better browser support
           autoComplete="new-password"
         />
         <TextField
           fullWidth
           margin="normal"
-          label="Confirm Password"
+          label={t("page.register.fields.confirm")}
           type="password"
           name="confirm"
           value={form.confirm}
           onChange={handleChange}
           required
-          // Add autocomplete for better browser support
           autoComplete="new-password"
         />
+
         <Button
           variant="contained"
           color="primary"
           fullWidth
           onClick={handleRegister}
           sx={{ mt: 3, py: 1.5, borderRadius: "8px" }}
+          aria-label={t("page.register.buttons.signUp")}
         >
-          Register
+          {t("page.register.buttons.signUp")}
         </Button>
+
         <Box textAlign="center" sx={{ mt: 2, width: "100%" }}>
           <Typography variant="body2" color="textSecondary">
-            Already have an account?{" "}
-            <Button onClick={() => navigate("/login")}>Sign in</Button>
+            {t("page.register.cta.haveAccount")}{" "}
+            <Button onClick={() => navigate("/login")}>
+              {t("page.register.buttons.signIn")}
+            </Button>
           </Typography>
         </Box>
       </Box>

@@ -6,7 +6,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-
+import { useTranslation } from "react-i18next";
 /**
  * A generic and reusable confirmation dialog component.
  * @param {object} props
@@ -24,9 +24,10 @@ export default function ConfirmationDialog({
   onConfirm,
   title,
   contentText,
-  cancelText = "Cancel",
-  confirmText = "Confirm",
+  cancelText = "dialog.cancel", //  use translation keys
+  confirmText = "dialog.confirm", //  use translation keys
 }) {
+  const { t } = useTranslation();
   return (
     <Dialog
       open={open}
@@ -34,18 +35,18 @@ export default function ConfirmationDialog({
       aria-labelledby="confirmation-dialog-title"
       aria-describedby="confirmation-dialog-description"
     >
-      <DialogTitle id="confirmation-dialog-title">{title}</DialogTitle>
+      <DialogTitle id="confirmation-dialog-title">{t(title)}</DialogTitle>
       <DialogContent>
         <DialogContentText id="confirmation-dialog-description">
-          {contentText}
+          {t(contentText)}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
-          {cancelText}
+          {t(cancelText)}
         </Button>
         <Button onClick={onConfirm} color="error" autoFocus>
-          {confirmText}
+          {t(confirmText)}
         </Button>
       </DialogActions>
     </Dialog>

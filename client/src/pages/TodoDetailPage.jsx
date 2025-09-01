@@ -19,6 +19,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
 import axios from "axios";
 import { red } from "@mui/material/colors";
+import { useTranslation } from "react-i18next";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -32,6 +33,7 @@ export default function TodoDetailPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const token = localStorage.getItem("jwtToken");
+  const { t } = useTranslation();
 
   const [form, setForm] = useState({
     title: "",
@@ -93,7 +95,7 @@ export default function TodoDetailPage() {
   const fetchTodo = async () => {
     setError("");
     if (!token) {
-      setError("You are not logged in. Redirecting to login page...");
+      setError(t("errors.notLoggedIn"));
       setTimeout(() => navigate("/login"), 3000);
       return;
     }
@@ -111,10 +113,12 @@ export default function TodoDetailPage() {
       console.error("Failed to load todo:", err);
       if (err.response && err.response.status === 401) {
         localStorage.removeItem("jwtToken");
-        setError("Session expired or unauthorized. Please log in again.");
+        setError(t("errors.sessionExpired"));
         setTimeout(() => navigate("/login"), 3000);
       } else {
-        setError(`Failed to load todo: ${err.response?.data || err.message}`);
+        setError(
+          t("errors.loadTodo", { message: err.response?.data || err.message }),
+        );
       }
     }
   };
@@ -143,10 +147,12 @@ export default function TodoDetailPage() {
       console.error("Save failed:", err);
       if (err.response && err.response.status === 401) {
         localStorage.removeItem("jwtToken");
-        setError("Session expired or unauthorized. Please log in again.");
+        setError(t("errors.sessionExpired"));
         setTimeout(() => navigate("/login"), 3000);
       } else {
-        setError(`Save failed: ${err.response?.data || err.message}`);
+        setError(
+          t("errors.saveTodo", { message: err.response?.data || err.message }),
+        );
       }
     }
   };
@@ -170,10 +176,10 @@ export default function TodoDetailPage() {
       console.error("Failed to delete todo:", err);
       if (err.response && err.response.status === 401) {
         localStorage.removeItem("jwtToken");
-        setError("Session expired or unauthorized. Please log in again.");
+        setError(t("errors.sessionExpired"));
         setTimeout(() => navigate("/login"), 3000);
       } else {
-        setError("Failed to delete todo.");
+        setError(t("errors.deleteTodo"));
       }
     } finally {
       handleCloseDeleteDialog();
@@ -204,7 +210,7 @@ export default function TodoDetailPage() {
         variant="h4"
         sx={{ fontWeight: "bold", color: "primary.main", mb: 3 }}
       >
-        {isEdit ? "Edit Todo" : "Add New Todo"}
+        {isEdit ? t("todoDetail.editTitle") : t("todoDetail.addTitle")}
       </Typography>
 
       {error && (
@@ -231,7 +237,7 @@ export default function TodoDetailPage() {
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
         <TextField
-          label="Title"
+          label={t("todoDetail.fields.title")}
           name="title"
           fullWidth
           value={form.title}
@@ -241,7 +247,7 @@ export default function TodoDetailPage() {
         />
 
         <TextField
-          label="Content"
+          label={t("todoDetail.fields.content")}
           name="content"
           fullWidth
           multiline
@@ -255,7 +261,7 @@ export default function TodoDetailPage() {
         />
 
         <TextField
-          label="Category"
+          label={t("todoDetail.fields.category")}
           name="category"
           select
           fullWidth
@@ -282,7 +288,7 @@ export default function TodoDetailPage() {
           <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="Due Date"
+                label={t("todoDetail.fields.dueDate")}
                 value={form.nextDueDate}
                 onChange={(newValue) => {
                   setForm((prev) => ({ ...prev, nextDueDate: newValue }));
@@ -393,7 +399,7 @@ export default function TodoDetailPage() {
                 disabled={isEdit && !isFormEnabled}
               />
             }
-            label="Mark as Completed"
+            label={t("todoDetail.fields.markCompleted")}
           />
         )}
 
@@ -431,7 +437,7 @@ export default function TodoDetailPage() {
                 }}
                 onClick={handleOpenDeleteDialog}
               >
-                Delete
+                {t("todoDetail.buttons.delete")}
               </Button>
             </>
           ) : (
@@ -448,7 +454,9 @@ export default function TodoDetailPage() {
                 }}
                 onClick={handleSave}
               >
-                {isEdit ? "Save Changes" : "Create Todo"}
+                {isEdit
+                  ? t("todoDetail.buttons.save")
+                  : t("todoDetail.buttons.create")}
               </Button>
               {isEdit && (
                 <Button
@@ -462,7 +470,7 @@ export default function TodoDetailPage() {
                   }}
                   onClick={handleOpenDeleteDialog}
                 >
-                  Delete
+                  {t("todoDetail.buttons.delete")}
                 </Button>
               )}
             </>
@@ -470,24 +478,19 @@ export default function TodoDetailPage() {
         </Box>
       </Box>
 
-      <Dialog
-        open={isDeleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+      <Dialog open={isDeleteDialogOpen} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>{t("todoDetail.dialog.title")}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            This action is permanent. Are you sure you want to delete this todo?
+          <DialogContentText>
+            {t("todoDetail.dialog.content")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteDialog} color="primary" autoFocus>
-            Cancel
+            {t("dialog.cancel")}
           </Button>
           <Button onClick={handleConfirmDelete} color="error">
-            Delete
+            {t("dialog.confirm")}
           </Button>
         </DialogActions>
       </Dialog>

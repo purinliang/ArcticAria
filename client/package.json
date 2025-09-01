@@ -21,11 +21,16 @@
     "@mui/x-date-pickers": "^8.11.0",
     "axios": "^1.11.0",
     "dayjs": "^1.11.18",
+    "i18next": "^25.4.2",
+    "i18next-browser-languagedetector": "^8.2.0",
     "jwt-decode": "^4.0.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-flags-select": "^2.5.0",
+    "react-i18next": "^15.7.3",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.8.2",
+    "react-world-flags": "^1.6.0",
     "remark-gfm": "^4.0.1",
     "swr": "^2.3.6"
   },
@@ -34,10 +39,13 @@
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.2",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9.34.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12",
     "vite": "^7.1.3"
   }
 }
