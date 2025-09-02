@@ -50,11 +50,11 @@
     "overdue_other": "Overdue by {{count}} days"
   },
   "categories": {
-    "Work": "Work",
-    "Study": "Study",
-    "Life": "Life",
-    "Play": "Play",
-    "Other": "Other"
+    "work": "Work",
+    "study": "Study",
+    "life": "Life",
+    "play": "Play",
+    "other": "Other"
   },
   "todoGroups": {
     "overdue": "Overdue",
@@ -281,6 +281,15 @@
     "dialog": {
       "title": "Confirm Deletion",
       "content": "This action is permanent. Are you sure you want to delete this todo?"
+    },
+    "repeat": {
+      "toggle": "Set a repeat rule",
+      "label": "Repeat"
+    },
+    "reminder": {
+      "toggle": "Set a reminder",
+      "label": "Remind me {{count}} day(s) before"
     }
+    
   }
 }
