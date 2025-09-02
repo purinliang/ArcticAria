@@ -327,7 +327,7 @@ function App() {
                   {/* Sign in button with primary color */}
                   <ListItem button onClick={() => handleNavigation("/login")}>
                     <ListItemText
-                      primary="Sign in"
+                      primary={t("auth.signIn")}
                       primaryTypographyProps={{
                         sx: { fontWeight: "bold", color: "primary.main" },
                       }}
