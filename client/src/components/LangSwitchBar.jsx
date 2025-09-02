@@ -1,6 +1,5 @@
 // src/components/LangSwitchBar.jsx
-import React from "react";
-import { IconButton, Box, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import LanguageIcon from "@mui/icons-material/Language";
 
@@ -18,15 +17,16 @@ export default function LangSwitchBar() {
   };
 
   return (
-    <IconButton
+    <Button
       onClick={toggleLanguage}
+      variant="outlined"
+      color="default"
       sx={{
-        display: "flex",
-        alignItems: "center",
+        py: 1,
+        px: 2,
+        borderRadius: "8px",
+        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
         gap: 0.5,
-        border: "none",
-        boxShadow: "none",
-        "&:focus": { outline: "none" },
       }}
     >
       {/* Globe icon */}
@@ -34,6 +34,6 @@ export default function LangSwitchBar() {
 
       {/* Text */}
       <Typography variant="body2">{isZh ? "中文" : "English"}</Typography>
-    </IconButton>
+    </Button>
   );
 }
