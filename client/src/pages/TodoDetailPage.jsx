@@ -281,7 +281,6 @@ export default function TodoDetailPage() {
           sx={{
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
-            alignItems: "center",
             gap: 2,
           }}
         >
@@ -301,7 +300,7 @@ export default function TodoDetailPage() {
               />
             </LocalizationProvider>
           </Box>
-          <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
+          <Box sx={{ flex: { xs: "auto", sm: 1, alignContent: "center" } }}>
             <Typography variant="body1" color="text.secondary">
               {getDueDateMessage(form.nextDueDate)}
             </Typography>
@@ -312,7 +311,6 @@ export default function TodoDetailPage() {
           sx={{
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
-            alignItems: "center",
             gap: 2,
           }}
         >
@@ -339,7 +337,6 @@ export default function TodoDetailPage() {
                 value={form.recurrenceRule}
                 onChange={handleChange}
                 variant="outlined"
-                size="small"
                 disabled={isEdit && !isFormEnabled}
               >
                 <MenuItem value="one-time">
@@ -364,7 +361,6 @@ export default function TodoDetailPage() {
           sx={{
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
-            alignItems: "center",
             gap: 2,
           }}
         >
@@ -393,7 +389,6 @@ export default function TodoDetailPage() {
                 value={form.reminderDaysBefore}
                 onChange={handleChange}
                 variant="outlined"
-                size="small"
                 disabled={isEdit && !isFormEnabled}
               />
             </Box>
