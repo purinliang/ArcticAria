@@ -290,6 +290,5 @@
       "toggle": "Set a reminder",
       "label": "Remind me {{count}} day(s) before"
     }
-    
   }
 }

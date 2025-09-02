@@ -12,7 +12,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -42,7 +42,7 @@ export default function TodoDetailPage() {
     recurrenceRule: "one-time",
     reminderDaysBefore: 0,
     category: "Other",
-    completed: false
+    completed: false,
   });
 
   const [isRecurring, setIsRecurring] = useState(false);
@@ -72,7 +72,7 @@ export default function TodoDetailPage() {
     const { name, value, checked, type } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -101,7 +101,7 @@ export default function TodoDetailPage() {
     }
     try {
       const res = await axios.get(`${API_BASE}/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       const isRec = res.data.recurrenceRule !== "one-time";
       setIsRecurring(isRec);
@@ -117,7 +117,7 @@ export default function TodoDetailPage() {
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(
-          t("errors.loadTodo", { message: err.response?.data || err.message })
+          t("errors.loadTodo", { message: err.response?.data || err.message }),
         );
       }
     }
@@ -131,15 +131,15 @@ export default function TodoDetailPage() {
         await axios.put(`${API_BASE}/todo/${id}`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         });
       } else {
         await axios.post(`${API_BASE}/todo`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         });
       }
       navigate("/todos");
@@ -151,7 +151,7 @@ export default function TodoDetailPage() {
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(
-          t("errors.saveTodo", { message: err.response?.data || err.message })
+          t("errors.saveTodo", { message: err.response?.data || err.message }),
         );
       }
     }
@@ -169,7 +169,7 @@ export default function TodoDetailPage() {
     setError("");
     try {
       await axios.delete(`${API_BASE}/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/todos");
     } catch (err) {
@@ -221,7 +221,7 @@ export default function TodoDetailPage() {
             mt: 2,
             mb: 2,
             borderRadius: "8px",
-            backgroundColor: red[50]
+            backgroundColor: red[50],
           }}
         >
           {error}
@@ -282,7 +282,7 @@ export default function TodoDetailPage() {
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
             alignItems: "center",
-            gap: 2
+            gap: 2,
           }}
         >
           <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
@@ -313,7 +313,7 @@ export default function TodoDetailPage() {
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
             alignItems: "center",
-            gap: 2
+            gap: 2,
           }}
         >
           <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
@@ -365,7 +365,7 @@ export default function TodoDetailPage() {
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
             alignItems: "center",
-            gap: 2
+            gap: 2,
           }}
         >
           <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
@@ -385,7 +385,7 @@ export default function TodoDetailPage() {
             <Box sx={{ flex: { xs: "auto", sm: 1 } }}>
               <TextField
                 label={t("todoDetail.reminder.label", {
-                  count: form.reminderDaysBefore || 0
+                  count: form.reminderDaysBefore || 0,
                 })}
                 name="reminderDaysBefore"
                 type="number"
@@ -420,7 +420,7 @@ export default function TodoDetailPage() {
           sx={{
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
-            gap: 2
+            gap: 2,
           }}
         >
           {isEdit && !isFormEnabled ? (
@@ -433,7 +433,7 @@ export default function TodoDetailPage() {
                   py: 1.5,
                   borderRadius: "8px",
                   boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                  flex: { xs: "auto", sm: 1 }
+                  flex: { xs: "auto", sm: 1 },
                 }}
                 onClick={handleEditClick}
               >
@@ -446,7 +446,7 @@ export default function TodoDetailPage() {
                 sx={{
                   py: 1.5,
                   borderRadius: "8px",
-                  flex: { xs: "auto", sm: 1 }
+                  flex: { xs: "auto", sm: 1 },
                 }}
                 onClick={handleOpenDeleteDialog}
               >
@@ -463,7 +463,7 @@ export default function TodoDetailPage() {
                   py: 1.5,
                   borderRadius: "8px",
                   boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                  flex: { xs: "auto", sm: 1 }
+                  flex: { xs: "auto", sm: 1 },
                 }}
                 onClick={handleSave}
               >
@@ -479,7 +479,7 @@ export default function TodoDetailPage() {
                   sx={{
                     py: 1.5,
                     borderRadius: "8px",
-                    flex: { xs: "auto", sm: 1 }
+                    flex: { xs: "auto", sm: 1 },
                   }}
                   onClick={handleOpenDeleteDialog}
                 >

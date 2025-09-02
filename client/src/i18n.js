@@ -23,7 +23,7 @@ i18n
     },
   });
 
-  // Sync Day.js locale with current i18n language
+// Sync Day.js locale with current i18n language
 i18n.on("languageChanged", (lng) => {
   dayjs.locale(lng === "zh" ? "zh-cn" : "en");
 });

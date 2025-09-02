@@ -7,7 +7,9 @@ import LanguageIcon from "@mui/icons-material/Language";
 export default function LangSwitchBar() {
   const { i18n } = useTranslation();
 
-  const isZh = (i18n.resolvedLanguage || i18n.language || "en").startsWith("zh");
+  const isZh = (i18n.resolvedLanguage || i18n.language || "en").startsWith(
+    "zh",
+  );
 
   const toggleLanguage = () => {
     const next = isZh ? "en" : "zh";
@@ -31,10 +33,7 @@ export default function LangSwitchBar() {
       <LanguageIcon fontSize="small" />
 
       {/* Text */}
-      <Typography variant="body2">
-        {isZh ? "中文" : "English"}
-      </Typography>
-      
+      <Typography variant="body2">{isZh ? "中文" : "English"}</Typography>
     </IconButton>
   );
 }

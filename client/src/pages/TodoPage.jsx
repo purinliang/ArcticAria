@@ -363,13 +363,12 @@ export default function TodoPage() {
               {sortByCategory ? (
                 // Render groups by category
                 CATEGORY_GROUPS.map((group) =>
-  renderTodoGroup(
-    groupedTodosByCategory[group.key],
-    `categories.${group.key}`,
-    group.icon,
-  )
-)
-
+                  renderTodoGroup(
+                    groupedTodosByCategory[group.key],
+                    `categories.${group.key}`,
+                    group.icon,
+                  ),
+                )
               ) : (
                 // Render groups by time (default)
                 <>
