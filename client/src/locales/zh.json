@@ -1,6 +1,5 @@
 {
   "appTitle": "北极之歌",
-
   "common": {
     "none": "无",
     "dateFormat": "YYYY年MM月DD日",
@@ -26,31 +25,26 @@
     "upcoming": "即将到期",
     "completed": "已完成"
   },
-
   "nav": {
     "todos": "待办",
     "discover": "发现",
     "discuss": "讨论"
   },
-
   "auth": {
     "signIn": "登录",
     "signOut": "退出"
   },
-
   "footer": {
     "rights": "保留所有权利。",
     "contact": "联系我：",
     "email": "邮箱"
   },
-
   "dialog": {
     "cancel": "取消",
     "confirm": "确认",
     "deleteTitle": "删除项目",
     "deleteContent": "您确定要删除此项目吗？此操作无法撤销。"
   },
-
   "todo": {
     "markComplete": "标记为已完成",
     "categoryLabel": "分类",
@@ -62,7 +56,6 @@
     "overdue_one": "已逾期 {{count}} 天",
     "overdue_other": "已逾期 {{count}} 天"
   },
-
   "page": {
     "home": {
       "title": "欢迎使用 ArcticAria",
@@ -276,7 +269,8 @@
     "buttons": {
       "create": "创建待办",
       "save": "保存修改",
-      "delete": "删除"
+      "delete": "删除",
+      "edit": "修改"
     },
     "dialog": {
       "title": "确认删除",
