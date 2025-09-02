@@ -16,6 +16,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import LanguageIcon from "@mui/icons-material/Language";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import TodoPage from "./pages/TodoPage";
@@ -31,12 +32,12 @@ import ArcticAriaLogo from "./assets/arctic-aria-logo.png";
 import ArcticAriaTitle from "./components/ArcticAriaTitle";
 import { useTranslation } from "react-i18next";
 import SwitchBar from "./components/LangSwitchBar";
+import LangSwitchBar from "./components/LangSwitchBar";
 
 function App() {
   const { isLoggedIn, username, logout } = useAuth();
   const navigate = useNavigate();
   const theme = useTheme();
-  // Use a media query to check for screen size. 'md' is a good breakpoint for tablets/desktops.
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -188,6 +189,10 @@ function App() {
             sx={{
               fontSize: "1rem",
               textTransform: "none",
+              py: 1,
+              px: 2,
+              borderRadius: "8px",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
             }}
           >
             {t("auth.signOut")}
@@ -201,6 +206,10 @@ function App() {
           sx={{
             fontSize: "1rem",
             textTransform: "none",
+            py: 1,
+            px: 2,
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
           }}
         >
           {t("auth.signIn")}
@@ -255,6 +264,7 @@ function App() {
                   fontWeight: "bold",
                   fontSize: "1.5rem",
                   textTransform: "none",
+                  borderRadius: "8px",
                 }}
               >
                 <img
@@ -307,6 +317,10 @@ function App() {
                 />
               </ListItem>
               <Divider sx={{ my: 1 }} />
+              <LangSwitchBar
+                isMobile={true}
+                handleCloseDrawer={toggleDrawer(false)}
+              />
               {isLoggedIn ? (
                 <>
                   <ListItem>
@@ -327,7 +341,7 @@ function App() {
                   {/* Sign in button with primary color */}
                   <ListItem button onClick={() => handleNavigation("/login")}>
                     <ListItemText
-                      primary="Sign in"
+                      primary={t("auth.signIn")}
                       primaryTypographyProps={{
                         sx: { fontWeight: "bold", color: "primary.main" },
                       }}
