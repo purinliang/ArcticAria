@@ -25,7 +25,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import i18n from "../i18n";
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
-const CATEGORIES = ["work", "study", "life", "play", "other"];
+const CATEGORIES = ["Work", "Study", "Life", "Play", "Other"];
 
 export default function TodoDetailPage() {
   const { id } = useParams();
@@ -272,7 +272,7 @@ export default function TodoDetailPage() {
         >
           {CATEGORIES.map((category) => (
             <MenuItem key={category} value={category}>
-              {t(`categories.${category}`)}
+              {t(`categories.${category.toLowerCase()}`)}
             </MenuItem>
           ))}
         </TextField>
@@ -437,7 +437,7 @@ export default function TodoDetailPage() {
                 }}
                 onClick={handleEditClick}
               >
-                Edit
+                {t("todoDetail.buttons.edit")}
               </Button>
               <Button
                 variant="outlined"

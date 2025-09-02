@@ -58,11 +58,10 @@ const groupTodosByCategory = (todos) => {
   todos.forEach((todo) => {
     // If the category exists in our defined groups, add it there.
     // Otherwise, it falls into the 'Other' category.
-    const categoryKey = CATEGORY_GROUPS.find(
-      (group) => group.key === todo.category,
-    )
-      ? todo.category
-      : "Other";
+    const categoryGroup = CATEGORY_GROUPS.find(
+      (group) => group.key.toLowerCase() === todo.category.toLowerCase(),
+    );
+    const categoryKey = categoryGroup ? categoryGroup.key : "Other";
     grouped[categoryKey].push(todo);
   });
   return grouped;
@@ -365,7 +364,7 @@ export default function TodoPage() {
                 CATEGORY_GROUPS.map((group) =>
                   renderTodoGroup(
                     groupedTodosByCategory[group.key],
-                    `categories.${group.key}`,
+                    `categories.${group.key.toLowerCase()}`,
                     group.icon,
                   ),
                 )

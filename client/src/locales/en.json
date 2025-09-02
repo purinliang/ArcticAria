@@ -1,6 +1,5 @@
 {
   "appTitle": "Arctic Aria",
-
   "common": {
     "none": "None",
     "dateFormat": "DD/MM/YYYY",
@@ -13,31 +12,26 @@
     "passwordMismatch": "Passwords do not match.",
     "registerFailed": "Register error: {{message}}"
   },
-
   "nav": {
     "todos": "Todos",
     "discover": "Discover",
     "discuss": "Discuss"
   },
-
   "auth": {
     "signIn": "Sign in",
     "signOut": "Sign out"
   },
-
   "footer": {
     "rights": "All rights reserved.",
     "contact": "Contact me:",
     "email": "Email"
   },
-
   "dialog": {
     "cancel": "Cancel",
     "confirm": "Confirm",
     "deleteTitle": "Delete Item",
     "deleteContent": "Are you sure you want to delete this item? This action cannot be undone."
   },
-
   "todo": {
     "markComplete": "Mark as complete",
     "categoryLabel": "Category",
@@ -62,7 +56,6 @@
     "upcoming": "Upcoming",
     "completed": "Completed"
   },
-
   "page": {
     "home": {
       "title": "Welcome to ArcticAria",
@@ -276,7 +269,8 @@
     "buttons": {
       "create": "Create Todo",
       "save": "Save Changes",
-      "delete": "Delete"
+      "delete": "Delete",
+      "edit": "Edit"
     },
     "dialog": {
       "title": "Confirm Deletion",
