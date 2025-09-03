@@ -15,10 +15,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Paper,
   TextField,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddCommentIcon from "@mui/icons-material/AddComment";
+import ReplyIcon from "@mui/icons-material/Reply";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../AuthContext";
@@ -59,12 +62,16 @@ export default function PostDetailPage() {
   const [error, setError] = useState(null);
   const [isAuthor, setIsAuthor] = useState(false);
   const [openPostDeleteDialog, setOpenPostDeleteDialog] = useState(false);
+  const [commentTree, setCommentTree] = useState([]);
+  const [commentsMap, setCommentsMap] = useState({});
 
   // Comments
   const [comments, setComments] = useState([]);
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [commentError, setCommentError] = useState(null);
   const [newCommentContent, setNewCommentContent] = useState("");
+  const [openAddCommentDialog, setOpenAddCommentDialog] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null); // To store parent comment info for reply
   const [openCommentEditDialog, setOpenCommentEditDialog] = useState(false);
   const [commentToEdit, setCommentToEdit] = useState(null);
   const [openCommentDeleteDialog, setOpenCommentDeleteDialog] = useState(false);
@@ -117,6 +124,28 @@ export default function PostDetailPage() {
     fetchComments();
   }, [id, token, t]);
 
+  // Build comment tree from flat list
+  useEffect(() => {
+    if (comments && comments.length > 0) {
+      const map = {};
+      comments.forEach((comment) => {
+        map[comment.id] = { ...comment, children: [] };
+      });
+
+      const tree = [];
+      comments.forEach((comment) => {
+        if (comment.parent_comment_id && map[comment.parent_comment_id]) {
+          map[comment.parent_comment_id].children.push(map[comment.id]);
+        } else {
+          tree.push(map[comment.id]);
+        }
+      });
+
+      setCommentsMap(map);
+      setCommentTree(tree);
+    }
+  }, [comments]);
+
   const handleDeletePost = async () => {
     setOpenPostDeleteDialog(false);
     try {
@@ -127,6 +156,11 @@ export default function PostDetailPage() {
     } catch (err) {
       setError(t("page.postDetail.errors.deletePost"));
     }
+  };
+
+  const handleReplyComment = (comment) => {
+    setReplyingTo(comment);
+    setOpenAddCommentDialog(true);
   };
 
   const handleAddComment = async () => {
@@ -142,10 +176,16 @@ export default function PostDetailPage() {
     try {
       await axios.post(
         `${API_BASE}/comments`,
-        { postId: id, content: newCommentContent },
+        {
+          postId: id,
+          content: newCommentContent,
+          parentCommentId: replyingTo ? replyingTo.id : null,
+        },
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setNewCommentContent("");
+      setOpenAddCommentDialog(false);
+      setReplyingTo(null);
       const res = await axios.get(`${API_BASE}/posts/${id}/comments`);
       setComments(res.data);
     } catch (err) {
@@ -232,6 +272,134 @@ export default function PostDetailPage() {
 
   if (!post) return null;
 
+  // --- Helper Components for Comments ---
+
+  function Comment({ comment, onEdit, onDelete, onReply }) {
+    const [isHovered, setIsHovered] = useState(false);
+
+    const createdAt = new Date(comment.createdAt);
+    const updatedAt = comment.updatedAt ? new Date(comment.updatedAt) : null;
+    const fiveMinutesInMs = 5 * 60 * 1000;
+    const isRecentUpdate =
+      updatedAt && updatedAt.getTime() - createdAt.getTime() > fiveMinutesInMs;
+
+    const displayTimestamp = isRecentUpdate
+      ? getRelativeTime(comment.updatedAt, t)
+      : getRelativeTime(comment.createdAt, t);
+
+    const displayLabel = isRecentUpdate
+      ? t("page.blogpage.meta.updated")
+      : t("page.blogpage.meta.created");
+
+    const parentComment = comment.parent_comment_id
+      ? commentsMap[comment.parent_comment_id]
+      : null;
+
+    return (
+      <Box
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        sx={{ position: "relative" }}
+      >
+        <Paper
+          elevation={1}
+          sx={{
+            p: 2,
+            borderRadius: "8px",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {parentComment && (
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
+              {t("page.postDetail.comments.replyingTo", {
+                name: parentComment.username,
+              })}
+            </Typography>
+          )}
+          <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
+            {comment.content}
+          </Typography>
+          <Box
+            sx={{
+              mt: 1,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="caption" color="text.secondary">
+              {comment.username} • {displayLabel}: {displayTimestamp}
+            </Typography>
+            {isLoggedIn && (
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 0.5,
+                  opacity: isHovered ? 1 : 0,
+                  transition: "opacity 0.2s ease-in-out",
+                }}
+              >
+                <Tooltip title={t("page.postDetail.tooltips.replyComment")}>
+                  <IconButton size="small" onClick={() => onReply(comment)}>
+                    <ReplyIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                {myUserId === comment.userId && (
+                  <>
+                    <Tooltip title={t("page.postDetail.tooltips.editComment")}>
+                      <IconButton size="small" onClick={() => onEdit(comment)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t("page.postDetail.tooltips.deleteComment")}>
+                      <IconButton size="small" onClick={() => onDelete(comment)}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                )}
+              </Box>
+            )}
+          </Box>
+        </Paper>
+      </Box>
+    );
+  }
+
+  function CommentThread({ comments, onEdit, onDelete, onReply, level = 0 }) {
+    return (
+      <Box
+        sx={{
+          pl: level > 0 ? 2 : 0,
+          borderLeft: level > 0 ? "2px solid #eee" : "none",
+          ml: level > 0 ? 1 : 0,
+          pt: level > 0 ? 2 : 0,
+        }}
+      >
+        {comments.map((comment) => (
+          <Box key={comment.id} sx={{ mb: 2 }}>
+            <Comment
+              comment={comment}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onReply={onReply}
+            />
+            {comment.children && comment.children.length > 0 && (
+              <CommentThread
+                comments={comment.children}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onReply={onReply}
+                level={level + 1}
+              />
+            )}
+          </Box>
+        ))}
+      </Box>
+    );
+  }
+
   const createdAt = new Date(post.createdAt);
   const updatedAt = new Date(post.updatedAt);
   const fiveMinutesInMs = 5 * 60 * 1000;
@@ -268,20 +436,24 @@ export default function PostDetailPage() {
         {isLoggedIn && isAuthor && (
           <Box sx={{ display: "flex", gap: 1 }}>
             <Tooltip title={t("page.postDetail.tooltips.editPost")}>
-              <IconButton
-                onClick={() => navigate(`/blog/edit/${post.id}`)}
+              <Button
+                variant="contained"
                 color="primary"
+                onClick={() => navigate(`/blog/edit/${post.id}`)}
+                sx={{ minWidth: "auto", width: 40, height: 40, borderRadius: "50%" }}
               >
                 <EditIcon />
-              </IconButton>
+              </Button>
             </Tooltip>
             <Tooltip title={t("page.postDetail.tooltips.deletePost")}>
-              <IconButton
-                onClick={() => setOpenPostDeleteDialog(true)}
+              <Button
+                variant="contained"
                 color="error"
+                onClick={() => setOpenPostDeleteDialog(true)}
+                sx={{ minWidth: "auto", width: 40, height: 40, borderRadius: "50%" }}
               >
                 <DeleteIcon />
-              </IconButton>
+              </Button>
             </Tooltip>
           </Box>
         )}
@@ -334,9 +506,33 @@ export default function PostDetailPage() {
 
       {/* --- Comments Section --- */}
       <Box sx={{ mt: 4 }}>
-        <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-          {t("page.postDetail.comments.title")}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            {t("page.postDetail.comments.title")}
+          </Typography>
+          {isLoggedIn && (
+            <Tooltip title={t("page.postDetail.tooltips.addComment")}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  setReplyingTo(null);
+                  setOpenAddCommentDialog(true);
+                }}
+                sx={{ minWidth: "auto", width: 40, height: 40, borderRadius: "50%" }}
+              >
+                <AddCommentIcon />
+              </Button>
+            </Tooltip>
+          )}
+        </Box>
 
         {commentError && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -349,66 +545,19 @@ export default function PostDetailPage() {
             <CircularProgress size={24} />
           </Box>
         ) : (
-          <Box sx={{ maxHeight: "400px", overflowY: "auto", pr: 2 }}>
-            {comments.length > 0 ? (
-              comments.map((comment) => (
-                <Box
-                  key={comment.id}
-                  sx={{
-                    mb: 2,
-                    p: 2,
-                    backgroundColor: "#fafafa",
-                    borderRadius: "8px",
-                    border: "1px solid #e0e0e0",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Typography variant="body1">{comment.content}</Typography>
-                  <Box
-                    sx={{
-                      mt: 1,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography variant="caption" color="text.secondary">
-                      {comment.username} •{" "}
-                      {getRelativeTime(comment.createdAt, t)}
-                    </Typography>
-                    {isLoggedIn && myUserId === comment.userId && (
-                      <Box sx={{ display: "flex", gap: 1 }}>
-                        <Tooltip
-                          title={t("page.postDetail.tooltips.editComment")}
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={() => handleEditComment(comment)}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                          title={t("page.postDetail.tooltips.deleteComment")}
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDeleteComment(comment)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    )}
-                  </Box>
-                </Box>
-              ))
+          <Box sx={{ maxHeight: "60vh", overflowY: "auto", pr: 1 }}>
+            {commentTree.length > 0 ? (
+              <CommentThread
+                comments={commentTree}
+                onEdit={handleEditComment}
+                onDelete={handleDeleteComment}
+                onReply={handleReplyComment}
+              />
             ) : (
               <Typography
                 variant="body2"
                 color="text.secondary"
-                sx={{ fontStyle: "italic" }}
+                sx={{ fontStyle: "italic", textAlign: "center", py: 4 }}
               >
                 {t("page.postDetail.comments.empty")}
               </Typography>
@@ -416,37 +565,6 @@ export default function PostDetailPage() {
           </Box>
         )}
 
-        {/* Comment Form */}
-        <Box sx={{ mt: 3, pt: 3, borderTop: "1px solid #e0e0e0" }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            {t("page.postDetail.comments.addTitle")}
-          </Typography>
-          {isLoggedIn ? (
-            <Box>
-              <TextField
-                multiline
-                fullWidth
-                minRows={3}
-                variant="outlined"
-                placeholder={t("page.postDetail.comments.placeholder")}
-                value={newCommentContent}
-                onChange={(e) => setNewCommentContent(e.target.value)}
-                sx={{ mb: 2 }}
-              />
-              <Button
-                variant="contained"
-                onClick={handleAddComment}
-                sx={{ borderRadius: 8 }}
-              >
-                {t("page.postDetail.comments.submit")}
-              </Button>
-            </Box>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              {t("page.postDetail.comments.loginToComment")}
-            </Typography>
-          )}
-        </Box>
       </Box>
 
       {/* Confirmation Dialog for Post Deletion */}
@@ -477,6 +595,52 @@ export default function PostDetailPage() {
         </DialogActions>
       </Dialog>
 
+      {/* Dialog for Add Comment */}
+      <Dialog
+        open={openAddCommentDialog}
+        onClose={() => {
+          setOpenAddCommentDialog(false);
+          setNewCommentContent("");
+          setReplyingTo(null);
+        }}
+        fullWidth
+      >
+        <DialogTitle>
+          {replyingTo
+            ? t("page.postDetail.comments.replyTitle", {
+              name: replyingTo.username,
+            })
+            : t("page.postDetail.comments.addTitle")}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            multiline
+            fullWidth
+            minRows={3}
+            placeholder={t("page.postDetail.comments.placeholder")}
+            value={newCommentContent}
+            onChange={(e) => setNewCommentContent(e.target.value)}
+            sx={{ mt: 1 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setOpenAddCommentDialog(false);
+              setNewCommentContent("");
+              setReplyingTo(null);
+            }}
+            color="primary"
+          >
+            {t("dialog.cancel")}
+          </Button>
+          <Button onClick={handleAddComment} color="primary" variant="contained">
+            {t("page.postDetail.comments.submit")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Dialog for Comment Edit */}
       <Dialog
         open={openCommentEditDialog}
@@ -488,7 +652,6 @@ export default function PostDetailPage() {
         </DialogTitle>
         <DialogContent>
           <TextField
-            autoFocus
             multiline
             fullWidth
             minRows={3}

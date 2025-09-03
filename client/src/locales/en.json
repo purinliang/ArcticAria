@@ -188,16 +188,20 @@
       "tooltips": {
         "editPost": "Edit Post",
         "deletePost": "Delete Post",
+        "addComment": "Add a comment",
         "editComment": "Edit Comment",
-        "deleteComment": "Delete Comment"
+        "deleteComment": "Delete Comment",
+        "replyComment": "Reply"
       },
       "comments": {
         "title": "Comments",
         "empty": "No comments yet. Be the first to comment!",
         "addTitle": "Add a Comment",
+        "replyTitle": "Replying to @{{name}}",
         "placeholder": "Write your comment here...",
         "submit": "Submit Comment",
-        "loginToComment": "You must be logged in to add a comment."
+        "loginToComment": "You must be logged in to add a comment.",
+        "replyingTo": "Replying to @{{name}}"
       },
       "dialog": {
         "postDelete": {
