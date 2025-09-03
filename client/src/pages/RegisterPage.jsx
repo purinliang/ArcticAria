@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   TextField,
   Button,
+  CircularProgress,
   Box,
   Typography,
   Container,
@@ -18,6 +19,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ username: "", password: "", confirm: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -30,9 +32,11 @@ export default function RegisterPage() {
   const handleRegister = async () => {
     setError("");
     setSuccess("");
+    setLoading(true);
 
     if (form.password !== form.confirm) {
       setError(t("errors.passwordMismatch"));
+      setLoading(false);
       return;
     }
 
@@ -49,6 +53,8 @@ export default function RegisterPage() {
           message: err.response?.data || err.message,
         }),
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,29 +90,6 @@ export default function RegisterPage() {
           {t("page.register.subtitle")}
         </Typography>
 
-        {/* success & error */}
-        {success && (
-          <Alert
-            severity="success"
-            sx={{ width: "100%", mb: 2, borderRadius: "8px" }}
-          >
-            {success}
-          </Alert>
-        )}
-        {error && (
-          <Alert
-            severity="error"
-            sx={{
-              width: "100%",
-              mb: 2,
-              borderRadius: "8px",
-              backgroundColor: red[50],
-            }}
-          >
-            {error}
-          </Alert>
-        )}
-
         <TextField
           fullWidth
           margin="normal"
@@ -118,6 +101,7 @@ export default function RegisterPage() {
           required
           autoComplete="username"
         />
+
         <TextField
           fullWidth
           margin="normal"
@@ -129,6 +113,7 @@ export default function RegisterPage() {
           required
           autoComplete="new-password"
         />
+
         <TextField
           fullWidth
           margin="normal"
@@ -145,12 +130,40 @@ export default function RegisterPage() {
           variant="contained"
           color="primary"
           fullWidth
+          disabled={loading}
           onClick={handleRegister}
           sx={{ mt: 3, py: 1.5, borderRadius: "8px" }}
           aria-label={t("page.register.buttons.signUp")}
         >
-          {t("page.register.buttons.signUp")}
+          {loading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            t("page.register.buttons.signUp")
+          )}
         </Button>
+
+        {/* Success and error messages */}
+        {success && (
+          <Alert
+            severity="success"
+            sx={{ alignSelf: "stretch", mt: 2, borderRadius: "8px" }}
+          >
+            {success}
+          </Alert>
+        )}
+
+        {error && (
+          <Alert
+            severity="error"
+            sx={{
+              alignSelf: "stretch",
+              mt: 2,
+              borderRadius: "8px",
+            }}
+          >
+            {error}
+          </Alert>
+        )}
 
         <Box textAlign="center" sx={{ mt: 2, width: "100%" }}>
           <Typography variant="body2" color="textSecondary">

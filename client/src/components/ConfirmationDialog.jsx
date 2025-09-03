@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
  * @param {function} props.onConfirm - Function to call when the user confirms the action.
  * @param {string} props.title - The title text for the dialog.
  * @param {string} props.contentText - The main content text for the dialog.
+ * @param {object} [props.contentOptions] - Options for i18next interpolation in contentText.
  * @param {string} [props.cancelText='Cancel'] - The text for the cancel button.
  * @param {string} [props.confirmText='Confirm'] - The text for the confirm button.
  */
@@ -24,6 +25,7 @@ export default function ConfirmationDialog({
   onConfirm,
   title,
   contentText,
+  contentOptions,
   cancelText = "dialog.cancel", //  use translation keys
   confirmText = "dialog.confirm", //  use translation keys
 }) {
@@ -38,7 +40,7 @@ export default function ConfirmationDialog({
       <DialogTitle id="confirmation-dialog-title">{t(title)}</DialogTitle>
       <DialogContent>
         <DialogContentText id="confirmation-dialog-description">
-          {t(contentText)}
+          {t(contentText, contentOptions)}
         </DialogContentText>
       </DialogContent>
       <DialogActions>

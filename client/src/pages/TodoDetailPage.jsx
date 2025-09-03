@@ -8,11 +8,6 @@ import {
   FormControlLabel,
   Box,
   Alert,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -24,6 +19,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import i18n from "../i18n";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 const CATEGORIES = ["Work", "Study", "Life", "Play", "Other"];
 
@@ -486,22 +482,13 @@ export default function TodoDetailPage() {
         </Box>
       </Box>
 
-      <Dialog open={isDeleteDialogOpen} onClose={handleCloseDeleteDialog}>
-        <DialogTitle>{t("todoDetail.dialog.title")}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {t("todoDetail.dialog.content")}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteDialog} color="primary" autoFocus>
-            {t("dialog.cancel")}
-          </Button>
-          <Button onClick={handleConfirmDelete} color="error">
-            {t("dialog.confirm")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        title="todoDetail.dialog.title"
+        contentText="todoDetail.dialog.content"
+      />
     </Container>
   );
 }

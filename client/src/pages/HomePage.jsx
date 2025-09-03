@@ -18,7 +18,7 @@ const HomePage = () => {
       {/* Introduction Section */}
       <Box sx={{ mb: 6 }}>
         <Typography
-          variant="h2"
+          variant="h3"
           component="h1"
           gutterBottom
           sx={{ fontWeight: "bold" }}
@@ -26,16 +26,7 @@ const HomePage = () => {
           {t("page.home.title")}
         </Typography>
 
-        <Typography
-          variant="h5"
-          component="p"
-          color="text.secondary"
-          sx={{ mb: 4 }}
-        >
-          {t("page.home.subtitle")}
-        </Typography>
-
-        <Typography variant="body1" sx={{ maxWidth: "720px", mx: "auto" }}>
+        <Typography variant="body1" sx={{ maxWidth: "480px", mx: "auto" }}>
           <Trans
             i18nKey="page.home.intro"
             components={{
@@ -72,7 +63,7 @@ const HomePage = () => {
             <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
               {t("page.home.features.todos.title")}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography height="150px" variant="body2" color="text.secondary">
               {t("page.home.features.todos.desc")}
             </Typography>
             <Button
@@ -90,11 +81,7 @@ const HomePage = () => {
             <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
               {t("page.home.features.discover.title")}
             </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              fontStyle="italic"
-            >
+            <Typography height="150px" variant="body2" color="text.secondary">
               {t("page.home.features.discover.desc")}
             </Typography>
             <Button
@@ -112,7 +99,7 @@ const HomePage = () => {
             <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
               {t("page.home.features.discuss.title")}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography height="150px" variant="body2" color="text.secondary">
               {t("page.home.features.discuss.desc")}
             </Typography>
             <Button
