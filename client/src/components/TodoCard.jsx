@@ -82,9 +82,6 @@ export default function TodoCard({ todo, onToggleComplete, color }) {
 
   // Date format (with safe fallback) and render text
   const dateFormat = t("todo.dateFormat", { defaultValue: "YYYY-MM-DD" });
-  const dateText = todo.nextDueDate
-    ? dayjs(todo.nextDueDate).format(dateFormat)
-    : t("todo.noDueDate");
 
   return (
     <Card
@@ -99,7 +96,7 @@ export default function TodoCard({ todo, onToggleComplete, color }) {
           boxShadow: "0 6px 12px rgba(0,0,0,0.15)",
         },
         // Use the passed 'color' prop for the border
-        borderLeft: "5px solid",
+        borderLeft: "4px solid",
         borderColor: color || "transparent",
       }}
       onClick={() => navigate(`/todos/${todo.id}`, { state: { todo } })}
@@ -139,7 +136,7 @@ export default function TodoCard({ todo, onToggleComplete, color }) {
             overflow: "hidden",
             textOverflow: "ellipsis",
             display: "-webkit-box",
-            WebkitLineClamp: 4,
+            WebkitLineClamp: 10,
             WebkitBoxOrient: "vertical",
           }}
         >
