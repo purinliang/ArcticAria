@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   TextField,
+  CircularProgress,
   Button,
   Box,
   Typography,
@@ -9,7 +10,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { red } from "@mui/material/colors";
 import { useAuth } from "../AuthContext";
 import { jwtDecode } from "jwt-decode";
 import { useTranslation } from "react-i18next";
@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { setIsLoggedIn, setUsername } = useAuth();
   const { t } = useTranslation();
@@ -33,6 +34,7 @@ export default function LoginPage() {
   const handleLogin = async () => {
     setError("");
     setSuccess("");
+    setLoading(true);
     try {
       const res = await axios.post(`${API_BASE}/login`, form);
       const { token } = res.data;
@@ -53,6 +55,8 @@ export default function LoginPage() {
     } catch (err) {
       const errorMessage = err.response?.data || err.message;
       setError(t("errors.loginFailed", { message: errorMessage }));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,18 +120,23 @@ export default function LoginPage() {
           variant="contained"
           color="primary"
           fullWidth
+          disabled={loading}
           onClick={handleLogin}
           sx={{ mt: 3, py: 1.5, borderRadius: "8px" }}
           aria-label={t("page.login.buttons.signIn")}
         >
-          {t("page.login.buttons.signIn")}
+          {loading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            t("page.login.buttons.signIn")
+          )}
         </Button>
 
-        {/* Success and error messages */}
+        {/* Status messages */}
         {success && (
           <Alert
             severity="success"
-            sx={{ width: "100%", mt: 2, borderRadius: "8px" }}
+            sx={{ alignSelf: "stretch", mt: 2, borderRadius: "8px" }}
           >
             {success}
           </Alert>
@@ -137,7 +146,7 @@ export default function LoginPage() {
           <Alert
             severity="error"
             sx={{
-              width: "100%",
+              alignSelf: "stretch",
               mt: 2,
               borderRadius: "8px",
             }}
