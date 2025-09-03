@@ -22,7 +22,7 @@
     "signOut": "Sign out",
     "account": "Account",
     "greeting": "Hi, {{name}}",
-    "switchToEnglish": "EN",
+    "switchToEnglish": "English",
     "switchToChinese": "中文"
   },
   "footer": {
@@ -216,11 +216,6 @@
           "title": "Confirm Deletion",
           "content": "Are you sure you want to delete this comment? This action cannot be undone."
         }
-      },
-      "validation": {
-        "emptyComment": "Comment cannot be empty.",
-        "mustLogin": "You must be logged in to comment.",
-        "emptyCommentContent": "Comment content cannot be empty."
       }
     },
     "postEdit": {
@@ -290,7 +285,8 @@
     },
     "reminder": {
       "toggle": "Set a reminder",
-      "label": "Remind me {{count}} day(s) before"
+      "label_one": "Remind me {{count}} day before",
+      "label_other": "Remind me {{count}} days before"
     }
   }
 }

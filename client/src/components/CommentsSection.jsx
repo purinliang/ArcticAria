@@ -150,7 +150,7 @@ export default function CommentsSection({ postId }) {
 
     const handleSaveComment = async () => {
         if (!commentToEdit || !commentToEdit.content.trim()) {
-            alert(t("page.postDetail.validation.emptyCommentContent"));
+            alert(t("page.postDetail.validation.emptyComment"));
             return;
         }
 

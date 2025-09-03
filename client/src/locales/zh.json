@@ -32,7 +32,11 @@
   },
   "auth": {
     "signIn": "登录",
-    "signOut": "登出"
+    "signOut": "登出",
+    "account": "账户",
+    "greeting": "你好，{{name}}",
+    "switchToEnglish": "English",
+    "switchToChinese": "中文"
   },
   "footer": {
     "rights": "保留所有权利。",
@@ -184,16 +188,20 @@
       "tooltips": {
         "editPost": "编辑帖子",
         "deletePost": "删除帖子",
+        "addComment": "添加评论",
         "editComment": "编辑评论",
-        "deleteComment": "删除评论"
+        "deleteComment": "删除评论",
+        "replyComment": "回复"
       },
       "comments": {
         "title": "评论",
         "empty": "还没有评论，快来抢沙发！",
         "addTitle": "添加评论",
+        "replyTitle": "回复 @{{name}}",
         "placeholder": "在此输入你的评论…",
         "submit": "提交评论",
-        "loginToComment": "你需要登录后才能发表评论。"
+        "loginToComment": "你需要登录后才能发表评论。",
+        "replyingTo": "回复 @{{name}}"
       },
       "dialog": {
         "postDelete": {
@@ -210,9 +218,7 @@
         }
       },
       "validation": {
-        "emptyComment": "评论不能为空。",
-        "mustLogin": "你需要登录后才能发表评论。",
-        "emptyCommentContent": "评论内容不能为空。"
+        "emptyComment": "评论内容不能为空。"
       }
     },
     "postEdit": {
