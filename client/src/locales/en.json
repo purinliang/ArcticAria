@@ -19,7 +19,11 @@
   },
   "auth": {
     "signIn": "Sign in",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "account": "Account",
+    "greeting": "Hi, {{name}}",
+    "switchToEnglish": "EN",
+    "switchToChinese": "中文"
   },
   "footer": {
     "rights": "All rights reserved.",
