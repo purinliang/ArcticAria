@@ -6,6 +6,7 @@ import {
   CardContent,
   Button,
   Tooltip,
+  Alert
 } from "@mui/material";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import axios from "axios";
@@ -171,15 +172,27 @@ export default function BlogPage() {
       </Typography>
 
       {loading && (
-        <Typography align="center">
+        <Alert
+          severity="info"
+          sx={{
+            mt: 2,
+            borderRadius: "8px",
+          }}
+        >
           {t("page.blogpage.status.loading")}
-        </Typography>
+        </Alert>
       )}
 
       {error && (
-        <Typography color="error" align="center">
+        <Alert
+          severity="error"
+          sx={{
+            mt: 2,
+            borderRadius: "8px",
+          }}
+        >
           {t("page.blogpage.status.error")}
-        </Typography>
+        </Alert>
       )}
 
       <Box sx={{ display: "flex", justifyContent: "center", p: 0, m: 0 }}>
