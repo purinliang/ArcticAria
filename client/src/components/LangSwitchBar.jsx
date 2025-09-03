@@ -39,10 +39,8 @@ export default function LangSwitchBar({ isMobile = false }) {
       variant="outlined"
       color="primary"
       sx={{
-        py: 1,
-        px: 2,
         borderRadius: "8px",
-        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+        textTransform: "none",
         gap: 0.5,
       }}
     >
