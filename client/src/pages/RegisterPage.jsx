@@ -84,29 +84,6 @@ export default function RegisterPage() {
           {t("page.register.subtitle")}
         </Typography>
 
-        {/* success & error */}
-        {success && (
-          <Alert
-            severity="success"
-            sx={{ width: "100%", mb: 2, borderRadius: "8px" }}
-          >
-            {success}
-          </Alert>
-        )}
-        {error && (
-          <Alert
-            severity="error"
-            sx={{
-              width: "100%",
-              mb: 2,
-              borderRadius: "8px",
-              backgroundColor: red[50],
-            }}
-          >
-            {error}
-          </Alert>
-        )}
-
         <TextField
           fullWidth
           margin="normal"
@@ -118,6 +95,7 @@ export default function RegisterPage() {
           required
           autoComplete="username"
         />
+
         <TextField
           fullWidth
           margin="normal"
@@ -129,6 +107,7 @@ export default function RegisterPage() {
           required
           autoComplete="new-password"
         />
+
         <TextField
           fullWidth
           margin="normal"
@@ -151,6 +130,29 @@ export default function RegisterPage() {
         >
           {t("page.register.buttons.signUp")}
         </Button>
+
+        {/* Success and error messages */}
+        {success && (
+          <Alert
+            severity="success"
+            sx={{ width: "100%", mt: 2, borderRadius: "8px" }}
+          >
+            {success}
+          </Alert>
+        )}
+
+        {error && (
+          <Alert
+            severity="error"
+            sx={{
+              width: "100%",
+              mt: 2,
+              borderRadius: "8px",
+            }}
+          >
+            {error}
+          </Alert>
+        )}
 
         <Box textAlign="center" sx={{ mt: 2, width: "100%" }}>
           <Typography variant="body2" color="textSecondary">

@@ -88,29 +88,6 @@ export default function LoginPage() {
           {t("page.login.subtitle")}
         </Typography>
 
-        {/* Success / error messages */}
-        {success && (
-          <Alert
-            severity="success"
-            sx={{ width: "100%", mb: 2, borderRadius: "8px" }}
-          >
-            {success}
-          </Alert>
-        )}
-        {error && (
-          <Alert
-            severity="error"
-            sx={{
-              width: "100%",
-              mb: 2,
-              borderRadius: "8px",
-              backgroundColor: red[50],
-            }}
-          >
-            {error}
-          </Alert>
-        )}
-
         <TextField
           fullWidth
           margin="normal"
@@ -122,6 +99,7 @@ export default function LoginPage() {
           required
           autoComplete="username"
         />
+
         <TextField
           fullWidth
           margin="normal"
@@ -144,6 +122,29 @@ export default function LoginPage() {
         >
           {t("page.login.buttons.signIn")}
         </Button>
+
+        {/* Success and error messages */}
+        {success && (
+          <Alert
+            severity="success"
+            sx={{ width: "100%", mt: 2, borderRadius: "8px" }}
+          >
+            {success}
+          </Alert>
+        )}
+
+        {error && (
+          <Alert
+            severity="error"
+            sx={{
+              width: "100%",
+              mt: 2,
+              borderRadius: "8px",
+            }}
+          >
+            {error}
+          </Alert>
+        )}
 
         <Box textAlign="center" sx={{ mt: 2, width: "100%" }}>
           <Typography variant="body2" color="textSecondary">
