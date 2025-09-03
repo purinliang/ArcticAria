@@ -22,7 +22,6 @@ export default function LangSwitchBar({ isMobile = false }) {
     localStorage.setItem("i18nextLng", next);
   };
 
-  console.log(`ismobile=${isMobile}`);
   if (isMobile) {
     return (
       <ListItem button onClick={toggleLanguage}>
