@@ -6,7 +6,6 @@ import {
   Alert,
   Box,
 } from "@mui/material";
-import { red } from "@mui/material/colors";
 import axios from "axios";
 import TodoCard from "../components/TodoCard";
 import { useNavigate } from "react-router-dom";
@@ -331,11 +330,8 @@ export default function TodoPage() {
         <Alert
           severity="error"
           sx={{
-            width: "100%",
             mt: 2,
-            mb: 2,
             borderRadius: "8px",
-            backgroundColor: red[50],
           }}
         >
           {swrError.status === 401
@@ -344,9 +340,14 @@ export default function TodoPage() {
         </Alert>
       )}
       {isLoading ? (
-        <Typography sx={{ mt: 4 }} align="center">
-          {t("common.loading")}
-        </Typography>
+        <Alert
+          severity="info"
+          sx={{
+            mt: 2,
+            borderRadius: "8px",
+          }}
+        >
+          {t("common.loading")}</Alert>
       ) : (
         <>
           {allGroupsEmpty ? (
