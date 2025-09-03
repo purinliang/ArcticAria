@@ -8,17 +8,21 @@ import { useTranslation } from "react-i18next";
  * - `isZh`: A boolean indicating if the current language is Chinese.
  */
 export const useLanguageSwitcher = () => {
-    const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
-    const isZh = (i18n.resolvedLanguage || i18n.language || "en").startsWith("zh");
+  const isZh = (i18n.resolvedLanguage || i18n.language || "en").startsWith(
+    "zh",
+  );
 
-    const toggleLanguage = () => {
-        const next = isZh ? "en" : "zh";
-        i18n.changeLanguage(next);
-        localStorage.setItem("i18nextLng", next);
-    };
+  const toggleLanguage = () => {
+    const next = isZh ? "en" : "zh";
+    i18n.changeLanguage(next);
+    localStorage.setItem("i18nextLng", next);
+  };
 
-    const switchLanguageText = isZh ? t("auth.switchToEnglish") : t("auth.switchToChinese");
+  const switchLanguageText = isZh
+    ? t("auth.switchToEnglish")
+    : t("auth.switchToChinese");
 
-    return { toggleLanguage, switchLanguageText, isZh };
+  return { toggleLanguage, switchLanguageText, isZh };
 };

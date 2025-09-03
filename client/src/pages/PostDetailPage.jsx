@@ -58,7 +58,8 @@ export default function PostDetailPage() {
   const token = localStorage.getItem("jwtToken");
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
-  const showComments = import.meta.env.VITE_IS_PRODUCTION_ENVIRONMENT !== 'true';
+  const showComments =
+    import.meta.env.VITE_IS_PRODUCTION_ENVIRONMENT !== "true";
 
   // Fetch Post
   useEffect(() => {
@@ -168,7 +169,12 @@ export default function PostDetailPage() {
                 variant="contained"
                 color="primary"
                 onClick={() => navigate(`/blog/edit/${post.id}`)}
-                sx={{ minWidth: "auto", width: 40, height: 40, borderRadius: "50%" }}
+                sx={{
+                  minWidth: "auto",
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                }}
               >
                 <EditIcon />
               </Button>
@@ -178,7 +184,12 @@ export default function PostDetailPage() {
                 variant="contained"
                 color="error"
                 onClick={() => setOpenPostDeleteDialog(true)}
-                sx={{ minWidth: "auto", width: 40, height: 40, borderRadius: "50%" }}
+                sx={{
+                  minWidth: "auto",
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                }}
               >
                 <DeleteIcon />
               </Button>

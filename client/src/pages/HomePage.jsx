@@ -63,8 +63,7 @@ const HomePage = () => {
             <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
               {t("page.home.features.todos.title")}
             </Typography>
-            <Typography
-              height="150px" variant="body2" color="text.secondary">
+            <Typography height="150px" variant="body2" color="text.secondary">
               {t("page.home.features.todos.desc")}
             </Typography>
             <Button
@@ -82,11 +81,7 @@ const HomePage = () => {
             <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
               {t("page.home.features.discover.title")}
             </Typography>
-            <Typography
-              height="150px"
-              variant="body2"
-              color="text.secondary"
-            >
+            <Typography height="150px" variant="body2" color="text.secondary">
               {t("page.home.features.discover.desc")}
             </Typography>
             <Button
@@ -104,8 +99,7 @@ const HomePage = () => {
             <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
               {t("page.home.features.discuss.title")}
             </Typography>
-            <Typography
-              height="150px" variant="body2" color="text.secondary">
+            <Typography height="150px" variant="body2" color="text.secondary">
               {t("page.home.features.discuss.desc")}
             </Typography>
             <Button

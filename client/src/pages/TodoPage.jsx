@@ -34,7 +34,11 @@ const CATEGORY_GROUPS = [
   { key: "Work", icon: <WorkIcon color="warning" />, color: "warning.main" },
   { key: "Study", icon: <BookIcon color="info" />, color: "info.main" },
   { key: "Life", icon: <HomeIcon color="success" />, color: "success.main" },
-  { key: "Play", icon: <SportsEsportsIcon color="secondary" />, color: "secondary.main" },
+  {
+    key: "Play",
+    icon: <SportsEsportsIcon color="secondary" />,
+    color: "secondary.main",
+  },
   { key: "Other", icon: <CategoryIcon color="disabled" />, color: "grey.500" },
 ];
 
@@ -336,7 +340,9 @@ export default function TodoPage() {
             mt: 2,
             borderRadius: "8px",
           }}
-        >{t("common.loading")}</Alert>
+        >
+          {t("common.loading")}
+        </Alert>
       )}
 
       {swrError && (
@@ -353,15 +359,18 @@ export default function TodoPage() {
         </Alert>
       )}
 
-      {!isLoading && !swrError && (
-        allGroupsEmpty ? (
+      {!isLoading &&
+        !swrError &&
+        (allGroupsEmpty ? (
           <Alert
             severity="info"
             sx={{
               mt: 2,
               borderRadius: "8px",
             }}
-          >{t("page.todos.empty")}</Alert>
+          >
+            {t("page.todos.empty")}
+          </Alert>
         ) : (
           <>
             {sortByCategory ? (
@@ -404,8 +413,7 @@ export default function TodoPage() {
               </>
             )}
           </>
-        )
-      )}
+        ))}
     </Container>
   );
 }
