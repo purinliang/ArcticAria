@@ -217,8 +217,8 @@ export default function TodoPage() {
       return null;
 
     return (
-      <Box key={labelKey} sx={{ my: 2 }}>
-        <Box sx={{ display: "flex", alignItems: "center", mt: 4, mb: 1 }}>
+      <Box key={labelKey}>
+        <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
           {icon && (
             <Box component="span" sx={{ mr: 0.5, mt: 0.5, fontSize: "1.2rem" }}>
               {icon}
@@ -288,6 +288,7 @@ export default function TodoPage() {
               minWidth: "200px",
               display: "flex",
               alignItems: "center",
+              mb: 1,
             }}
           >
             <Tooltip
@@ -353,13 +354,13 @@ export default function TodoPage() {
 
       {!isLoading && !swrError && (
         allGroupsEmpty ? (
-          <Typography
-            color="text.secondary"
-            align="center"
-            sx={{ mt: 8, mb: 4 }}
-          >
-            {t("page.todos.empty")}
-          </Typography>
+          <Alert
+            severity="info"
+            sx={{
+              mt: 2,
+              borderRadius: "8px",
+            }}
+          >{t("page.todos.empty")}</Alert>
         ) : (
           <>
             {sortByCategory ? (
