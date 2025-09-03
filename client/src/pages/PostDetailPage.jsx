@@ -9,13 +9,6 @@ import {
   Tooltip,
   useTheme,
   useMediaQuery,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  TextField,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,6 +20,8 @@ import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
+import CommentsSection from "../components/CommentsSection";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 
 const API_BASE = import.meta.env.VITE_BLOG_API_BASE;
 
@@ -60,19 +55,11 @@ export default function PostDetailPage() {
   const [isAuthor, setIsAuthor] = useState(false);
   const [openPostDeleteDialog, setOpenPostDeleteDialog] = useState(false);
 
-  // Comments
-  const [comments, setComments] = useState([]);
-  const [commentsLoading, setCommentsLoading] = useState(true);
-  const [commentError, setCommentError] = useState(null);
-  const [newCommentContent, setNewCommentContent] = useState("");
-  const [openCommentEditDialog, setOpenCommentEditDialog] = useState(false);
-  const [commentToEdit, setCommentToEdit] = useState(null);
-  const [openCommentDeleteDialog, setOpenCommentDeleteDialog] = useState(false);
-  const [commentToDelete, setCommentToDelete] = useState(null);
-
   const token = localStorage.getItem("jwtToken");
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
+  const showComments =
+    import.meta.env.VITE_IS_PRODUCTION_ENVIRONMENT !== "true";
 
   // Fetch Post
   useEffect(() => {
@@ -99,24 +86,6 @@ export default function PostDetailPage() {
     fetchPost();
   }, [id, token, t]);
 
-  // Fetch Comments
-  useEffect(() => {
-    const fetchComments = async () => {
-      if (!id) return;
-      setCommentsLoading(true);
-      try {
-        const res = await axios.get(`${API_BASE}/posts/${id}/comments`);
-        setComments(res.data);
-        setCommentError(null);
-      } catch (err) {
-        setCommentError(t("page.postDetail.errors.loadComments"));
-      } finally {
-        setCommentsLoading(false);
-      }
-    };
-    fetchComments();
-  }, [id, token, t]);
-
   const handleDeletePost = async () => {
     setOpenPostDeleteDialog(false);
     try {
@@ -126,76 +95,6 @@ export default function PostDetailPage() {
       navigate("/blog");
     } catch (err) {
       setError(t("page.postDetail.errors.deletePost"));
-    }
-  };
-
-  const handleAddComment = async () => {
-    if (!newCommentContent.trim()) {
-      alert(t("page.postDetail.validation.emptyComment"));
-      return;
-    }
-    if (!isLoggedIn || !token) {
-      alert(t("page.postDetail.validation.mustLogin"));
-      return;
-    }
-
-    try {
-      await axios.post(
-        `${API_BASE}/comments`,
-        { postId: id, content: newCommentContent },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
-      setNewCommentContent("");
-      const res = await axios.get(`${API_BASE}/posts/${id}/comments`);
-      setComments(res.data);
-    } catch (err) {
-      setCommentError(t("page.postDetail.errors.addComment"));
-    }
-  };
-
-  const handleEditComment = (comment) => {
-    setCommentToEdit(comment);
-    setOpenCommentEditDialog(true);
-  };
-
-  const handleSaveComment = async () => {
-    if (!commentToEdit || !commentToEdit.content.trim()) {
-      alert(t("page.postDetail.validation.emptyCommentContent"));
-      return;
-    }
-
-    try {
-      await axios.put(
-        `${API_BASE}/comments/${commentToEdit.id}`,
-        { content: commentToEdit.content },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
-      setOpenCommentEditDialog(false);
-      setCommentToEdit(null);
-      const res = await axios.get(`${API_BASE}/posts/${id}/comments`);
-      setComments(res.data);
-    } catch (err) {
-      setCommentError(t("page.postDetail.errors.updateComment"));
-    }
-  };
-
-  const handleDeleteComment = (comment) => {
-    setCommentToDelete(comment);
-    setOpenCommentDeleteDialog(true);
-  };
-
-  const handleConfirmDeleteComment = async () => {
-    if (!commentToDelete) return;
-    try {
-      await axios.delete(`${API_BASE}/comments/${commentToDelete.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setOpenCommentDeleteDialog(false);
-      setCommentToDelete(null);
-      const res = await axios.get(`${API_BASE}/posts/${id}/comments`);
-      setComments(res.data);
-    } catch (err) {
-      setCommentError(t("page.postDetail.errors.deleteComment"));
     }
   };
 
@@ -246,8 +145,6 @@ export default function PostDetailPage() {
     ? t("page.blogpage.meta.created")
     : t("page.blogpage.meta.updated");
 
-  const myUserId = token ? jwtDecode(token).userId : null;
-
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       {/* Post Title & Author Actions */}
@@ -268,20 +165,34 @@ export default function PostDetailPage() {
         {isLoggedIn && isAuthor && (
           <Box sx={{ display: "flex", gap: 1 }}>
             <Tooltip title={t("page.postDetail.tooltips.editPost")}>
-              <IconButton
-                onClick={() => navigate(`/blog/edit/${post.id}`)}
+              <Button
+                variant="contained"
                 color="primary"
+                onClick={() => navigate(`/blog/edit/${post.id}`)}
+                sx={{
+                  minWidth: "auto",
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                }}
               >
                 <EditIcon />
-              </IconButton>
+              </Button>
             </Tooltip>
             <Tooltip title={t("page.postDetail.tooltips.deletePost")}>
-              <IconButton
-                onClick={() => setOpenPostDeleteDialog(true)}
+              <Button
+                variant="contained"
                 color="error"
+                onClick={() => setOpenPostDeleteDialog(true)}
+                sx={{
+                  minWidth: "auto",
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                }}
               >
                 <DeleteIcon />
-              </IconButton>
+              </Button>
             </Tooltip>
           </Box>
         )}
@@ -332,215 +243,17 @@ export default function PostDetailPage() {
         </Typography>
       </Box>
 
-      {/* --- Comments Section --- */}
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-          {t("page.postDetail.comments.title")}
-        </Typography>
-
-        {commentError && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {commentError}
-          </Alert>
-        )}
-
-        {commentsLoading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-            <CircularProgress size={24} />
-          </Box>
-        ) : (
-          <Box sx={{ maxHeight: "400px", overflowY: "auto", pr: 2 }}>
-            {comments.length > 0 ? (
-              comments.map((comment) => (
-                <Box
-                  key={comment.id}
-                  sx={{
-                    mb: 2,
-                    p: 2,
-                    backgroundColor: "#fafafa",
-                    borderRadius: "8px",
-                    border: "1px solid #e0e0e0",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Typography variant="body1">{comment.content}</Typography>
-                  <Box
-                    sx={{
-                      mt: 1,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography variant="caption" color="text.secondary">
-                      {comment.username} •{" "}
-                      {getRelativeTime(comment.createdAt, t)}
-                    </Typography>
-                    {isLoggedIn && myUserId === comment.userId && (
-                      <Box sx={{ display: "flex", gap: 1 }}>
-                        <Tooltip
-                          title={t("page.postDetail.tooltips.editComment")}
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={() => handleEditComment(comment)}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                          title={t("page.postDetail.tooltips.deleteComment")}
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDeleteComment(comment)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    )}
-                  </Box>
-                </Box>
-              ))
-            ) : (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ fontStyle: "italic" }}
-              >
-                {t("page.postDetail.comments.empty")}
-              </Typography>
-            )}
-          </Box>
-        )}
-
-        {/* Comment Form */}
-        <Box sx={{ mt: 3, pt: 3, borderTop: "1px solid #e0e0e0" }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            {t("page.postDetail.comments.addTitle")}
-          </Typography>
-          {isLoggedIn ? (
-            <Box>
-              <TextField
-                multiline
-                fullWidth
-                minRows={3}
-                variant="outlined"
-                placeholder={t("page.postDetail.comments.placeholder")}
-                value={newCommentContent}
-                onChange={(e) => setNewCommentContent(e.target.value)}
-                sx={{ mb: 2 }}
-              />
-              <Button
-                variant="contained"
-                onClick={handleAddComment}
-                sx={{ borderRadius: 8 }}
-              >
-                {t("page.postDetail.comments.submit")}
-              </Button>
-            </Box>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              {t("page.postDetail.comments.loginToComment")}
-            </Typography>
-          )}
-        </Box>
-      </Box>
+      {showComments && <CommentsSection postId={id} />}
 
       {/* Confirmation Dialog for Post Deletion */}
-      <Dialog
+      <ConfirmationDialog
         open={openPostDeleteDialog}
         onClose={() => setOpenPostDeleteDialog(false)}
-      >
-        <DialogTitle>
-          {t("page.postDetail.dialog.postDelete.title")}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {t("page.postDetail.dialog.postDelete.content", {
-              title: post.title,
-            })}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setOpenPostDeleteDialog(false)}
-            color="primary"
-          >
-            {t("dialog.cancel")}
-          </Button>
-          <Button onClick={handleDeletePost} color="error" autoFocus>
-            {t("dialog.confirm")}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Dialog for Comment Edit */}
-      <Dialog
-        open={openCommentEditDialog}
-        onClose={() => setOpenCommentEditDialog(false)}
-        fullWidth
-      >
-        <DialogTitle>
-          {t("page.postDetail.dialog.commentEdit.title")}
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            multiline
-            fullWidth
-            minRows={3}
-            value={commentToEdit?.content || ""}
-            onChange={(e) =>
-              setCommentToEdit({ ...commentToEdit, content: e.target.value })
-            }
-            sx={{ mt: 1 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setOpenCommentEditDialog(false)}
-            color="primary"
-          >
-            {t("dialog.cancel")}
-          </Button>
-          <Button
-            onClick={handleSaveComment}
-            color="primary"
-            variant="contained"
-          >
-            {t("page.postDetail.dialog.commentEdit.save")}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Confirmation Dialog for Comment Deletion */}
-      <Dialog
-        open={openCommentDeleteDialog}
-        onClose={() => setOpenCommentDeleteDialog(false)}
-      >
-        <DialogTitle>
-          {t("page.postDetail.dialog.commentDelete.title")}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {t("page.postDetail.dialog.commentDelete.content")}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setOpenCommentDeleteDialog(false)}
-            color="primary"
-          >
-            {t("dialog.cancel")}
-          </Button>
-          <Button onClick={handleConfirmDeleteComment} color="error" autoFocus>
-            {t("dialog.confirm")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={handleDeletePost}
+        title="page.postDetail.dialog.postDelete.title"
+        contentText="page.postDetail.dialog.postDelete.content"
+        contentOptions={{ title: post.title }}
+      />
     </Container>
   );
 }

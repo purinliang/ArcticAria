@@ -8,7 +8,6 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { lightBlue, deepOrange, green, blue } from "@mui/material/colors";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
@@ -17,7 +16,7 @@ import LabelIcon from "@mui/icons-material/Label";
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function TodoCard({ todo, onToggleComplete }) {
+export default function TodoCard({ todo, onToggleComplete, color }) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
 
@@ -39,37 +38,6 @@ export default function TodoCard({ todo, onToggleComplete }) {
     if (diffDays === 0) return t("todo.dueToday");
     if (diffDays > 0) return t("todo.daysLeft", { count: diffDays });
     return t("todo.overdue", { count: Math.abs(diffDays) });
-  };
-
-  /**
-   * Determines the color of the card based on the todo's status.
-   */
-  const getCardColor = (todo) => {
-    if (todo.completed) return green[50];
-
-    const dueDate = todo.nextDueDate ? new Date(todo.nextDueDate) : null;
-    const remindDate = dueDate ? new Date(dueDate) : null;
-    if (remindDate) {
-      remindDate.setDate(remindDate.getDate() - (todo.reminderDaysBefore || 0));
-    }
-
-    const now = new Date();
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    );
-
-    if (
-      remindDate &&
-      startOfToday.getTime() >= remindDate.getTime() &&
-      startOfToday.getTime() <= dueDate.getTime()
-    ) {
-      return blue[50]; // reminding window
-    } else if (dueDate && startOfToday.getTime() > dueDate.getTime()) {
-      return deepOrange[50]; // overdue
-    }
-    return lightBlue[50]; // upcoming
   };
 
   // Map raw category to top-level categories.* (supports "Work" and "work")
@@ -114,9 +82,6 @@ export default function TodoCard({ todo, onToggleComplete }) {
 
   // Date format (with safe fallback) and render text
   const dateFormat = t("todo.dateFormat", { defaultValue: "YYYY-MM-DD" });
-  const dateText = todo.nextDueDate
-    ? dayjs(todo.nextDueDate).format(dateFormat)
-    : t("todo.noDueDate");
 
   return (
     <Card
@@ -130,7 +95,9 @@ export default function TodoCard({ todo, onToggleComplete }) {
           transform: "translateY(-4px)",
           boxShadow: "0 6px 12px rgba(0,0,0,0.15)",
         },
-        bgcolor: getCardColor(todo),
+        // Use the passed 'color' prop for the border
+        borderLeft: "4px solid",
+        borderColor: color || "transparent",
       }}
       onClick={() => navigate(`/todos/${todo.id}`, { state: { todo } })}
     >
@@ -169,7 +136,7 @@ export default function TodoCard({ todo, onToggleComplete }) {
             overflow: "hidden",
             textOverflow: "ellipsis",
             display: "-webkit-box",
-            WebkitLineClamp: 4,
+            WebkitLineClamp: 10,
             WebkitBoxOrient: "vertical",
           }}
         >
@@ -203,7 +170,11 @@ export default function TodoCard({ todo, onToggleComplete }) {
                 sx={{ mr: 1.2, fontSize: "1.0rem", color: "action" }}
               />
             </Tooltip>
-            <Typography variant="body2">{dateText}</Typography>
+            <Box>
+              <Typography variant="body2">
+                {dayjs(todo.nextDueDate).format("DD/MM/YYYY")}
+              </Typography>
+            </Box>
           </Box>
 
           {todo.nextDueDate && (

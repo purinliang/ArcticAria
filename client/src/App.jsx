@@ -1,22 +1,12 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import {
-  AppBar,
-  Toolbar,
-  Button,
   Typography,
   Box,
   Divider,
   useTheme,
   useMediaQuery,
   Tooltip,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import LanguageIcon from "@mui/icons-material/Language";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import TodoPage from "./pages/TodoPage";
@@ -25,53 +15,22 @@ import BlogPage from "./pages/BlogPage";
 import PostEditPage from "./pages/PostEditPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import DiscoverPage from "./pages/DiscoverPage";
-import { AuthProvider, useAuth } from "./AuthContext";
+import { AuthProvider } from "./AuthContext";
 import { useState, useEffect } from "react";
 import HomePage from "./pages/HomePage";
-import ArcticAriaLogo from "./assets/arctic-aria-logo.png";
-import ArcticAriaTitle from "./components/ArcticAriaTitle";
 import { useTranslation } from "react-i18next";
-import SwitchBar from "./components/LangSwitchBar";
-import LangSwitchBar from "./components/LangSwitchBar";
+import NavBar from "./components/NavBar";
 
-function App() {
-  const { isLoggedIn, username, logout } = useAuth();
-  const navigate = useNavigate();
+function AppLayout() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     const h = (lng) => console.log("i18n language changed ->", lng);
     i18n.on("languageChanged", h);
     return () => i18n.off("languageChanged", h);
   }, [i18n]);
-
-  const toggleDrawer = (open) => (event) => {
-    if (
-      event.type === "keydown" &&
-      (event.key === "Tab" || event.key === "Shift")
-    ) {
-      return;
-    }
-    setDrawerOpen(open);
-  };
-
-  /**
-   * Handles the logout action.
-   * Clears the JWT token from local storage and navigates to the login page.
-   */
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
-  const handleNavigation = (path) => {
-    navigate(path);
-    setDrawerOpen(false); // Close the drawer after navigation
-  };
 
   const emailAddress = "purinliang@gmail.com";
   // State to manage the special "copied" tooltip and its text
@@ -123,236 +82,13 @@ function App() {
     }
   };
 
-  // Render navigation buttons for desktop layout
-  const renderNavButtons = () => (
-    <Box
-      sx={{
-        flexGrow: 1,
-        display: "flex",
-        alignItems: "center",
-        gap: 2,
-        ml: 4,
-      }}
-    >
-      <Button
-        onClick={() => handleNavigation("/todos")}
-        color="inherit"
-        sx={{
-          fontWeight: "bold",
-          textTransform: "none",
-        }}
-      >
-        {t("nav.todos")}
-      </Button>
-      <Button
-        onClick={() => handleNavigation("/discover")}
-        color="inherit"
-        sx={{ fontWeight: "bold", textTransform: "none" }}
-      >
-        {t("nav.discover")}
-      </Button>
-      <Button
-        onClick={() => handleNavigation("/blog")}
-        color="inherit"
-        sx={{ fontWeight: "bold", textTransform: "none" }}
-      >
-        {t("nav.discuss")}
-      </Button>
-    </Box>
-  );
-
-  // Render authentication buttons
-  const renderAuthButtons = () => (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "flex-end",
-        alignItems: "center",
-        gap: 1,
-      }}
-    >
-      <SwitchBar />
-
-      {isLoggedIn ? (
-        <>
-          <Typography
-            variant="body1"
-            component="span"
-            sx={{ mr: 1, fontWeight: "medium" }}
-          >
-            {username}
-          </Typography>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleLogout}
-            sx={{
-              fontSize: "1rem",
-              textTransform: "none",
-              py: 1,
-              px: 2,
-              borderRadius: "8px",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-            }}
-          >
-            {t("auth.signOut")}
-          </Button>
-        </>
-      ) : (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate("/login")}
-          sx={{
-            fontSize: "1rem",
-            textTransform: "none",
-            py: 1,
-            px: 2,
-            borderRadius: "8px",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-          }}
-        >
-          {t("auth.signIn")}
-        </Button>
-      )}
-    </Box>
-  );
-
   return (
-    <AuthProvider>
-      <Box>
-        <AppBar
-          position="static"
-          sx={{
-            bgcolor: "white",
-            color: "black",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          }}
-        >
-          <Toolbar
-            sx={{
-              maxWidth: "1120px",
-              width: "90%",
-              mx: "auto",
-              justifyContent: "space-between",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              {isMobile && (
-                <IconButton
-                  size="large"
-                  edge="start"
-                  color="inherit"
-                  aria-label="menu"
-                  onClick={toggleDrawer(true)}
-                  sx={{ mr: 1 }}
-                >
-                  <MenuIcon />
-                </IconButton>
-              )}
-              {/* Logo and App Name - Always show for better branding on all screens */}
-              <Button
-                onClick={() => navigate("/")}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  fontWeight: "bold",
-                  fontSize: "1.5rem",
-                  textTransform: "none",
-                  borderRadius: "8px",
-                }}
-              >
-                <img
-                  src={ArcticAriaLogo}
-                  alt="Arctic Aria Logo"
-                  style={{ height: "32px" }}
-                />
-                <ArcticAriaTitle
-                  width="auto"
-                  height="24px"
-                  fill="#000000"
-                  stroke="#000000"
-                  style={{ marginLeft: "6px" }}
-                />
-              </Button>
-            </Box>
-
-            {/* Navigation links (desktop only) */}
-            {!isMobile && renderNavButtons()}
-
-            {/* Auth buttons (desktop only) */}
-            {!isMobile && renderAuthButtons()}
-          </Toolbar>
-        </AppBar>
-
-        <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
-          <Box
-            sx={{ width: 250 }}
-            role="presentation"
-            onClick={toggleDrawer(false)}
-            onKeyDown={toggleDrawer(false)}
-          >
-            <List>
-              <ListItem button onClick={() => handleNavigation("/todos")}>
-                <ListItemText
-                  primary={t("nav.todos")}
-                  primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
-                />
-              </ListItem>
-              <ListItem button onClick={() => handleNavigation("/discover")}>
-                <ListItemText
-                  primary={t("nav.discover")}
-                  primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
-                />
-              </ListItem>
-              <ListItem button onClick={() => handleNavigation("/blog")}>
-                <ListItemText
-                  primary={t("nav.discuss")}
-                  primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
-                />
-              </ListItem>
-              <Divider sx={{ my: 1 }} />
-              <LangSwitchBar
-                isMobile={true}
-                handleCloseDrawer={toggleDrawer(false)}
-              />
-              {isLoggedIn ? (
-                <>
-                  <ListItem>
-                    <ListItemText primary={`${username}`} />
-                  </ListItem>
-                  {/* Sign out button with error color */}
-                  <ListItem button onClick={handleLogout}>
-                    <ListItemText
-                      primary={t("auth.signOut")}
-                      primaryTypographyProps={{
-                        sx: { fontWeight: "bold", color: "error.main" },
-                      }}
-                    />
-                  </ListItem>
-                </>
-              ) : (
-                <>
-                  {/* Sign in button with primary color */}
-                  <ListItem button onClick={() => handleNavigation("/login")}>
-                    <ListItemText
-                      primary={t("auth.signIn")}
-                      primaryTypographyProps={{
-                        sx: { fontWeight: "bold", color: "primary.main" },
-                      }}
-                    />
-                  </ListItem>
-                </>
-              )}
-            </List>
-          </Box>
-        </Drawer>
-
+    <Box>
+      <NavBar />
+      <Box
+        component="main"
+        sx={{ p: isMobile ? 0.5 : 2, maxWidth: "960px", mx: "auto" }}
+      >
         <Box
           component="main"
           sx={{ p: isMobile ? 0.5 : 2, maxWidth: "960px", mx: "auto" }}
@@ -430,6 +166,14 @@ function App() {
           </Typography>
         </Box>
       </Box>
+    </Box>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppLayout />
     </AuthProvider>
   );
 }
