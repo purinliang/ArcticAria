@@ -31,11 +31,11 @@ const API_BASE = import.meta.env.VITE_TODO_API_BASE;
 
 // Define the categories and their corresponding icons for sorting
 const CATEGORY_GROUPS = [
-  { key: "Work", icon: <WorkIcon color="primary" /> },
-  { key: "Study", icon: <BookIcon color="info" /> },
-  { key: "Life", icon: <HomeIcon color="action" /> },
-  { key: "Play", icon: <SportsEsportsIcon color="secondary" /> },
-  { key: "Other", icon: <CategoryIcon /> },
+  { key: "Work", icon: <WorkIcon color="warning" />, color: "warning.main" },
+  { key: "Study", icon: <BookIcon color="info" />, color: "info.main" },
+  { key: "Life", icon: <HomeIcon color="success" />, color: "success.main" },
+  { key: "Play", icon: <SportsEsportsIcon color="secondary" />, color: "secondary.main" },
+  { key: "Other", icon: <CategoryIcon color="disabled" />, color: "grey.500" },
 ];
 
 // Helper function to sort todos by due date
@@ -212,13 +212,13 @@ export default function TodoPage() {
 
   const groupedTodosByCategory = groupTodosByCategory(todos || []);
 
-  const renderTodoGroup = (todoItems, labelKey, icon) => {
+  const renderTodoGroup = (todoItems, labelKey, icon, groupColor) => {
     if (!todoItems || !Array.isArray(todoItems) || todoItems.length === 0)
       return null;
 
     return (
       <Box key={labelKey}>
-        <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", mt: 1.5 }}>
           {icon && (
             <Box component="span" sx={{ mr: 0.5, mt: 0.5, fontSize: "1.2rem" }}>
               {icon}
@@ -235,6 +235,7 @@ export default function TodoPage() {
               onToggleComplete={() =>
                 handleToggleComplete(todo.id, todo.completed)
               }
+              color={groupColor}
             />
           ))}
         </Masonry>
@@ -370,6 +371,7 @@ export default function TodoPage() {
                   groupedTodosByCategory[group.key],
                   `categories.${group.key.toLowerCase()}`,
                   group.icon,
+                  group.color,
                 ),
               )
             ) : (
@@ -379,21 +381,25 @@ export default function TodoPage() {
                   groupedTodosByTime.overdued,
                   "todoGroups.overdue",
                   <WarningIcon color="error" />,
+                  "error.main",
                 )}
                 {renderTodoGroup(
                   groupedTodosByTime.reminding,
                   "todoGroups.reminding",
-                  <NotificationsActiveIcon color="info" />,
+                  <NotificationsActiveIcon color="warning" />,
+                  "warning.main",
                 )}
                 {renderTodoGroup(
                   groupedTodosByTime.upcoming,
                   "todoGroups.upcoming",
-                  <CalendarTodayIcon sx={{ color: "info" }} />,
+                  <CalendarTodayIcon color="info" />,
+                  "info.main",
                 )}
                 {renderTodoGroup(
                   groupedTodosByTime.completed,
                   "todoGroups.completed",
                   <CheckCircleOutlineIcon color="success" />,
+                  "success.main",
                 )}
               </>
             )}
