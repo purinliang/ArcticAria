@@ -326,6 +326,17 @@ export default function TodoPage() {
           </Tooltip>
         </Box>
       </Box>
+
+      {isLoading && (
+        <Alert
+          severity="info"
+          sx={{
+            mt: 2,
+            borderRadius: "8px",
+          }}
+        >{t("common.loading")}</Alert>
+      )}
+
       {swrError && (
         <Alert
           severity="error"
@@ -339,64 +350,54 @@ export default function TodoPage() {
             : t("errors.fetchTodos", { message: swrError.message })}
         </Alert>
       )}
-      {isLoading ? (
-        <Alert
-          severity="info"
-          sx={{
-            mt: 2,
-            borderRadius: "8px",
-          }}
-        >
-          {t("common.loading")}</Alert>
-      ) : (
-        <>
-          {allGroupsEmpty ? (
-            <Typography
-              color="text.secondary"
-              align="center"
-              sx={{ mt: 8, mb: 4 }}
-            >
-              {t("page.todos.empty")}
-            </Typography>
-          ) : (
-            <>
-              {sortByCategory ? (
-                // Render groups by category
-                CATEGORY_GROUPS.map((group) =>
-                  renderTodoGroup(
-                    groupedTodosByCategory[group.key],
-                    `categories.${group.key.toLowerCase()}`,
-                    group.icon,
-                  ),
-                )
-              ) : (
-                // Render groups by time (default)
-                <>
-                  {renderTodoGroup(
-                    groupedTodosByTime.overdued,
-                    "todoGroups.overdue",
-                    <WarningIcon color="error" />,
-                  )}
-                  {renderTodoGroup(
-                    groupedTodosByTime.reminding,
-                    "todoGroups.reminding",
-                    <NotificationsActiveIcon color="info" />,
-                  )}
-                  {renderTodoGroup(
-                    groupedTodosByTime.upcoming,
-                    "todoGroups.upcoming",
-                    <CalendarTodayIcon sx={{ color: "info" }} />,
-                  )}
-                  {renderTodoGroup(
-                    groupedTodosByTime.completed,
-                    "todoGroups.completed",
-                    <CheckCircleOutlineIcon color="success" />,
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </>
+
+      {!isLoading && !swrError && (
+        allGroupsEmpty ? (
+          <Typography
+            color="text.secondary"
+            align="center"
+            sx={{ mt: 8, mb: 4 }}
+          >
+            {t("page.todos.empty")}
+          </Typography>
+        ) : (
+          <>
+            {sortByCategory ? (
+              // Render groups by category
+              CATEGORY_GROUPS.map((group) =>
+                renderTodoGroup(
+                  groupedTodosByCategory[group.key],
+                  `categories.${group.key.toLowerCase()}`,
+                  group.icon,
+                ),
+              )
+            ) : (
+              // Render groups by time (default)
+              <>
+                {renderTodoGroup(
+                  groupedTodosByTime.overdued,
+                  "todoGroups.overdue",
+                  <WarningIcon color="error" />,
+                )}
+                {renderTodoGroup(
+                  groupedTodosByTime.reminding,
+                  "todoGroups.reminding",
+                  <NotificationsActiveIcon color="info" />,
+                )}
+                {renderTodoGroup(
+                  groupedTodosByTime.upcoming,
+                  "todoGroups.upcoming",
+                  <CalendarTodayIcon sx={{ color: "info" }} />,
+                )}
+                {renderTodoGroup(
+                  groupedTodosByTime.completed,
+                  "todoGroups.completed",
+                  <CheckCircleOutlineIcon color="success" />,
+                )}
+              </>
+            )}
+          </>
+        )
       )}
     </Container>
   );
