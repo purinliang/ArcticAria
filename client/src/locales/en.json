@@ -64,22 +64,22 @@
     "home": {
       "title": "Welcome to ArcticAria",
       "subtitle": "Your personal assistant for managing daily life.",
-      "intro": "ArcticAria is designed to be your small life assistant, helping you plan your daily progress with <strong>Todos</strong> for work, study, and essential tasks. In your free time, it will offer <strong>Discover</strong> for food, entertainment, and shopping to help you decide.",
+      "intro": "ArcticAria is your personal life assistant. Use <strong>Todos</strong> to organize your day, let <strong>Discover</strong> help you find new experiences, and share your thoughts in the <strong>Discuss</strong> section.",
       "features": {
         "title": "Key Features",
         "todos": {
           "title": "Todos",
-          "desc": "Easily create, track, and manage all your tasks. Ensure every task is completed on time.",
+          "desc": "Organize your tasks by categories like Work, Study, Life, and Play, or sort them by time-based status such as Overdue, Reminding, and Completed to better manage your daily schedule.",
           "cta": "Go to Todos"
         },
         "discover": {
           "title": "Discover",
-          "desc": "Coming Soon! We plan to offer personalized recommendations for food, places to visit, and things to do to help you make decisions effortlessly.",
+          "desc": "Explore food, outings, and shopping. Tell ArcticAria what you like by adding to a recommendation list, snoozing for later, or disliking. This helps ArcticAria learn your tastes to make better recommendations.",
           "cta": "Go to Discover"
         },
         "discuss": {
           "title": "Discuss",
-          "desc": "A public discussion area for everyone. If you have ideas for new daily life tools, feel free to leave a message here!",
+          "desc": "Leave a message here to share your thoughts on ArcticAria's features and future development. In the future, you'll also be able to comment on and like posts.",
           "cta": "Go to Discuss"
         }
       }

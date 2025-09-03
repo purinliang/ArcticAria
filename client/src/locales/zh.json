@@ -1,5 +1,5 @@
 {
-  "appTitle": "北极之歌",
+  "appTitle": "北极阿莉娅",
   "common": {
     "none": "无",
     "dateFormat": "YYYY年MM月DD日",
@@ -32,7 +32,7 @@
   },
   "auth": {
     "signIn": "登录",
-    "signOut": "退出"
+    "signOut": "登出"
   },
   "footer": {
     "rights": "保留所有权利。",
@@ -60,22 +60,22 @@
     "home": {
       "title": "欢迎使用 ArcticAria",
       "subtitle": "你的日常生活管理助手。",
-      "intro": "ArcticAria 致力于成为你的生活小助手，帮助你用 <strong>待办</strong> 规划工作、学习和必要事项；空闲时提供 <strong>发现</strong> 的美食、娱乐与购物参考，助你轻松决策。",
+      "intro": "ArcticAria 致力于成为你的生活小助手。使用 <strong>待办</strong> 来组织你的一天，让 <strong>发现</strong> 帮助你寻找新体验，并在 <strong>讨论</strong> 区分享你的想法。",
       "features": {
         "title": "核心功能",
         "todos": {
           "title": "待办",
-          "desc": "轻松创建、跟踪并管理所有任务，确保每一项都按时完成。",
+          "desc": "通过工作、学习、生活和娱乐等类别来组织你的任务，或者根据逾期、提醒中和已完成等时间状态进行排序，以更好地管理你的日常安排。",
           "cta": "前往待办"
         },
         "discover": {
           "title": "发现",
-          "desc": "即将上线！我们计划提供个性化的餐饮、出行与活动推荐，帮助你更轻松地做决定。",
+          "desc": "探索美食、郊游和购物。通过添加到推荐列表、暂时不提醒或不喜欢来告诉 ArcticAria 你的偏好。这有助于 ArcticAria 了解你的品味，从而提供更好的推荐。",
           "cta": "前往发现"
         },
         "discuss": {
           "title": "讨论",
-          "desc": "面向所有人的公开讨论区。如果你对新的生活工具有想法，欢迎在此留言！",
+          "desc": "在这里留言，分享你对 ArcticAria 功能和未来发展的看法。未来你还可以对帖子进行评论和点赞。",
           "cta": "前往讨论"
         }
       }
