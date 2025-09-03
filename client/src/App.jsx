@@ -1,6 +1,5 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import {
-  Button,
   Typography,
   Box,
   Divider,
@@ -23,10 +22,9 @@ import { useTranslation } from "react-i18next";
 import NavBar from "./components/NavBar";
 
 function AppLayout() {
-  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     const h = (lng) => console.log("i18n language changed ->", lng);
