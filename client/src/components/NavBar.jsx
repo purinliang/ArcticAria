@@ -23,7 +23,6 @@ import LoginIcon from "@mui/icons-material/Login";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LanguageIcon from "@mui/icons-material/Language";
 import ChecklistRtlIcon from "@mui/icons-material/ChecklistRtl";
-import ExploreIcon from "@mui/icons-material/Explore";
 import ForumIcon from "@mui/icons-material/Forum";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
@@ -81,13 +80,6 @@ export default function NavBar() {
         sx={{ fontWeight: "bold", textTransform: "none" }}
       >
         {t("nav.todos")}
-      </Button>
-      <Button
-        onClick={() => handleNavigation("/discover")}
-        color="inherit"
-        sx={{ fontWeight: "bold", textTransform: "none" }}
-      >
-        {t("nav.discover")}
       </Button>
       <Button
         onClick={() => handleNavigation("/blog")}
@@ -170,15 +162,6 @@ export default function NavBar() {
           </ListItemIcon>
           <ListItemText
             primary={t("nav.todos")}
-            primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
-          />
-        </ListItem>
-        <ListItem button onClick={() => handleNavigation("/discover")}>
-          <ListItemIcon sx={{ minWidth: "36px", color: "black" }}>
-            <ExploreIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary={t("nav.discover")}
             primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
           />
         </ListItem>
