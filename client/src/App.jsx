@@ -8,10 +8,10 @@ import {
   Tooltip,
   Stack,
   IconButton,
-  createSvgIcon,
 } from "@mui/material";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import EmailIcon from "@mui/icons-material/Email";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGithub, faWeixin } from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import TodoPage from "./pages/TodoPage";
@@ -24,11 +24,6 @@ import { useState, useEffect } from "react";
 import HomePage from "./pages/HomePage";
 import { useTranslation } from "react-i18next";
 import NavBar from "./components/NavBar";
-
-const WeChatIcon = createSvgIcon(
-  <path d="M21.2,3H2.8A1.8,1.8,0,0,0,1,4.8V16.2A1.8,1.8,0,0,0,2.8,18H8l3,3,3-3h5.2A1.8,1.8,0,0,0,23,16.2V4.8A1.8,1.8,0,0,0,21.2,3ZM8.3,12.9a3.8,3.8,0,0,1-2.1-.8,3.1,3.1,0,0,1-1-2.3,1.6,1.6,0,0,1,.4-1.2,1.1,1.1,0,0,1,.8-.3,1.4,1.4,0,0,1,.6.1,1.1,1.1,0,0,1,.6.4c.1.2.6,1,.6,1.1s0,.2-.1.3a.6.6,0,0,1-.3.2.9.9,0,0,1-.4.2,1.1,1.1,0,0,0-.1.4,2.9,2.9,0,0,0,1,1.2,2.1,2.1,0,0,0,1.3.5.6.6,0,0,0,.4-.1.8.8,0,0,0,.4-.6c.1-.2.2-.3.4-.3a.6.6,0,0,1,.6.1.3.3,0,0,1,.2.3c0,.1,0,.4-.1.6A2.1,2.1,0,0,1,8.3,12.9Zm7.4,0a3.8,3.8,0,0,1-2.1-.8,3.1,3.1,0,0,1-1-2.3,1.6,1.6,0,0,1,.4-1.2,1.1,1.1,0,0,1,.8-.3,1.4,1.4,0,0,1,.6.1,1.1,1.1,0,0,1,.6.4c.1.2.6,1,.6,1.1s0,.2-.1.3a.6.6,0,0,1-.3.2.9.9,0,0,1-.4.2,1.1,1.1,0,0,0-.1.4,2.9,2.9,0,0,0,1,1.2,2.1,2.1,0,0,0,1.3.5.6.6,0,0,0,.4-.1.8.8,0,0,0,.4-.6c.1-.2.2-.3.4-.3a.6.6,0,0,1,.6.1.3.3,0,0,1,.2.3c0,.1,0,.4-.1.6A2.1,2.1,0,0,1,15.7,12.9Z" />,
-  'WeChat',
-);
 
 function AppLayout() {
   const theme = useTheme();
@@ -115,7 +110,7 @@ function AppLayout() {
           </Typography>
           <Stack
             direction="row"
-            spacing={1}
+            spacing={2}
             justifyContent="center"
             alignItems="center"
             sx={{ mt: 1 }}
@@ -126,25 +121,25 @@ function AppLayout() {
                 href="https://github.com/purinliang/ArcticAria"
                 target="_blank"
                 rel="noopener noreferrer"
-                sx={{ color: "text.secondary" }}
+                sx={{ color: "text.secondary", width: 32, height: 32 }}
               >
-                <GitHubIcon />
+                <FontAwesomeIcon icon={faGithub} />
               </IconButton>
             </Tooltip>
             <Tooltip
               title={emailTooltipText}
               onClose={() => setEmailTooltipText(t("footer.copyEmail"))}
             >
-              <IconButton onClick={handleEmailClick} sx={{ color: "text.secondary" }}>
-                <EmailIcon />
+              <IconButton onClick={handleEmailClick} sx={{ color: "text.secondary", width: 32, height: 32 }}>
+                <FontAwesomeIcon icon={faEnvelope} />
               </IconButton>
             </Tooltip>
             <Tooltip
               title={wechatTooltipText}
               onClose={() => setWechatTooltipText(t("footer.copyWeChat"))}
             >
-              <IconButton onClick={handleWeChatClick} sx={{ color: "text.secondary" }}>
-                <WeChatIcon />
+              <IconButton onClick={handleWeChatClick} sx={{ color: "text.secondary", width: 32, height: 32 }}>
+                <FontAwesomeIcon icon={faWeixin} />
               </IconButton>
             </Tooltip>
           </Stack>
