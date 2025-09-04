@@ -23,7 +23,6 @@ import LoginIcon from "@mui/icons-material/Login";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LanguageIcon from "@mui/icons-material/Language";
 import ChecklistRtlIcon from "@mui/icons-material/ChecklistRtl";
-import ExploreIcon from "@mui/icons-material/Explore";
 import ForumIcon from "@mui/icons-material/Forum";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
