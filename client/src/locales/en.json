@@ -14,7 +14,6 @@
   },
   "nav": {
     "todos": "Todos",
-    "discover": "Discover",
     "discuss": "Discuss"
   },
   "auth": {
@@ -26,9 +25,12 @@
     "switchToChinese": "中文"
   },
   "footer": {
-    "rights": "All rights reserved.",
-    "contact": "Contact me:",
-    "email": "Email"
+    "rights": "All rights reserved",
+    "sourceCode": "View source on GitHub",
+    "copyEmail": "Click to copy email",
+    "copyWeChat": "Click to copy WeChat ID",
+    "copied": "Copied to clipboard!",
+    "copyFailed": "Failed to copy!"
   },
   "dialog": {
     "cancel": "Cancel",
@@ -62,26 +64,61 @@
   },
   "page": {
     "home": {
-      "title": "Welcome to ArcticAria",
-      "subtitle": "Your personal assistant for managing daily life.",
-      "intro": "ArcticAria is your personal life assistant. Use <strong>Todos</strong> to organize your day, let <strong>Discover</strong> help you find new experiences, and share your thoughts in the <strong>Discuss</strong> section.",
+      "title": "ArcticAria",
+      "subtitle": "Your one-stop platform for life, study, and work.",
+      "summary": "Ever feel like life is a mess? Unsure what to do today? Get sidetracked and forget tasks halfway through? ArcticAria was born to solve these problems.",
+      "solve": {
+        "title": "What Problem Do We Solve?",
+        "items": [
+          {
+            "title": "Clear Your Mind, Focus on the Present",
+            "desc": "Say goodbye to chaotic task lists. Clearly know what project you're working on and what to do next."
+          },
+          {
+            "title": "Manage Life, Forget Forgetting",
+            "desc": "Delegate unimportant but necessary recurring chores to our smart reminder system. Stop worrying about paying bills or taking out the trash."
+          },
+          {
+            "title": "Find Joy, Balance Life",
+            "desc": "In your spare time, let us help you discover new ways to relax and enjoy the beauty of life."
+          }
+        ]
+      },
       "features": {
-        "title": "Key Features",
+        "title": "Current Features",
         "todos": {
           "title": "Todos",
           "desc": "Organize your tasks by categories like Work, Study, Life, and Play, or sort them by time-based status such as Overdue, Reminding, and Completed to better manage your daily schedule.",
           "cta": "Go to Todos"
-        },
-        "discover": {
-          "title": "Discover",
-          "desc": "Explore food, outings, and shopping. Tell ArcticAria what you like by adding to a recommendation list, snoozing for later, or disliking. This helps ArcticAria learn your tastes to make better recommendations.",
-          "cta": "Go to Discover"
         },
         "discuss": {
           "title": "Discuss",
           "desc": "Leave a message here to share your thoughts on ArcticAria's features and future development. In the future, you'll also be able to comment on and like posts.",
           "cta": "Go to Discuss"
         }
+      },
+      "vision": {
+        "title": "Future Vision",
+        "items": [
+          {
+            "title": "Career",
+            "desc": "Designed for project management and deep work/study. Whether you're preparing for exams or developing a new project, it helps you systematically track progress."
+          },
+          {
+            "title": "Life Reminder & Discover",
+            "desc": "Created to solve the frustration of trivial, recurring tasks and to help you discover new fun things to do. A personalized inspiration library for new life experiences."
+          }
+        ],
+        "cta": "View Full Blueprint"
+      },
+      "join": {
+        "title": "Join Us",
+        "summary": "ArcticAria is an open-source project, and its future needs more like-minded people to build it together. If you've been troubled by the problems above, we are solving them together.",
+        "core_dev_title": "Core Feature Developers",
+        "core_dev_desc": "If you have 3+ months of development experience and are interested in our core modules, we welcome you. The core modules are technically challenging.",
+        "entry_dev_title": "Entry-Level Developers",
+        "entry_dev_desc": "If you're a beginner, don't worry! We have many peripheral features (like discussion likes, OAuth login, etc.) for you to practice on. It's a great learning opportunity.",
+        "cta": "Contribute on GitHub"
       }
     },
     "todos": {
@@ -100,15 +137,6 @@
         "addNew": "Add new todo"
       },
       "empty": "No tasks found. Click the button above to add a new todo."
-    },
-    "discover": {
-      "title": "Discover",
-      "subtitle": "This feature is coming soon!",
-      "description": "We are currently working hard to bring you personalized recommendations for your daily life. In the meantime, feel free to explore our other features.",
-      "buttons": {
-        "todos": "Go to Todos",
-        "discussion": "Join the Discussion"
-      }
     },
     "blogpage": {
       "title": "Discuss",

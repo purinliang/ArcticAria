@@ -6,7 +6,12 @@ import {
   useTheme,
   useMediaQuery,
   Tooltip,
+  Stack,
+  IconButton,
 } from "@mui/material";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGithub, faWeixin } from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import TodoPage from "./pages/TodoPage";
@@ -14,7 +19,6 @@ import TodoDetailPage from "./pages/TodoDetailPage";
 import BlogPage from "./pages/BlogPage";
 import PostEditPage from "./pages/PostEditPage";
 import PostDetailPage from "./pages/PostDetailPage";
-import DiscoverPage from "./pages/DiscoverPage";
 import { AuthProvider } from "./AuthContext";
 import { useState, useEffect } from "react";
 import HomePage from "./pages/HomePage";
@@ -24,7 +28,7 @@ import NavBar from "./components/NavBar";
 function AppLayout() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const h = (lng) => console.log("i18n language changed ->", lng);
@@ -33,53 +37,41 @@ function AppLayout() {
   }, [i18n]);
 
   const emailAddress = "purinliang@gmail.com";
-  // State to manage the special "copied" tooltip and its text
-  const [copiedTooltipOpen, setCopiedTooltipOpen] = useState(false);
-  const [tooltipText, setTooltipText] = useState(
-    `Click to copy: ${emailAddress}`,
+  const wechatId = "purinliang";
+
+  const [emailTooltipText, setEmailTooltipText] = useState(t("footer.copyEmail"));
+  const [wechatTooltipText, setWechatTooltipText] = useState(
+    t("footer.copyWeChat"),
   );
 
-  const handleEmailClick = async () => {
+  const copyToClipboard = async (textToCopy, setText) => {
     try {
-      // Use document.execCommand for better cross-browser compatibility in iframes
-      const textarea = document.createElement("textarea");
-      textarea.value = emailAddress;
-      textarea.style.position = "fixed"; // Avoid scrolling to the bottom of the page
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-
-      // On success, set tooltip text and open state
-      setTooltipText("Copied to clipboard!");
-      setCopiedTooltipOpen(true);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(textToCopy);
+      } else {
+        // Fallback for insecure contexts or older browsers
+        const textarea = document.createElement("textarea");
+        textarea.value = textToCopy;
+        textarea.style.position = "fixed"; // Avoids scrolling to bottom
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setText(t("footer.copied"));
     } catch (err) {
       console.error("Failed to copy text:", err);
-      setTooltipText("Failed to copy!");
-      setCopiedTooltipOpen(true);
-    } finally {
-      // Hide the tooltip and revert text after 2 seconds
-      setTimeout(() => {
-        setCopiedTooltipOpen(false);
-      }, 2000);
-      setTimeout(() => {
-        setTooltipText(`Click to copy: ${emailAddress}`);
-      }, 2500);
+      setText(t("footer.copyFailed"));
     }
   };
 
-  const handleHoverOpen = () => {
-    // Only open the tooltip on hover if it's not currently in the "copied" state
-    if (!copiedTooltipOpen) {
-      setCopiedTooltipOpen(true);
-    }
+  const handleEmailClick = () => {
+    copyToClipboard(emailAddress, setEmailTooltipText);
   };
 
-  const handleHoverClose = () => {
-    // Only close the tooltip on hover if it's not currently in the "copied" state
-    if (!copiedTooltipOpen) {
-      setCopiedTooltipOpen(false);
-    }
+  const handleWeChatClick = () => {
+    copyToClipboard(wechatId, setWechatTooltipText);
   };
 
   return (
@@ -89,31 +81,24 @@ function AppLayout() {
         component="main"
         sx={{ p: isMobile ? 0.5 : 2, maxWidth: "960px", mx: "auto" }}
       >
-        <Box
-          component="main"
-          sx={{ p: isMobile ? 0.5 : 2, maxWidth: "960px", mx: "auto" }}
-        >
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/todos" element={<TodoPage />} />
-            <Route path="/todos/new" element={<TodoDetailPage />} />
-            <Route path="/todos/:id" element={<TodoDetailPage />} />
-            <Route path="/discover" element={<DiscoverPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/new" element={<PostEditPage />} />
-            <Route path="/blog/edit/:id" element={<PostEditPage />} />
-            <Route path="/blog/:id" element={<PostDetailPage />} />
-          </Routes>
-        </Box>
-
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/todos" element={<TodoPage />} />
+          <Route path="/todos/new" element={<TodoDetailPage />} />
+          <Route path="/todos/:id" element={<TodoDetailPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/new" element={<PostEditPage />} />
+          <Route path="/blog/edit/:id" element={<PostEditPage />} />
+          <Route path="/blog/:id" element={<PostDetailPage />} />
+        </Routes>
         {/* Footer */}
         <Divider sx={{ mt: 4, mb: 1 }} />
         <Box
           component="footer"
           sx={{
-            mb: 4,
+            mb: 2,
             p: 2,
             maxWidth: "1120px",
             mx: "auto",
@@ -121,49 +106,43 @@ function AppLayout() {
           }}
         >
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            &copy; {new Date().getFullYear()} ArcticAria. All rights reserved.
+            &copy; {new Date().getFullYear()} ArcticAria. {t("footer.rights")}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Contact me:{" "}
-            <a
-              href="https://github.com/purinliang"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                color: "inherit",
-                textDecoration: "none",
-                marginRight: "8px",
-              }}
-            >
-              GitHub
-            </a>
-            |
-            <Box
-              component="span"
-              sx={{ position: "relative", display: "inline-block" }}
-            >
-              <Tooltip
-                title={tooltipText}
-                open={copiedTooltipOpen}
-                onOpen={handleHoverOpen}
-                onClose={handleHoverClose}
-                disableFocusListener
-                disableTouchListener
+          <Stack
+            direction="row"
+            spacing={2}
+            justifyContent="center"
+            alignItems="center"
+            sx={{ mt: 1 }}
+          >
+            <Tooltip title={t("footer.sourceCode")}>
+              <IconButton
+                component="a"
+                href="https://github.com/purinliang/ArcticAria"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ color: "text.secondary", width: 32, height: 32 }}
               >
-                <a
-                  onClick={handleEmailClick}
-                  style={{
-                    color: "inherit",
-                    textDecoration: "none",
-                    marginLeft: "8px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Email
-                </a>
-              </Tooltip>
-            </Box>
-          </Typography>
+                <FontAwesomeIcon icon={faGithub} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={emailTooltipText}
+              onClose={() => setEmailTooltipText(t("footer.copyEmail"))}
+            >
+              <IconButton onClick={handleEmailClick} sx={{ color: "text.secondary", width: 32, height: 32 }}>
+                <FontAwesomeIcon icon={faEnvelope} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={wechatTooltipText}
+              onClose={() => setWechatTooltipText(t("footer.copyWeChat"))}
+            >
+              <IconButton onClick={handleWeChatClick} sx={{ color: "text.secondary", width: 32, height: 32 }}>
+                <FontAwesomeIcon icon={faWeixin} />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Box>
       </Box>
     </Box>
