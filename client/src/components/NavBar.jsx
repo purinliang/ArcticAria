@@ -83,13 +83,6 @@ export default function NavBar() {
         {t("nav.todos")}
       </Button>
       <Button
-        onClick={() => handleNavigation("/discover")}
-        color="inherit"
-        sx={{ fontWeight: "bold", textTransform: "none" }}
-      >
-        {t("nav.discover")}
-      </Button>
-      <Button
         onClick={() => handleNavigation("/blog")}
         color="inherit"
         sx={{ fontWeight: "bold", textTransform: "none" }}
@@ -170,15 +163,6 @@ export default function NavBar() {
           </ListItemIcon>
           <ListItemText
             primary={t("nav.todos")}
-            primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
-          />
-        </ListItem>
-        <ListItem button onClick={() => handleNavigation("/discover")}>
-          <ListItemIcon sx={{ minWidth: "36px", color: "black" }}>
-            <ExploreIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary={t("nav.discover")}
             primaryTypographyProps={{ sx: { fontWeight: "bold" } }}
           />
         </ListItem>
