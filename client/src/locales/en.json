@@ -30,7 +30,9 @@
     "copyEmail": "Click to copy email",
     "copyWeChat": "Click to copy WeChat ID",
     "copied": "Copied to clipboard!",
-    "copyFailed": "Failed to copy!"
+    "copyFailed": "Failed to copy!",
+    "site_views": "Total site views",
+    "times": "times"
   },
   "dialog": {
     "cancel": "Cancel",
