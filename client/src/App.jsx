@@ -41,7 +41,7 @@ function AppLayout() {
     script.src = '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
     script.async = true;
     document.body.appendChild(script);
-    
+
     return () => {
       document.body.removeChild(script);
     };
@@ -119,11 +119,11 @@ function AppLayout() {
           <Typography variant="body2" color="text.secondary" gutterBottom>
             &copy; {new Date().getFullYear()} ArcticAria. {t("footer.rights")}
           </Typography>
-          
+
           <Typography variant="body2" color="text.secondary">
-            {t("footer.site_views")} <span id="busuanzi_value_site_pv"></span> {t("footer.times")}
+            {t("footer.siteViews")} <span id="busuanzi_value_site_pv"></span> {t("footer.times")}
           </Typography>
-          
+
           <Stack
             direction="row"
             spacing={2}

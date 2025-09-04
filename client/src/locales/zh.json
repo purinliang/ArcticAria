@@ -44,7 +44,7 @@
     "copyWeChat": "点击复制微信号",
     "copied": "已复制到剪贴板！",
     "copyFailed": "复制失败！",
-    "site_views": "本站总访问量",
+    "siteViews": "总访问量：",
     "times": "次"
   },
   "dialog": {

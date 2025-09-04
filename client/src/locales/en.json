@@ -31,8 +31,8 @@
     "copyWeChat": "Click to copy WeChat ID",
     "copied": "Copied to clipboard!",
     "copyFailed": "Failed to copy!",
-    "site_views": "Total site views",
-    "times": "times"
+    "siteViews": "Total views: ",
+    "times": ""
   },
   "dialog": {
     "cancel": "Cancel",
