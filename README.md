@@ -75,11 +75,12 @@ Therefore, this project warmly welcomes entry-level developers, especially unive
 ### Deployed Environments
 
 Here are the current production environment links for ArcticAria:
-*   **Frontend Production**: [https://arcticaria.pages.dev/](https://arcticaria.pages.dev/)
-*   **Backend Production**:
-    *   Auth Service: [https://auth.arcticaria.workers.dev](https://auth.arcticaria.workers.dev)
-    *   Todo Service: [https://todo.arcticaria.workers.dev](https://todo.arcticaria.workers.dev)
-    *   Blog Service: [https://blog.arcticaria.workers.dev](https://blog.arcticaria.workers.dev)
+
+- **Frontend Production**: [https://arcticaria.pages.dev/](https://arcticaria.pages.dev/)
+- **Backend Production**:
+  - Auth Service: [https://auth.arcticaria.workers.dev](https://auth.arcticaria.workers.dev)
+  - Todo Service: [https://todo.arcticaria.workers.dev](https://todo.arcticaria.workers.dev)
+  - Blog Service: [https://blog.arcticaria.workers.dev](https://blog.arcticaria.workers.dev)
 
 ### Project Structure and Execution
 
@@ -93,25 +94,25 @@ The project is currently divided into two main directories: `client` (frontend) 
 
 The frontend project has a CI/CD pipeline configured:
 
-*   **Local Development**: Running `npm run dev` in the `client` directory will automatically connect to the local backend Worker  started by `wrangler dev` and local D1 database (may need to execute init sql_files to create tables in it).
-*   **Preview Deployment**: Merging code into the `main` branch will automatically deploy to the Cloudflare Pages preview environment.
-*   **Production Deployment**: Merging code into the `release` branch will automatically deploy to the Cloudflare Pages production environment.
+- **Local Development**: Running `npm run dev` in the `client` directory will automatically connect to the local backend Worker started by `wrangler dev` and local D1 database (may need to execute init sql_files to create tables in it).
+- **Preview Deployment**: Merging code into the `main` branch will automatically deploy to the Cloudflare Pages preview environment.
+- **Production Deployment**: Merging code into the `release` branch will automatically deploy to the Cloudflare Pages production environment.
 
 #### Backend and Database
 
 Currently, the deployment of backend Workers and the D1 database is a manual process:
 
-*   **Local Development**: In the `server` directory, `wrangler dev` starts a local Worker connected to a local version of the D1 database. Database schema changes must be written in SQL files and applied to the local database using the command `wrangler d1 execute arctic_aria_db --file='path_to_sql_file'`.
-*   **Production Deployment**:
-    *   Workers need to be deployed using the `wrangler deploy` command.
-    *   For each change to the D1 database, you can either manually copy and execute SQL statements in the Cloudflare dashboard or use the command `wrangler d1 execute arctic_aria_db --remote --file='path_to_sql_file'` for remote deployment.
+- **Local Development**: In the `server` directory, `wrangler dev` starts a local Worker connected to a local version of the D1 database. Database schema changes must be written in SQL files and applied to the local database using the command `wrangler d1 execute arctic_aria_db --file='path_to_sql_file'`.
+- **Production Deployment**:
+  - Workers need to be deployed using the `wrangler deploy` command.
+  - For each change to the D1 database, you can either manually copy and execute SQL statements in the Cloudflare dashboard or use the command `wrangler d1 execute arctic_aria_db --remote --file='path_to_sql_file'` for remote deployment.
 
 ## How to Contribute?
 
 Whether you are a developer or a regular user, there are many ways to contribute to ArcticAria.
 
--   **For Users**: You can help us test the app by using it in your daily life, or by testing the preview version (which corresponds to the `main` branch). The most direct way to contribute is by leaving your valuable suggestions in the **Discuss** section of ArcticAria. It supports Markdown, allowing you to describe your ideas clearly. You can also find my contact information in the website's footer.
--   **For Developers**: We welcome you to contribute code. We follow the standard GitHub Fork & Pull Request workflow. As this is my first time organizing an open-source collaboration, I welcome any suggestions for improving the process.
+- **For Users**: You can help us test the app by using it in your daily life, or by testing the preview version (which corresponds to the `main` branch). The most direct way to contribute is by leaving your valuable suggestions in the **Discuss** section of ArcticAria. It supports Markdown, allowing you to describe your ideas clearly. You can also find my contact information in the website's footer.
+- **For Developers**: We welcome you to contribute code. We follow the standard GitHub Fork & Pull Request workflow. As this is my first time organizing an open-source collaboration, I welcome any suggestions for improving the process.
 
 **Code Contribution Workflow:**
 
@@ -124,8 +125,8 @@ Whether you are a developer or a regular user, there are many ways to contribute
 
 **A Few Notes:**
 
--   As we currently have a limited number of core developers, code reviews and testing may take some time. Therefore, we kindly ask that you thoroughly self-test the features affected by your changes before submitting a PR, ensuring that the main "happy paths" work correctly.
--   To speed up the review and merge process, it's recommended to keep each PR focused on a single, small change. This not only reduces the risk of merge conflicts but also minimizes the scope of testing required. For large features, consider breaking them down into multiple smaller PRs.
+- As we currently have a limited number of core developers, code reviews and testing may take some time. Therefore, we kindly ask that you thoroughly self-test the features affected by your changes before submitting a PR, ensuring that the main "happy paths" work correctly.
+- To speed up the review and merge process, it's recommended to keep each PR focused on a single, small change. This not only reduces the risk of merge conflicts but also minimizes the scope of testing required. For large features, consider breaking them down into multiple smaller PRs.
 
 ### Collaboration Welcome
 
