@@ -9,9 +9,9 @@ import {
   Stack,
   IconButton,
 } from "@mui/material";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGithub, faWeixin } from '@fortawesome/free-brands-svg-icons';
-import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGithub, faWeixin } from "@fortawesome/free-brands-svg-icons";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import TodoPage from "./pages/TodoPage";
@@ -37,8 +37,8 @@ function AppLayout() {
   }, [i18n]);
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+    const script = document.createElement("script");
+    script.src = "//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
     script.async = true;
     document.body.appendChild(script);
 
@@ -50,7 +50,9 @@ function AppLayout() {
   const emailAddress = "purinliang@gmail.com";
   const wechatId = "purinliang";
 
-  const [emailTooltipText, setEmailTooltipText] = useState(t("footer.copyEmail"));
+  const [emailTooltipText, setEmailTooltipText] = useState(
+    t("footer.copyEmail"),
+  );
   const [wechatTooltipText, setWechatTooltipText] = useState(
     t("footer.copyWeChat"),
   );
@@ -121,7 +123,8 @@ function AppLayout() {
           </Typography>
 
           <Typography variant="body2" color="text.secondary">
-            {t("footer.siteViews")} <span id="busuanzi_value_site_pv"></span> {t("footer.times")}
+            {t("footer.siteViews")} <span id="busuanzi_value_site_pv"></span>{" "}
+            {t("footer.times")}
           </Typography>
 
           <Stack
@@ -146,7 +149,10 @@ function AppLayout() {
               title={emailTooltipText}
               onClose={() => setEmailTooltipText(t("footer.copyEmail"))}
             >
-              <IconButton onClick={handleEmailClick} sx={{ color: "text.secondary", width: 32, height: 32 }}>
+              <IconButton
+                onClick={handleEmailClick}
+                sx={{ color: "text.secondary", width: 32, height: 32 }}
+              >
                 <FontAwesomeIcon icon={faEnvelope} />
               </IconButton>
             </Tooltip>
@@ -154,7 +160,10 @@ function AppLayout() {
               title={wechatTooltipText}
               onClose={() => setWechatTooltipText(t("footer.copyWeChat"))}
             >
-              <IconButton onClick={handleWeChatClick} sx={{ color: "text.secondary", width: 32, height: 32 }}>
+              <IconButton
+                onClick={handleWeChatClick}
+                sx={{ color: "text.secondary", width: 32, height: 32 }}
+              >
                 <FontAwesomeIcon icon={faWeixin} />
               </IconButton>
             </Tooltip>

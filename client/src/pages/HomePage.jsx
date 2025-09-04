@@ -1,11 +1,4 @@
-import {
-  Box,
-  Typography,
-  Button,
-  Container,
-  Paper,
-  Grid,
-} from "@mui/material";
+import { Box, Typography, Button, Container, Paper, Grid } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -59,7 +52,11 @@ const HomePage = () => {
         <Typography variant="h5" color="text.secondary" sx={{ mt: 2 }}>
           {t("page.home.subtitle")}
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: "700px", mx: "auto" }}>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ mt: 2, maxWidth: "700px", mx: "auto" }}
+        >
           {t("page.home.summary")}
         </Typography>
       </Box>
@@ -79,10 +76,18 @@ const HomePage = () => {
           }}
         >
           {solveItems.map((item, index) => (
-            <Paper key={index} elevation={2} sx={{ flex: 1, textAlign: "center", p: 3 }}>
+            <Paper
+              key={index}
+              elevation={2}
+              sx={{ flex: 1, textAlign: "center", p: 3 }}
+            >
               {item.icon}
-              <Typography variant="h6" component="div" sx={{ mt: 2 }}>{item.title}</Typography>
-              <Typography sx={{ mt: 1.5 }} color="text.secondary">{item.desc}</Typography>
+              <Typography variant="h6" component="div" sx={{ mt: 2 }}>
+                {item.title}
+              </Typography>
+              <Typography sx={{ mt: 1.5 }} color="text.secondary">
+                {item.desc}
+              </Typography>
             </Paper>
           ))}
         </Box>
@@ -103,14 +108,36 @@ const HomePage = () => {
           }}
         >
           <Paper elevation={3} sx={{ p: 3, flex: 1 }}>
-            <Typography variant="h5">{t("page.home.features.todos.title")}</Typography>
-            <Typography sx={{ mt: 1 }} color="text.secondary">{t("page.home.features.todos.desc")}</Typography>
-            <Button component={RouterLink} to="/todos" variant="outlined" sx={{ mt: 2 }}>{t("page.home.features.todos.cta")}</Button>
+            <Typography variant="h5">
+              {t("page.home.features.todos.title")}
+            </Typography>
+            <Typography sx={{ mt: 1 }} color="text.secondary">
+              {t("page.home.features.todos.desc")}
+            </Typography>
+            <Button
+              component={RouterLink}
+              to="/todos"
+              variant="outlined"
+              sx={{ mt: 2 }}
+            >
+              {t("page.home.features.todos.cta")}
+            </Button>
           </Paper>
           <Paper elevation={3} sx={{ p: 3, flex: 1 }}>
-            <Typography variant="h5">{t("page.home.features.discuss.title")}</Typography>
-            <Typography sx={{ mt: 1 }} color="text.secondary">{t("page.home.features.discuss.desc")}</Typography>
-            <Button component={RouterLink} to="/blog" variant="outlined" sx={{ mt: 2 }}>{t("page.home.features.discuss.cta")}</Button>
+            <Typography variant="h5">
+              {t("page.home.features.discuss.title")}
+            </Typography>
+            <Typography sx={{ mt: 1 }} color="text.secondary">
+              {t("page.home.features.discuss.desc")}
+            </Typography>
+            <Button
+              component={RouterLink}
+              to="/blog"
+              variant="outlined"
+              sx={{ mt: 2 }}
+            >
+              {t("page.home.features.discuss.cta")}
+            </Button>
           </Paper>
         </Box>
       </Box>
@@ -132,7 +159,9 @@ const HomePage = () => {
           {visionItems.map((item, index) => (
             <Paper key={index} elevation={2} sx={{ p: 3, flex: 1 }}>
               <Typography variant="h6">{item.title}</Typography>
-              <Typography sx={{ mt: 1 }} color="text.secondary">{item.desc}</Typography>
+              <Typography sx={{ mt: 1 }} color="text.secondary">
+                {item.desc}
+              </Typography>
             </Paper>
           ))}
         </Box>
@@ -143,7 +172,11 @@ const HomePage = () => {
         <Typography variant="h4" component="h2" gutterBottom>
           {t("page.home.join.title")}
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: "700px", mx: "auto" }}>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ mt: 2, maxWidth: "700px", mx: "auto" }}
+        >
           {t("page.home.join.summary")}
         </Typography>
         <Box
@@ -156,12 +189,28 @@ const HomePage = () => {
           }}
         >
           <Paper sx={{ p: 3, textAlign: "left", flex: 1 }}>
-            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}><CodeIcon sx={{ mr: 1 }} />{t("page.home.join.core_dev_title")}</Typography>
-            <Typography sx={{ mt: 1 }}>{t("page.home.join.core_dev_desc")}</Typography>
+            <Typography
+              variant="h6"
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              <CodeIcon sx={{ mr: 1 }} />
+              {t("page.home.join.core_dev_title")}
+            </Typography>
+            <Typography sx={{ mt: 1 }}>
+              {t("page.home.join.core_dev_desc")}
+            </Typography>
           </Paper>
           <Paper sx={{ p: 3, textAlign: "left", flex: 1 }}>
-            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}><CodeIcon sx={{ mr: 1 }} />{t("page.home.join.entry_dev_title")}</Typography>
-            <Typography sx={{ mt: 1 }}>{t("page.home.join.entry_dev_desc")}</Typography>
+            <Typography
+              variant="h6"
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              <CodeIcon sx={{ mr: 1 }} />
+              {t("page.home.join.entry_dev_title")}
+            </Typography>
+            <Typography sx={{ mt: 1 }}>
+              {t("page.home.join.entry_dev_desc")}
+            </Typography>
           </Paper>
         </Box>
         <Button
